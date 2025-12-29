@@ -1,10 +1,401 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoDrop</title>
+    <link rel="stylesheet" href="menu.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
+<!-- Header -->
+<header class="header">
+    <div class="header-content">
+        <h1 class="header-title"><img src="img/Sh__2_-removebg-preview.png" alt="GoDrop" style="width: 190px; margin: 0px 0px 0px 0px;"></h1>
+        <div class="header-actions">
+            <!-- Botões quando não está logado -->
+            <div class="auth-buttons" id="authButtons">
+                <button class="btn btn-outline" id="btnLogin">Login</button>
+                <button class="btn btn-primary" id="btnRegister">Cadastre-se</button>
+            </div>
+            <!-- Menu do usuário quando está logado -->
+            <div class="user-menu hidden" id="userMenu">
+                <button class="user-avatar" id="userAvatar">
+                    <i class="ri-user-line"></i>
+                </button>
+                <div class="dropdown-menu hidden" id="dropdownMenu">
+                    <div class="dropdown-header">
+                        <span id="userName">Usuário</span>
+                    </div>
+                    <a href="#" class="dropdown-item">
+                        <i class="ri-user-line"></i>
+                        Meu Perfil
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="ri-settings-3-line"></i>
+                        Configurações
+                    </a>
+                    <hr class="dropdown-divider">
+                    <a href="#" class="dropdown-item" id="btnLogout">
+                        <i class="ri-logout-box-line"></i>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
 
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <i class="ri-store-2-line"></i>
+            <span class="sidebar-title">Menu</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="ri-arrow-left-s-line"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="home">
+            <i class="ri-home-4-line"></i>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="#" class="nav-item" data-page="dashboard">
+            <i class="ri-dashboard-line"></i>
+            <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="produtos">
+            <i class="ri-shopping-bag-line"></i>
+            <span class="nav-text">Produtos</span>
+        </a>
+        <a href="#" class="nav-item" data-page="etiquetas">
+            <i class="ri-price-tag-3-line"></i>
+            <span class="nav-text">Etiquetas</span>
+        </a>
+        <a href="#" class="nav-item" data-page="pedidos">
+            <i class="ri-file-list-3-line"></i>
+            <span class="nav-text">Pedidos</span>
+        </a>
+        <a href="#" class="nav-item" data-page="chat">
+            <i class="ri-message-3-line"></i>
+            <span class="nav-text">Chat</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button class="theme-toggle" id="themeToggle">
+            <i class="ri-sun-line"></i>
+            <span class="nav-text">Tema</span>
+        </button>
+    </div>
+</aside>
+
+<!-- Mobile Menu Button -->
+<button class="mobile-menu-btn" id="mobileMenuBtn">
+    <i class="ri-menu-line"></i>
+</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Main Content -->
+<main class="main-content" id="mainContent">
+    <!-- Página Home com produto de exemplo -->
+    <div id="homePage" class="page-content active">
+        <h2>Produtos Disponíveis</h2>
+        <p>Confira nossos produtos e faça sua compra</p>
+
+        <div class="products-grid">
+            <!-- Produto de exemplo - lista virá do banco -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="/placeholder.svg?height=300&width=300" alt="Produto Exemplo">
+                </div>
+                <div class="product-info">
+                    <h3>Produto Exemplo</h3>
+                    <p class="product-description">Descrição do produto que será carregada do banco de dados</p>
+                    <div class="product-footer">
+                        <span class="product-price">R$ 99,90</span>
+                        <button class="btn btn-primary" onclick="openPurchaseModal()">
+                            <i class="ri-shopping-cart-line"></i>
+                            Comprar Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard mantém estrutura -->
+    <div id="dashboardPage" class="page-content">
+        <h2>Dashboard</h2>
+        <p>Visão geral do seu negócio</p>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="ri-shopping-bag-line"></i>
+                </div>
+                <h3>Total de Produtos</h3>
+                <p class="card-value">0</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="ri-file-list-3-line"></i>
+                </div>
+                <h3>Pedidos Hoje</h3>
+                <p class="card-value">0</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="ri-money-dollar-circle-line"></i>
+                </div>
+                <h3>Faturamento</h3>
+                <p class="card-value">R$ 0,00</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="ri-user-line"></i>
+                </div>
+                <h3>Clientes</h3>
+                <p class="card-value">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Produtos com modal de cadastro -->
+    <div id="produtosPage" class="page-content">
+        <h2>Produtos</h2>
+        <p>Gerencie seus produtos</p>
+        <div class="content-header">
+            <button class="btn btn-primary" onclick="openProductModal()">
+                <i class="ri-add-line"></i>
+                Novo Produto
+            </button>
+        </div>
+        <div class="card">
+            <div id="productsList" class="empty-state">
+                <i class="ri-shopping-bag-line"></i>
+                <p>Nenhum produto cadastrado ainda</p>
+                <small>Os produtos serão carregados do banco de dados</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Etiquetas vazia para listar do banco -->
+    <div id="etiquetasPage" class="page-content">
+        <h2>Etiquetas</h2>
+        <p>Etiquetas enviadas pelos clientes nas compras</p>
+
+        <div class="card">
+            <div id="labelsList" class="empty-state">
+                <i class="ri-price-tag-3-line"></i>
+                <p>Nenhuma etiqueta recebida ainda</p>
+                <small>As etiquetas enviadas nas compras aparecerão aqui</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pedidos vazio para listar do banco -->
+    <div id="pedidosPage" class="page-content">
+        <h2>Pedidos</h2>
+        <p>Acompanhe todos os pedidos realizados</p>
+
+        <div class="card">
+            <div id="ordersList" class="empty-state">
+                <i class="ri-file-list-3-line"></i>
+                <p>Nenhum pedido realizado ainda</p>
+                <small>Os pedidos serão carregados do banco de dados</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat vazio até ter compra -->
+    <div id="chatPage" class="page-content">
+        <h2>Chat</h2>
+        <p>Suporte e dúvidas sobre compras</p>
+
+        <div class="card">
+            <div class="empty-state">
+                <i class="ri-message-3-line"></i>
+                <p>Nenhuma conversa ativa</p>
+                <small>O chat será aberto automaticamente após uma compra</small>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal de Login -->
+<div class="modal hidden" id="loginModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Login</h2>
+            <button class="modal-close" data-modal="loginModal">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <form class="modal-body" id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Senha</label>
+                <input type="password" id="loginPassword" placeholder="********" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        </form>
+        <div class="modal-footer">
+            <p>Não tem conta? <a href="#" id="switchToRegister">Cadastre-se</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cadastro -->
+<div class="modal hidden" id="registerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Cadastre-se</h2>
+            <button class="modal-close" data-modal="registerModal">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <form class="modal-body" id="registerForm">
+            <div class="form-group">
+                <label for="registerName">Nome</label>
+                <input type="text" id="registerName" placeholder="Seu nome" required>
+            </div>
+            <div class="form-group">
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Senha</label>
+                <input type="password" id="registerPassword" placeholder="********" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+        </form>
+        <div class="modal-footer">
+            <p>Já tem conta? <a href="#" id="switchToLogin">Faça login</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cadastro de Produto -->
+<div class="modal hidden" id="productModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2>Novo Produto</h2>
+            <button class="modal-close" data-modal="productModal">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <form class="modal-body" id="productForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="productName">Nome do Produto *</label>
+                    <input type="text" id="productName" placeholder="Digite o nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Preço *</label>
+                    <input type="number" id="productPrice" step="0.01" placeholder="0.00" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="productDescription">Descrição</label>
+                <textarea id="productDescription" rows="3" placeholder="Descreva o produto"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="productImage">Imagem</label>
+                <input type="file" id="productImage" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Cadastrar Produto</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Compra -->
+<div class="modal hidden" id="purchaseModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2>Finalizar Compra</h2>
+            <button class="modal-close" data-modal="purchaseModal">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <form class="modal-body" id="purchaseForm">
+            <h3>Informações do Comprador</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buyerName">Nome Completo *</label>
+                    <input type="text" id="buyerName" placeholder="Digite seu nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="buyerEmail">Email *</label>
+                    <input type="email" id="buyerEmail" placeholder="seu@email.com" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buyerPhone">Telefone *</label>
+                    <input type="tel" id="buyerPhone" placeholder="(00) 00000-0000" required>
+                </div>
+                <div class="form-group">
+                    <label for="buyerCPF">CPF *</label>
+                    <input type="text" id="buyerCPF" placeholder="000.000.000-00" required>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 24px;">Endereço de Entrega</h3>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label for="buyerCEP">CEP *</label>
+                    <input type="text" id="buyerCEP" placeholder="00000-000" required>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label for="buyerStreet">Rua *</label>
+                    <input type="text" id="buyerStreet" placeholder="Nome da rua" required>
+                </div>
+                <div class="form-group">
+                    <label for="buyerNumber">Número *</label>
+                    <input type="text" id="buyerNumber" placeholder="123" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buyerComplement">Complemento</label>
+                    <input type="text" id="buyerComplement" placeholder="Apt, Bloco, etc">
+                </div>
+                <div class="form-group">
+                    <label for="buyerNeighborhood">Bairro *</label>
+                    <input type="text" id="buyerNeighborhood" placeholder="Nome do bairro" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buyerCity">Cidade *</label>
+                    <input type="text" id="buyerCity" placeholder="Nome da cidade" required>
+                </div>
+                <div class="form-group">
+                    <label for="buyerState">Estado *</label>
+                    <input type="text" id="buyerState" placeholder="UF" maxlength="2" required>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 24px;">Etiqueta de Envio</h3>
+            <div class="form-group">
+                <label for="shippingLabel">Anexar Etiqueta (PDF) *</label>
+                <input type="file" id="shippingLabel" accept=".pdf" required>
+                <small>Anexe a etiqueta de envio em formato PDF</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Confirmar Compra</button>
+        </form>
+    </div>
+</div>
+
+<script src="menu.js"></script>
 </body>
 </html>
