@@ -18,10 +18,10 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Long email;
+    private String email;
 
     @Column(nullable = false)
-    private Long password;
+    private String password;
 
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
