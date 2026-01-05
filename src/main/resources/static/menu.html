@@ -18,8 +18,34 @@
                 <button class="btn btn-outline" id="btnLogin">Login</button>
                 <button class="btn btn-primary" id="btnRegister">Cadastre-se</button>
             </div>
+            <!-- Added notifications, cart icons and user menu for logged users -->
             <!-- Menu do usuário quando está logado -->
             <div class="user-menu hidden" id="userMenu">
+                <!-- Notifications Icon -->
+                <button class="icon-button" id="notificationsBtn">
+                    <i class="ri-notification-3-line"></i>
+                    <span class="notification-badge hidden" id="notificationBadge">0</span>
+                </button>
+                <!-- Notifications Dropdown -->
+                <div class="dropdown-menu notifications-dropdown hidden" id="notificationsDropdown">
+                    <div class="dropdown-header">
+                        <span>Notificações</span>
+                    </div>
+                    <div id="notificationsList" class="notifications-list">
+                        <div class="empty-state-small">
+                            <i class="ri-notification-3-line"></i>
+                            <p>Nenhuma notificação</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Icon -->
+                <button class="icon-button" id="cartBtn">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge hidden" id="cartBadge">0</span>
+                </button>
+
+                <!-- User Avatar -->
                 <button class="user-avatar" id="userAvatar">
                     <i class="ri-user-line"></i>
                 </button>
@@ -30,6 +56,10 @@
                     <a href="#" class="dropdown-item">
                         <i class="ri-user-line"></i>
                         Meu Perfil
+                    </a>
+                    <a href="#" class="dropdown-item" id="navMyHistory">
+                        <i class="ri-history-line"></i>
+                        Meu Histórico
                     </a>
                     <a href="#" class="dropdown-item">
                         <i class="ri-settings-3-line"></i>
@@ -109,6 +139,7 @@
         <p>Confira nossos produtos e faça sua compra</p>
 
         <div class="products-grid">
+            <!-- Updated product card with cart and buy buttons -->
             <!-- Produto de exemplo - lista virá do banco -->
             <div class="product-card">
                 <div class="product-image">
@@ -119,10 +150,14 @@
                     <p class="product-description">Descrição do produto que será carregada do banco de dados</p>
                     <div class="product-footer">
                         <span class="product-price">R$ 99,90</span>
-                        <button class="btn btn-primary" onclick="openPurchaseModal()">
-                            <i class="ri-shopping-cart-line"></i>
-                            Comprar Agora
-                        </button>
+                        <div class="product-actions">
+                            <button class="btn btn-outline btn-sm" onclick="addToCart(1)">
+                                <i class="ri-shopping-cart-line"></i>
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="buyNow(1)">
+                                Comprar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -212,6 +247,58 @@
         </div>
     </div>
 
+    <!-- Added cart page for logged users -->
+    <!-- Carrinho -->
+    <div id="carrinhoPage" class="page-content">
+        <h2>Meu Carrinho</h2>
+        <p>Revise seus itens antes de finalizar a compra</p>
+
+        <div class="cart-container">
+            <div class="cart-items" id="cartItemsList">
+                <div class="empty-state">
+                    <i class="ri-shopping-cart-line"></i>
+                    <p>Seu carrinho está vazio</p>
+                    <small>Adicione produtos para continuar</small>
+                </div>
+            </div>
+
+            <div class="cart-summary">
+                <h3>Resumo do Pedido</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal">R$ 0,00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Frete</span>
+                    <span id="cartShipping">A calcular</span>
+                </div>
+                <hr>
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span id="cartTotal">R$ 0,00</span>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="finalizePurchase()" id="btnFinalizePurchase" disabled>
+                    Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added order history page -->
+    <!-- Histórico de Pedidos -->
+    <div id="historicoPage" class="page-content">
+        <h2>Meu Histórico</h2>
+        <p>Acompanhe seus pedidos e veja o status de cada um</p>
+
+        <div class="card">
+            <div id="orderHistoryList" class="empty-state">
+                <i class="ri-history-line"></i>
+                <p>Nenhum pedido realizado ainda</p>
+                <small>Seus pedidos aparecerão aqui</small>
+            </div>
+        </div>
+    </div>
+
     <!-- Chat vazio até ter compra -->
     <div id="chatPage" class="page-content">
         <h2>Chat</h2>
@@ -229,8 +316,12 @@
 
 <!-- Modal de Login -->
 <div class="modal hidden" id="loginModal">
-    <div class="modal-content">
-        <div class="modal-header">
+    <div class="modal-content modal-auth">
+        <!-- Added logo and centered title layout -->
+        <div class="modal-auth-header">
+            <div class="modal-auth-logo">
+                <img src="img/Sh__3_-removebg-preview.png" alt="logo" style="width: 150px;">
+            </div>
             <h2>Login</h2>
             <button class="modal-close" data-modal="loginModal">
                 <i class="ri-close-line"></i>
@@ -255,9 +346,13 @@
 
 <!-- Modal de Cadastro -->
 <div class="modal hidden" id="registerModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Cadastre-se</h2>
+    <div class="modal-content modal-auth">
+        <!-- Added logo and centered title layout -->
+        <div class="modal-auth-header">
+            <div class="modal-auth-logo">
+                <img src="img/Sh__3_-removebg-preview.png" alt="logo" style="width: 150px;">
+            </div>
+            <h2>Cadastro</h2>
             <button class="modal-close" data-modal="registerModal">
                 <i class="ri-close-line"></i>
             </button>
@@ -283,12 +378,13 @@
     </div>
 </div>
 
+<!-- Fixed product modal by ensuring proper close function -->
 <!-- Modal de Cadastro de Produto -->
 <div class="modal hidden" id="productModal">
     <div class="modal-content modal-large">
         <div class="modal-header">
             <h2>Novo Produto</h2>
-            <button class="modal-close" data-modal="productModal">
+            <button class="modal-close" onclick="closeModal('productModal')">
                 <i class="ri-close-line"></i>
             </button>
         </div>
@@ -321,7 +417,7 @@
     <div class="modal-content modal-large">
         <div class="modal-header">
             <h2>Finalizar Compra</h2>
-            <button class="modal-close" data-modal="purchaseModal">
+            <button class="modal-close" onclick="closeModal('purchaseModal')">
                 <i class="ri-close-line"></i>
             </button>
         </div>
@@ -393,6 +489,70 @@
 
             <button type="submit" class="btn btn-primary btn-block">Confirmar Compra</button>
         </form>
+    </div>
+</div>
+
+<!-- Added order details modal with status tracking -->
+<!-- Modal de Detalhes do Pedido -->
+<div class="modal hidden" id="orderDetailsModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2>Detalhes do Pedido</h2>
+            <button class="modal-close" onclick="closeModal('orderDetailsModal')">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="order-tracking">
+                <h3>Acompanhamento do Pedido</h3>
+                <div class="tracking-steps">
+                    <div class="tracking-step completed">
+                        <div class="step-icon">
+                            <i class="ri-checkbox-circle-fill"></i>
+                        </div>
+                        <div class="step-info">
+                            <h4>Pedido Confirmado</h4>
+                            <p>Seu pedido foi confirmado</p>
+                        </div>
+                    </div>
+                    <div class="tracking-step completed">
+                        <div class="step-icon">
+                            <i class="ri-money-dollar-circle-fill"></i>
+                        </div>
+                        <div class="step-info">
+                            <h4>Pagamento Aprovado</h4>
+                            <p>Pagamento processado com sucesso</p>
+                        </div>
+                    </div>
+                    <div class="tracking-step active">
+                        <div class="step-icon">
+                            <i class="ri-truck-fill"></i>
+                        </div>
+                        <div class="step-info">
+                            <h4>Em Transporte</h4>
+                            <p>Seu pedido está a caminho</p>
+                        </div>
+                    </div>
+                    <div class="tracking-step">
+                        <div class="step-icon">
+                            <i class="ri-home-smile-fill"></i>
+                        </div>
+                        <div class="step-info">
+                            <h4>Entregue</h4>
+                            <p>Pedido será entregue em breve</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-details-info">
+                <h3>Informações do Pedido</h3>
+                <div id="orderDetailsContent">
+                    <!-- Dados do pedido serão carregados do banco -->
+                    <p>Carregando informações...</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

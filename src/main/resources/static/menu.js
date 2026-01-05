@@ -1,6 +1,8 @@
 // Estado da aplicação
 let isLoggedIn = false
 let currentUser = null
+let cartItems = [] // Added cart state
+const notifications = [] // Added notifications state
 
 // Elementos
 const sidebar = document.getElementById("sidebar")
@@ -19,6 +21,13 @@ const btnLogin = document.getElementById("btnLogin")
 const btnRegister = document.getElementById("btnRegister")
 const btnLogout = document.getElementById("btnLogout")
 const userName = document.getElementById("userName")
+
+const cartBtn = document.getElementById("cartBtn")
+const cartBadge = document.getElementById("cartBadge")
+const notificationsBtn = document.getElementById("notificationsBtn")
+const notificationBadge = document.getElementById("notificationBadge")
+const notificationsDropdown = document.getElementById("notificationsDropdown")
+const navHistorico = document.getElementById("navHistorico")
 
 // Modals
 const loginModal = document.getElementById("loginModal")
@@ -42,6 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initNavigation()
   initSidebar()
   initModals()
+  initCart() // Initialize cart
+  initNotifications() // Initialize notifications
   addTooltips()
 })
 
@@ -90,6 +101,7 @@ function initAuth() {
   document.addEventListener("click", (e) => {
     if (!userMenu.contains(e.target)) {
       dropdownMenu.classList.add("hidden")
+      notificationsDropdown.classList.add("hidden")
     }
   })
 }
@@ -98,24 +110,263 @@ function showUserMenu() {
   authButtons.classList.add("hidden")
   userMenu.classList.remove("hidden")
   userName.textContent = currentUser.name
+  navHistorico.classList.remove("hidden") // Show history link when logged in
+  updateCartBadge() // Update cart count
+  updateNotificationBadge() // Update notification count
 }
 
 function showAuthButtons() {
   userMenu.classList.add("hidden")
   authButtons.classList.remove("hidden")
+  navHistorico.classList.add("hidden") // Hide history link when logged out
 }
 
 function toggleDropdown(e) {
   e.stopPropagation()
   dropdownMenu.classList.toggle("hidden")
+  notificationsDropdown.classList.add("hidden") // Close notifications when opening user menu
 }
 
 function logout() {
   isLoggedIn = false
   currentUser = null
+  cartItems = [] // Clear cart on logout
   localStorage.removeItem("currentUser")
+  localStorage.removeItem("cartItems")
   showAuthButtons()
   dropdownMenu.classList.add("hidden")
+  updateCartBadge()
+}
+
+function initCart() {
+  // Load cart from localStorage
+  const savedCart = localStorage.getItem("cartItems")
+  if (savedCart) {
+    cartItems = JSON.parse(savedCart)
+    updateCartBadge()
+  }
+
+  // Cart button click
+  cartBtn.addEventListener("click", (e) => {
+    e.stopPropagation()
+    showPage("carrinho")
+    navItems.forEach((nav) => nav.classList.remove("active"))
+    renderCart()
+  })
+}
+
+function addToCart(productId) {
+  if (!isLoggedIn) {
+    alert("Faça login para adicionar produtos ao carrinho")
+    openModal("loginModal")
+    return
+  }
+
+  // TODO: Get product data from database
+  const product = {
+    id: productId,
+    name: "Produto Exemplo",
+    price: 99.9,
+    quantity: 1,
+    image: "/placeholder.svg?height=100&width=100",
+  }
+
+  // Check if product already in cart
+  const existingItem = cartItems.find((item) => item.id === productId)
+  if (existingItem) {
+    existingItem.quantity++
+  } else {
+    cartItems.push(product)
+  }
+
+  localStorage.setItem("cartItems", JSON.stringify(cartItems))
+  updateCartBadge()
+
+  // Show feedback
+  showNotification("Produto adicionado ao carrinho!")
+}
+
+function buyNow(productId) {
+  if (!isLoggedIn) {
+    alert("Faça login para realizar a compra")
+    openModal("loginModal")
+    return
+  }
+
+  // Add to cart and go to purchase
+  addToCart(productId)
+  showPage("carrinho")
+  navItems.forEach((nav) => nav.classList.remove("active"))
+  renderCart()
+}
+
+function removeFromCart(productId) {
+  cartItems = cartItems.filter((item) => item.id !== productId)
+  localStorage.setItem("cartItems", JSON.stringify(cartItems))
+  updateCartBadge()
+  renderCart()
+}
+
+function updateCartQuantity(productId, change) {
+  const item = cartItems.find((item) => item.id === productId)
+  if (item) {
+    item.quantity += change
+    if (item.quantity <= 0) {
+      removeFromCart(productId)
+    } else {
+      localStorage.setItem("cartItems", JSON.stringify(cartItems))
+      renderCart()
+    }
+  }
+}
+
+function updateCartBadge() {
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  if (totalItems > 0) {
+    cartBadge.textContent = totalItems
+    cartBadge.classList.remove("hidden")
+  } else {
+    cartBadge.classList.add("hidden")
+  }
+}
+
+function renderCart() {
+  const cartItemsList = document.getElementById("cartItemsList")
+  const btnFinalizePurchase = document.getElementById("btnFinalizePurchase")
+
+  if (cartItems.length === 0) {
+    cartItemsList.innerHTML = `
+      <div class="empty-state">
+        <i class="ri-shopping-cart-line"></i>
+        <p>Seu carrinho está vazio</p>
+        <small>Adicione produtos para continuar</small>
+      </div>
+    `
+    btnFinalizePurchase.disabled = true
+    updateCartSummary(0)
+    return
+  }
+
+  btnFinalizePurchase.disabled = false
+
+  let html = ""
+  cartItems.forEach((item) => {
+    const itemTotal = item.price * item.quantity
+    html += `
+      <div class="cart-item">
+        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+        <div class="cart-item-info">
+          <h4>${item.name}</h4>
+          <p class="cart-item-price">R$ ${item.price.toFixed(2)}</p>
+        </div>
+        <div class="cart-item-controls">
+          <button class="btn-icon" onclick="updateCartQuantity(${item.id}, -1)">
+            <i class="ri-subtract-line"></i>
+          </button>
+          <span class="cart-item-quantity">${item.quantity}</span>
+          <button class="btn-icon" onclick="updateCartQuantity(${item.id}, 1)">
+            <i class="ri-add-line"></i>
+          </button>
+        </div>
+        <div class="cart-item-total">
+          <p>R$ ${itemTotal.toFixed(2)}</p>
+          <button class="btn-icon" onclick="removeFromCart(${item.id})">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
+      </div>
+    `
+  })
+
+  cartItemsList.innerHTML = html
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  updateCartSummary(subtotal)
+}
+
+function updateCartSummary(subtotal) {
+  document.getElementById("cartSubtotal").textContent = `R$ ${subtotal.toFixed(2)}`
+  document.getElementById("cartTotal").textContent = `R$ ${subtotal.toFixed(2)}`
+}
+
+function finalizePurchase() {
+  if (cartItems.length === 0) {
+    alert("Seu carrinho está vazio")
+    return
+  }
+  openModal("purchaseModal")
+}
+
+function initNotifications() {
+  // Load notifications from localStorage or database
+  // TODO: Fetch from database
+
+  notificationsBtn.addEventListener("click", (e) => {
+    e.stopPropagation()
+    notificationsDropdown.classList.toggle("hidden")
+    dropdownMenu.classList.add("hidden")
+    renderNotifications()
+  })
+}
+
+function updateNotificationBadge() {
+  // TODO: Get unread count from database
+  const unreadCount = notifications.filter((n) => !n.read).length
+  if (unreadCount > 0) {
+    notificationBadge.textContent = unreadCount
+    notificationBadge.classList.remove("hidden")
+  } else {
+    notificationBadge.classList.add("hidden")
+  }
+}
+
+function renderNotifications() {
+  const notificationsList = document.getElementById("notificationsList")
+
+  // TODO: Fetch from database
+  if (notifications.length === 0) {
+    notificationsList.innerHTML = `
+      <div class="empty-state-small">
+        <i class="ri-notification-3-line"></i>
+        <p>Nenhuma notificação</p>
+      </div>
+    `
+    return
+  }
+
+  // Render notifications
+  let html = ""
+  notifications.forEach((notif) => {
+    html += `
+      <div class="notification-item ${notif.read ? "read" : "unread"}">
+        <i class="${notif.icon}"></i>
+        <div>
+          <p>${notif.message}</p>
+          <small>${notif.time}</small>
+        </div>
+      </div>
+    `
+  })
+  notificationsList.innerHTML = html
+}
+
+function showNotification(message) {
+  // Simple toast notification
+  const toast = document.createElement("div")
+  toast.className = "toast-notification"
+  toast.textContent = message
+  document.body.appendChild(toast)
+
+  setTimeout(() => {
+    toast.classList.add("show")
+  }, 100)
+
+  setTimeout(() => {
+    toast.classList.remove("show")
+    setTimeout(() => {
+      document.body.removeChild(toast)
+    }, 300)
+  }, 3000)
 }
 
 // Modals
@@ -139,14 +390,6 @@ function initModals() {
     openModal("loginModal")
   })
 
-  // Fechar modal ao clicar no botão X
-  document.querySelectorAll(".modal-close").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const modalId = btn.getAttribute("data-modal")
-      closeModal(modalId)
-    })
-  })
-
   // Fechar modal ao clicar no overlay
   loginModal.addEventListener("click", (e) => {
     if (e.target === loginModal) closeModal("loginModal")
@@ -157,20 +400,34 @@ function initModals() {
   })
 
   productModal.addEventListener("click", (e) => {
-    if (e.target.id === "productModal") closeModal("productModal")
+    if (e.target === productModal) closeModal("productModal")
   })
 
   purchaseModal.addEventListener("click", (e) => {
-    if (e.target.id === "purchaseModal") closeModal("purchaseModal")
+    if (e.target === purchaseModal) closeModal("purchaseModal")
   })
 }
 
 function openModal(modalId) {
-  document.getElementById(modalId).classList.remove("hidden")
+  const modal = document.getElementById(modalId)
+  if (modal) {
+    modal.classList.remove("hidden")
+  }
 }
 
 function closeModal(modalId) {
-  document.getElementById(modalId).classList.add("hidden")
+  const modal = document.getElementById(modalId)
+  if (modal) {
+    modal.classList.add("hidden")
+  }
+}
+
+function openProductModal() {
+  openModal("productModal")
+}
+
+function openPurchaseModal() {
+  openModal("purchaseModal")
 }
 
 function handleLogin(e) {
@@ -228,7 +485,7 @@ function handleProductSubmit(e) {
 
   // TODO: Salvar no banco de dados
 
-  alert("Produto cadastrado com sucesso!\n(Integração com banco pendente)")
+  showNotification("Produto cadastrado com sucesso!")
   closeModal("productModal")
   productForm.reset()
 }
@@ -253,11 +510,18 @@ function handlePurchaseSubmit(e) {
       state: document.getElementById("buyerState").value,
     },
     label: document.getElementById("shippingLabel").files[0],
+    items: cartItems,
+    total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
   }
 
   console.log("[v0] Compra realizada:", purchaseData)
 
   // TODO: Salvar no banco de dados
+
+  // Clear cart
+  cartItems = []
+  localStorage.removeItem("cartItems")
+  updateCartBadge()
 
   // Fechar modal de compra
   closeModal("purchaseModal")
@@ -271,7 +535,7 @@ function handlePurchaseSubmit(e) {
   const chatNav = document.querySelector('[data-page="chat"]')
   if (chatNav) chatNav.classList.add("active")
 
-  alert("Compra realizada com sucesso!\nO chat foi aberto para suporte.")
+  showNotification("Compra realizada com sucesso! O chat foi aberto para suporte.")
 }
 
 // Sidebar
@@ -334,7 +598,89 @@ function showPage(pageId) {
   const selectedPage = document.getElementById(pageId + "Page")
   if (selectedPage) {
     selectedPage.classList.add("active")
+
+    if (pageId === "carrinho") {
+      renderCart()
+    }
+
+    if (pageId === "historico") {
+      renderOrderHistory()
+    }
   }
+}
+
+function renderOrderHistory() {
+  const orderHistoryList = document.getElementById("orderHistoryList")
+
+  // TODO: Fetch from database
+  const orders = [] // Will be populated from database
+
+  if (orders.length === 0) {
+    orderHistoryList.innerHTML = `
+      <div class="empty-state">
+        <i class="ri-history-line"></i>
+        <p>Nenhum pedido realizado ainda</p>
+        <small>Seus pedidos aparecerão aqui</small>
+      </div>
+    `
+    return
+  }
+
+  // Render orders with tracking
+  let html = '<div class="orders-list">'
+  orders.forEach((order) => {
+    html += `
+      <div class="order-item" onclick="showOrderDetails(${order.id})">
+        <div class="order-info">
+          <h4>Pedido #${order.id}</h4>
+          <p>${order.items.length} item(ns)</p>
+          <p class="order-date">${order.date}</p>
+        </div>
+        <div>
+          <span class="order-status status-${order.status}">${order.statusText}</span>
+          <p class="order-value">R$ ${order.total.toFixed(2)}</p>
+        </div>
+      </div>
+    `
+  })
+  html += "</div>"
+  orderHistoryList.innerHTML = html
+}
+
+function showOrderDetails(orderId) {
+  // TODO: Fetch order details from database
+  console.log("[v0] Showing order details for:", orderId)
+
+  const orderDetailsContent = document.getElementById("orderDetailsContent")
+  orderDetailsContent.innerHTML = `
+    <div class="order-tracking">
+      <h3>Pedido #${orderId}</h3>
+      <div class="tracking-status">
+        <div class="status-step completed">
+          <i class="ri-checkbox-circle-line"></i>
+          <p>Pedido Confirmado</p>
+          <small>01/01/2024</small>
+        </div>
+        <div class="status-step completed">
+          <i class="ri-checkbox-circle-line"></i>
+          <p>Pagamento Aprovado</p>
+          <small>01/01/2024</small>
+        </div>
+        <div class="status-step active">
+          <i class="ri-truck-line"></i>
+          <p>Em Transporte</p>
+          <small>02/01/2024</small>
+        </div>
+        <div class="status-step">
+          <i class="ri-home-line"></i>
+          <p>Entregue</p>
+          <small>Aguardando</small>
+        </div>
+      </div>
+    </div>
+  `
+
+  openModal("orderDetailsModal")
 }
 
 // Tooltips para sidebar colapsada
