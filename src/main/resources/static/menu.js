@@ -730,16 +730,16 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
 });
 
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const dados = {
-        email: document.getElementById('loginEmail').value,
-        senha: document.getElementById('loginPassword').value
+        email: document.getElementById('registerEmail').value,
+        senha: document.getElementById('registerPassword').value
     };
 
     try {
-        const resposta = await fetch('http://localhost:8080/api/auth/login', {
+        const resposta = await fetch('http://localhost:8080/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)

@@ -51,6 +51,11 @@ public class AuthService {
     }
 
     public RegisterResponse cadastrar(RegisterRequest request) throws Exception {
+
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new Exception("Nome é obrigatório");
+        }
+
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
             throw new Exception("E-mail é obrigatório");
         }
@@ -64,6 +69,7 @@ public class AuthService {
         }
 
         User user = new User ();
+        user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword((passwordEncoder.encode(request.getSenha())));
         user.setDataCriacao(LocalDateTime.now());
@@ -71,7 +77,7 @@ public class AuthService {
         User savedUser = loginRepository.save(user);
 
         return new RegisterResponse(
-                "Usuário cadastrado com sucesso!", savedUser.getId(), savedUser.getEmail()
+                "Usuário cadastrado com sucesso!", savedUser.getName(), savedUser.getId(), savedUser.getEmail()
         );
     }
 

@@ -2,6 +2,8 @@ package com.project.shiphub.login.controller;
 
 import com.project.shiphub.login.dto.LoginRequest;
 import com.project.shiphub.login.dto.LoginResponse;
+import com.project.shiphub.login.dto.RegisterRequest;
+import com.project.shiphub.login.dto.RegisterResponse;
 import com.project.shiphub.login.service.AuthService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,19 @@ public class AuthController {
             resp.setMensagem("Error");
             LoginResponse errorResponse = resp;
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+        try {
+            RegisterResponse response = authService.cadastrar(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (Exception e) {
+            RegisterResponse error = new RegisterResponse();
+            error.setMensagem(e.getMessage());
+            return ResponseEntity.badRequest().body(error);
         }
     }
 
