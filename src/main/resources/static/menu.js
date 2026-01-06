@@ -1,49 +1,10 @@
+// ====== Variáveis Globais ======
 let isLoggedIn = false;
 let currentUser = null;
 let cartItems = [];
 const notifications = [];
 
-// Elementos
-const sidebar = document.getElementById("sidebar");
-const sidebarToggle = document.getElementById("sidebarToggle");
-const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-const overlay = document.getElementById("overlay");
-const themeToggle = document.getElementById("themeToggle");
-const mainContent = document.getElementById("mainContent");
-
-// Auth elements
-const authButtons = document.getElementById("authButtons");
-const userMenu = document.getElementById("userMenu");
-const userAvatar = document.getElementById("userAvatar");
-const dropdownMenu = document.getElementById("dropdownMenu");
-const btnLogin = document.getElementById("btnLogin");
-const btnRegister = document.getElementById("btnRegister");
-const btnLogout = document.getElementById("btnLogout");
-const userName = document.getElementById("userName");
-
-const cartBtn = document.getElementById("cartBtn");
-const cartBadge = document.getElementById("cartBadge");
-const notificationsBtn = document.getElementById("notificationsBtn");
-const notificationBadge = document.getElementById("notificationBadge");
-const notificationsDropdown = document.getElementById("notificationsDropdown");
-const navHistorico = document.getElementById("navHistorico");
-
-// Modals
-const loginModal = document.getElementById("loginModal");
-const registerModal = document.getElementById("registerModal");
-const loginForm = document.getElementById("loginForm");
-const registerForm = document.getElementById("registerForm");
-const switchToRegister = document.getElementById("switchToRegister");
-const switchToLogin = document.getElementById("switchToLogin");
-const productModal = document.getElementById("productModal");
-const purchaseModal = document.getElementById("purchaseModal");
-const productForm = document.getElementById("productForm");
-const purchaseForm = document.getElementById("purchaseForm");
-
-// Navegação
-const navItems = document.querySelectorAll(".nav-item");
-
-// Inicialização
+// ====== Inicialização ======
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initAuth();
@@ -55,12 +16,15 @@ document.addEventListener("DOMContentLoaded", () => {
   addTooltips();
 });
 
-// ------------------- TEMA -------------------
+// ====== Tema Dark/Light ======
 function initTheme() {
   const savedTheme = localStorage.getItem("theme") || "light";
   document.documentElement.setAttribute("data-theme", savedTheme);
   updateThemeIcon(savedTheme);
-  themeToggle.addEventListener("click", toggleTheme);
+
+  document.body.addEventListener("click", (e) => {
+    if (e.target.closest("#themeToggle")) toggleTheme();
+  });
 }
 
 function toggleTheme() {
@@ -72,112 +36,92 @@ function toggleTheme() {
 }
 
 function updateThemeIcon(theme) {
+  const themeToggle = document.getElementById("themeToggle");
+  if (!themeToggle) return;
   const icon = themeToggle.querySelector("i");
   icon.className = theme === "light" ? "ri-moon-line" : "ri-sun-line";
 }
 
-// ------------------- AUTENTICAÇÃO -------------------
+// ====== Autenticação ======
 function initAuth() {
+  // Carregar usuário
   const savedUser = localStorage.getItem("currentUser");
   if (savedUser) {
     currentUser = JSON.parse(savedUser);
     isLoggedIn = true;
     showUserMenu();
+  } else {
+    showAuthButtons();
   }
 
-  btnLogin.addEventListener("click", () => openModal("loginModal"));
-  btnRegister.addEventListener("click", () => openModal("registerModal"));
-  btnLogout.addEventListener("click", logout);
-  userAvatar.addEventListener("click", toggleDropdown);
+  // Delegação de clique para login/register/logout/avatar
+  document.body.addEventListener("click", (e) => {
+    if (e.target.closest("#btnLogin")) openModal("loginModal");
+    if (e.target.closest("#btnRegister")) openModal("registerModal");
+    if (e.target.closest("#btnLogout")) logout();
+    if (e.target.closest("#userAvatar")) toggleDropdown(e);
+  });
 
+  // Fechar dropdown ao clicar fora
   document.addEventListener("click", (e) => {
+    const userMenu = document.getElementById("userMenu");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const notificationsDropdown = document.getElementById("notificationsDropdown");
     if (!userMenu.contains(e.target)) {
       dropdownMenu.classList.add("hidden");
       notificationsDropdown.classList.add("hidden");
     }
   });
 
-  // Login
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const dados = {
-      email: document.getElementById("loginEmail").value,
-      senha: document.getElementById("loginPassword").value,
-    };
-    try {
-      const resposta = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      const resultado = await resposta.json();
-      if (resposta.ok) {
-        currentUser = resultado;
-        isLoggedIn = true;
-        localStorage.setItem("currentUser", JSON.stringify(resultado));
-        showUserMenu();
-        closeModal("loginModal");
-        loginForm.reset();
-        showNotification("Login realizado com sucesso!");
-      } else {
-        alert("Erro: " + resultado.mensagem);
-      }
-    } catch (erro) {
-      alert("Erro ao conectar com servidor");
-    }
+  // Login/Register via backend
+  handleFormSubmit("loginForm", "loginModal", "login", async (data) => {
+    return await fetch("http://localhost:8080/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
   });
 
-  // Registro
-  registerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const dados = {
-      name: document.getElementById("registerName").value,
-      email: document.getElementById("registerEmail").value,
-      senha: document.getElementById("registerPassword").value,
-    };
-    try {
-      const resposta = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      const resultado = await resposta.json();
-      if (resposta.ok) {
-        currentUser = resultado;
-        isLoggedIn = true;
-        localStorage.setItem("currentUser", JSON.stringify(resultado));
-        showUserMenu();
-        closeModal("registerModal");
-        registerForm.reset();
-        showNotification("Cadastro realizado com sucesso!");
-      } else {
-        alert("Erro: " + resultado.mensagem);
-      }
-    } catch (erro) {
-      alert("Erro ao conectar com servidor");
-    }
+  handleFormSubmit("registerForm", "registerModal", "register", async (data) => {
+    return await fetch("http://localhost:8080/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
   });
 }
 
 function showUserMenu() {
-  authButtons.classList.add("hidden");
-  userMenu.classList.remove("hidden");
-  userName.textContent = currentUser.name;
-  navHistorico.classList.remove("hidden");
+  const authButtons = document.getElementById("authButtons");
+  const userMenu = document.getElementById("userMenu");
+  const userName = document.getElementById("userName");
+  const navHistorico = document.getElementById("navHistorico");
+
+  if (authButtons) authButtons.classList.add("hidden");
+  if (userMenu) userMenu.classList.remove("hidden");
+  if (userName) userName.textContent = currentUser.name;
+  if (navHistorico) navHistorico.classList.remove("hidden");
+
   updateCartBadge();
   updateNotificationBadge();
 }
 
 function showAuthButtons() {
-  userMenu.classList.add("hidden");
-  authButtons.classList.remove("hidden");
-  navHistorico.classList.add("hidden");
+  const authButtons = document.getElementById("authButtons");
+  const userMenu = document.getElementById("userMenu");
+  const navHistorico = document.getElementById("navHistorico");
+
+  if (userMenu) userMenu.classList.add("hidden");
+  if (authButtons) authButtons.classList.remove("hidden");
+  if (navHistorico) navHistorico.classList.add("hidden");
 }
 
 function toggleDropdown(e) {
   e.stopPropagation();
-  dropdownMenu.classList.toggle("hidden");
-  notificationsDropdown.classList.add("hidden");
+  const dropdownMenu = document.getElementById("dropdownMenu");
+  const notificationsDropdown = document.getElementById("notificationsDropdown");
+  if (dropdownMenu) dropdownMenu.classList.toggle("hidden");
+  if (notificationsDropdown) notificationsDropdown.classList.add("hidden");
 }
 
 function logout() {
@@ -187,73 +131,144 @@ function logout() {
   localStorage.removeItem("currentUser");
   localStorage.removeItem("cartItems");
   showAuthButtons();
-  dropdownMenu.classList.add("hidden");
   updateCartBadge();
 }
 
-// ------------------- CARRINHO -------------------
-function initCart() {
-  const savedCart = localStorage.getItem("cartItems");
-  if (savedCart) {
-    cartItems = JSON.parse(savedCart);
-    updateCartBadge();
-  }
+// Função genérica para submit de forms de login/register
+function handleFormSubmit(formId, modalId, type, fetchFunc) {
+  const form = document.getElementById(formId);
+  if (!form) return;
 
-  cartBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    showPage("carrinho");
-    navItems.forEach((nav) => nav.classList.remove("active"));
-    renderCart();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {};
+    form.querySelectorAll("input").forEach((input) => {
+      data[input.name || input.id] = input.value;
+    });
+
+    try {
+      const response = await fetchFunc(data);
+      const result = await response.json();
+
+      if (response.ok) {
+        currentUser = result;
+        isLoggedIn = true;
+        localStorage.setItem("currentUser", JSON.stringify(result));
+        showUserMenu();
+        closeModal(modalId);
+        form.reset();
+        showNotification(`${type === "login" ? "Login" : "Cadastro"} realizado com sucesso!`);
+      } else {
+        alert("Erro: " + result.mensagem);
+      }
+    } catch (err) {
+      alert("Erro ao conectar com servidor");
+    }
   });
 }
 
-function addToCart(productId) {
+// ====== Modals ======
+function initModals() {
+  const modals = ["loginModal", "registerModal", "productModal", "purchaseModal"];
+  modals.forEach((id) => {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal(id);
+    });
+  });
+
+  // Switch login/register
+  const switchToRegister = document.getElementById("switchToRegister");
+  const switchToLogin = document.getElementById("switchToLogin");
+  if (switchToRegister) switchToRegister.addEventListener("click", (e) => { e.preventDefault(); closeModal("loginModal"); openModal("registerModal"); });
+  if (switchToLogin) switchToLogin.addEventListener("click", (e) => { e.preventDefault(); closeModal("registerModal"); openModal("loginModal"); });
+}
+
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add("hidden");
+}
+
+// ====== Cart ======
+function initCart() {
+  const savedCart = localStorage.getItem("cartItems");
+  if (savedCart) cartItems = JSON.parse(savedCart);
+
+  document.body.addEventListener("click", (e) => {
+    if (e.target.closest("#cartBtn")) {
+      showPage("carrinho");
+      renderCart();
+    }
+
+    // Carrinho controls
+    if (e.target.closest(".btn-add")) {
+      const id = parseInt(e.target.closest(".cart-item").dataset.id);
+      updateCartQuantity(id, 1);
+    }
+    if (e.target.closest(".btn-sub")) {
+      const id = parseInt(e.target.closest(".cart-item").dataset.id);
+      updateCartQuantity(id, -1);
+    }
+    if (e.target.closest(".btn-remove")) {
+      const id = parseInt(e.target.closest(".cart-item").dataset.id);
+      removeFromCart(id);
+    }
+
+    if (e.target.closest("#btnFinalizePurchase")) {
+      finalizePurchase();
+    }
+  });
+
+  updateCartBadge();
+}
+
+function addToCart(product) {
   if (!isLoggedIn) {
     alert("Faça login para adicionar produtos ao carrinho");
     openModal("loginModal");
     return;
   }
 
-  const product = {
-    id: productId,
-    name: "Produto Exemplo",
-    price: 99.9,
-    quantity: 1,
-    image: "/placeholder.svg?height=100&width=100",
-  };
-
-  const existingItem = cartItems.find((item) => item.id === productId);
-  if (existingItem) existingItem.quantity++;
-  else cartItems.push(product);
+  const existing = cartItems.find((i) => i.id === product.id);
+  if (existing) existing.quantity++;
+  else cartItems.push({ ...product, quantity: 1 });
 
   localStorage.setItem("cartItems", JSON.stringify(cartItems));
   updateCartBadge();
   showNotification("Produto adicionado ao carrinho!");
 }
 
-function removeFromCart(productId) {
-  cartItems = cartItems.filter((item) => item.id !== productId);
-  localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  updateCartBadge();
-  renderCart();
-}
-
 function updateCartQuantity(productId, change) {
-  const item = cartItems.find((item) => item.id === productId);
-  if (item) {
-    item.quantity += change;
-    if (item.quantity <= 0) removeFromCart(productId);
-    else {
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-      renderCart();
-    }
+  const item = cartItems.find((i) => i.id === productId);
+  if (!item) return;
+  item.quantity += change;
+  if (item.quantity <= 0) removeFromCart(productId);
+  else {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    renderCart();
   }
 }
 
+function removeFromCart(productId) {
+  cartItems = cartItems.filter((i) => i.id !== productId);
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  renderCart();
+  updateCartBadge();
+}
+
 function updateCartBadge() {
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  if (totalItems > 0) {
-    cartBadge.textContent = totalItems;
+  const cartBadge = document.getElementById("cartBadge");
+  if (!cartBadge) return;
+  const total = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+  if (total > 0) {
+    cartBadge.textContent = total;
     cartBadge.classList.remove("hidden");
   } else {
     cartBadge.classList.add("hidden");
@@ -261,306 +276,129 @@ function updateCartBadge() {
 }
 
 function renderCart() {
-  const cartItemsList = document.getElementById("cartItemsList");
-  const btnFinalizePurchase = document.getElementById("btnFinalizePurchase");
+  const list = document.getElementById("cartItemsList");
+  const btnFinalize = document.getElementById("btnFinalizePurchase");
+  if (!list || !btnFinalize) return;
 
   if (cartItems.length === 0) {
-    cartItemsList.innerHTML = `
-      <div class="empty-state">
-        <i class="ri-shopping-cart-line"></i>
-        <p>Seu carrinho está vazio</p>
-        <small>Adicione produtos para continuar</small>
-      </div>
-    `;
-    btnFinalizePurchase.disabled = true;
-    updateCartSummary(0);
+    list.innerHTML = `<div class="empty-state"><p>Carrinho vazio</p></div>`;
+    btnFinalize.disabled = true;
     return;
   }
 
-  btnFinalizePurchase.disabled = false;
-  let html = "";
-  cartItems.forEach((item) => {
-    const itemTotal = item.price * item.quantity;
-    html += `
-      <div class="cart-item">
-        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-        <div class="cart-item-info">
-          <h4>${item.name}</h4>
-          <p class="cart-item-price">R$ ${item.price.toFixed(2)}</p>
-        </div>
-        <div class="cart-item-controls">
-          <button class="btn-icon" onclick="updateCartQuantity(${item.id}, -1)">
-            <i class="ri-subtract-line"></i>
-          </button>
-          <span class="cart-item-quantity">${item.quantity}</span>
-          <button class="btn-icon" onclick="updateCartQuantity(${item.id}, 1)">
-            <i class="ri-add-line"></i>
-          </button>
-        </div>
-        <div class="cart-item-total">
-          <p>R$ ${itemTotal.toFixed(2)}</p>
-          <button class="btn-icon" onclick="removeFromCart(${item.id})">
-            <i class="ri-delete-bin-line"></i>
-          </button>
-        </div>
-      </div>
-    `;
-  });
-
-  cartItemsList.innerHTML = html;
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  updateCartSummary(subtotal);
+  btnFinalize.disabled = false;
+  list.innerHTML = cartItems.map(i => `
+    <div class="cart-item" data-id="${i.id}">
+      <h4>${i.name}</h4>
+      <p>R$ ${i.price.toFixed(2)}</p>
+      <button class="btn-sub">-</button>
+      <span>${i.quantity}</span>
+      <button class="btn-add">+</button>
+      <button class="btn-remove">Remover</button>
+    </div>
+  `).join('');
 }
 
-function updateCartSummary(subtotal) {
-  document.getElementById("cartSubtotal").textContent = `R$ ${subtotal.toFixed(2)}`;
-  document.getElementById("cartTotal").textContent = `R$ ${subtotal.toFixed(2)}`;
-}
-
-function finalizePurchase() {
-  if (cartItems.length === 0) {
-    alert("Seu carrinho está vazio");
-    return;
-  }
-  openModal("purchaseModal");
-}
-
-// ------------------- NOTIFICAÇÕES -------------------
+// ====== Notificações ======
 function initNotifications() {
-  notificationsBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    notificationsDropdown.classList.toggle("hidden");
-    dropdownMenu.classList.add("hidden");
-    renderNotifications();
+  document.body.addEventListener("click", (e) => {
+    if (e.target.closest("#notificationsBtn")) {
+      const dropdown = document.getElementById("notificationsDropdown");
+      const menu = document.getElementById("dropdownMenu");
+      if (dropdown) dropdown.classList.toggle("hidden");
+      if (menu) menu.classList.add("hidden");
+      renderNotifications();
+    }
   });
+
+  updateNotificationBadge();
 }
 
 function updateNotificationBadge() {
-  const unreadCount = notifications.filter((n) => !n.read).length;
-  if (unreadCount > 0) {
-    notificationBadge.textContent = unreadCount;
-    notificationBadge.classList.remove("hidden");
-  } else {
-    notificationBadge.classList.add("hidden");
-  }
+  const badge = document.getElementById("notificationBadge");
+  if (!badge) return;
+  const unread = notifications.filter(n => !n.read).length;
+  if (unread > 0) {
+    badge.textContent = unread;
+    badge.classList.remove("hidden");
+  } else badge.classList.add("hidden");
 }
 
 function renderNotifications() {
-  const notificationsList = document.getElementById("notificationsList");
+  const list = document.getElementById("notificationsList");
+  if (!list) return;
+
   if (notifications.length === 0) {
-    notificationsList.innerHTML = `
-      <div class="empty-state-small">
-        <i class="ri-notification-3-line"></i>
-        <p>Nenhuma notificação</p>
-      </div>
-    `;
+    list.innerHTML = `<div class="empty-state-small"><p>Nenhuma notificação</p></div>`;
     return;
   }
 
-  let html = "";
-  notifications.forEach((notif) => {
-    html += `
-      <div class="notification-item ${notif.read ? "read" : "unread"}">
-        <i class="${notif.icon}"></i>
-        <div>
-          <p>${notif.message}</p>
-          <small>${notif.time}</small>
-        </div>
-      </div>
-    `;
-  });
-  notificationsList.innerHTML = html;
+  list.innerHTML = notifications.map(n => `
+    <div class="notification-item ${n.read ? "read" : "unread"}">
+      <p>${n.message}</p>
+    </div>
+  `).join('');
 }
 
-// ------------------- MODALS -------------------
-function initModals() {
-  switchToRegister.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeModal("loginModal");
-    openModal("registerModal");
-  });
+function showNotification(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast-notification";
+  toast.textContent = message;
+  document.body.appendChild(toast);
 
-  switchToLogin.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeModal("registerModal");
-    openModal("loginModal");
-  });
-
-  [loginModal, registerModal, productModal, purchaseModal].forEach((modal) => {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal(modal.id);
-    });
-  });
-
-  productForm.addEventListener("submit", handleProductSubmit);
-  purchaseForm.addEventListener("submit", handlePurchaseSubmit);
+  setTimeout(() => toast.classList.add("show"), 100);
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => document.body.removeChild(toast), 300);
+  }, 3000);
 }
 
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.remove("hidden");
-}
-
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.add("hidden");
-}
-
-function handleProductSubmit(e) {
-  e.preventDefault();
-  const productData = {
-    name: document.getElementById("productName").value,
-    price: document.getElementById("productPrice").value,
-    description: document.getElementById("productDescription").value,
-    image: document.getElementById("productImage").files[0],
-  };
-  console.log("Produto cadastrado:", productData);
-  showNotification("Produto cadastrado com sucesso!");
-  closeModal("productModal");
-  productForm.reset();
-}
-
-function handlePurchaseSubmit(e) {
-  e.preventDefault();
-  const purchaseData = {
-    buyer: {
-      name: document.getElementById("buyerName").value,
-      email: document.getElementById("buyerEmail").value,
-      phone: document.getElementById("buyerPhone").value,
-      cpf: document.getElementById("buyerCPF").value,
-    },
-    address: {
-      cep: document.getElementById("buyerCEP").value,
-      street: document.getElementById("buyerStreet").value,
-      number: document.getElementById("buyerNumber").value,
-      complement: document.getElementById("buyerComplement").value,
-      neighborhood: document.getElementById("buyerNeighborhood").value,
-      city: document.getElementById("buyerCity").value,
-      state: document.getElementById("buyerState").value,
-    },
-    label: document.getElementById("shippingLabel").files[0],
-    items: cartItems,
-    total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-  };
-  console.log("Compra realizada:", purchaseData);
-
-  cartItems = [];
-  localStorage.removeItem("cartItems");
-  updateCartBadge();
-
-  closeModal("purchaseModal");
-  purchaseForm.reset();
-  showPage("chat");
-  navItems.forEach((nav) => nav.classList.remove("active"));
-  const chatNav = document.querySelector('[data-page="chat"]');
-  if (chatNav) chatNav.classList.add("active");
-
-  showNotification("Compra realizada com sucesso! O chat foi aberto para suporte.");
-}
-
-// ------------------- SIDEBAR -------------------
+// ====== Sidebar ======
 function initSidebar() {
-  const savedCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
-  if (savedCollapsed) sidebar.classList.add("collapsed");
+  const sidebar = document.getElementById("sidebar");
+  const toggle = document.getElementById("sidebarToggle");
+  const mobileBtn = document.getElementById("mobileMenuBtn");
+  const overlay = document.getElementById("overlay");
+  if (!sidebar) return;
 
-  sidebarToggle.addEventListener("click", () => {
+  if (localStorage.getItem("sidebarCollapsed") === "true") sidebar.classList.add("collapsed");
+
+  if (toggle) toggle.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
     localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"));
   });
 
-  mobileMenuBtn.addEventListener("click", () => {
+  if (mobileBtn) mobileBtn.addEventListener("click", () => {
     sidebar.classList.add("active");
     overlay.classList.add("active");
   });
 
-  overlay.addEventListener("click", closeMobileSidebar);
+  if (overlay) overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
 }
 
-function closeMobileSidebar() {
-  sidebar.classList.remove("active");
-  overlay.classList.remove("active");
-}
-
-// ------------------- NAVEGAÇÃO -------------------
+// ====== Navegação ======
 function initNavigation() {
-  navItems.forEach((item) => {
-    item.addEventListener("click", (e) => {
-      e.preventDefault();
-      navItems.forEach((nav) => nav.classList.remove("active"));
-      item.classList.add("active");
-      const pageId = item.getAttribute("data-page");
-      showPage(pageId);
-      if (window.innerWidth <= 768) closeMobileSidebar();
-    });
+  const navItems = document.querySelectorAll(".nav-item");
+  document.body.addEventListener("click", (e) => {
+    const item = e.target.closest(".nav-item");
+    if (!item) return;
+    navItems.forEach(n => n.classList.remove("active"));
+    item.classList.add("active");
+    const pageId = item.dataset.page;
+    if (pageId) showPage(pageId);
+    if (window.innerWidth <= 768) {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("overlay").classList.remove("active");
+    }
   });
 }
 
 function showPage(pageId) {
-  const allPages = document.querySelectorAll(".page-content");
-  allPages.forEach((page) => page.classList.remove("active"));
-  const selectedPage = document.getElementById(pageId + "Page");
-  if (selectedPage) selectedPage.classList.add("active");
+  document.querySelectorAll(".page-content").forEach(p => p.classList.remove("active"));
+  const page = document.getElementById(pageId + "Page");
+  if (page) page.classList.add("active");
   if (pageId === "carrinho") renderCart();
-  if (pageId === "historico") renderOrderHistory();
-}
-
-// ------------------- HISTÓRICO -------------------
-function renderOrderHistory() {
-  const orderHistoryList = document.getElementById("orderHistoryList");
-  const orders = [];
-  if (orders.length === 0) {
-    orderHistoryList.innerHTML = `
-      <div class="empty-state">
-        <i class="ri-history-line"></i>
-        <p>Nenhum pedido realizado ainda</p>
-        <small>Seus pedidos aparecerão aqui</small>
-      </div>
-    `;
-    return;
-  }
-  let html = '<div class="orders-list">';
-  orders.forEach((order) => {
-    html += `
-      <div class="order-item" onclick="showOrderDetails(${order.id})">
-        <div class="order-info">
-          <h4>Pedido #${order.id}</h4>
-          <p>${order.items.length} item(ns)</p>
-          <p class="order-date">${order.date}</p>
-        </div>
-        <div>
-          <span class="order-status status-${order.status}">${order.statusText}</span>
-          <p class="order-value">R$ ${order.total.toFixed(2)}</p>
-        </div>
-      </div>
-    `;
-  });
-  html += "</div>";
-  orderHistoryList.innerHTML = html;
-}
-
-// ------------------- UTILS -------------------
-function showNotification(message) {
-  const notificationArea = document.getElementById("toastContainer");
-  if (!notificationArea) return;
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  notificationArea.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
-}
-
-function addTooltips() {
-  const tooltipElements = document.querySelectorAll("[data-tooltip]");
-  tooltipElements.forEach((el) => {
-    el.addEventListener("mouseenter", () => {
-      const tooltip = document.createElement("span");
-      tooltip.className = "tooltip";
-      tooltip.textContent = el.dataset.tooltip;
-      el.appendChild(tooltip);
-    });
-    el.addEventListener("mouseleave", () => {
-      const tooltip = el.querySelector(".tooltip");
-      if (tooltip) tooltip.remove();
-    });
-  });
 }
