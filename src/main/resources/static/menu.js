@@ -700,3 +700,32 @@ const resizeObserver = new ResizeObserver(() => {
 })
 
 resizeObserver.observe(sidebar)
+
+// JavaScript resumido
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const dados = {
+        email: document.getElementById('loginEmail').value,
+        senha: document.getElementById('loginPassword').value
+    };
+
+    try {
+        const resposta = await fetch('http://localhost:8080/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+            alert('Login realizado com sucesso!');
+            window.location.href = 'menu.html';
+        } else {
+            alert('Erro: ' + resultado.mensagem);
+        }
+    } catch (erro) {
+        alert('Erro ao conectar com servidor');
+    }
+});
