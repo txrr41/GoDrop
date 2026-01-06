@@ -1,238 +1,268 @@
-// Estado da aplicação
-let isLoggedIn = false
-let currentUser = null
-let cartItems = [] // Added cart state
-const notifications = [] // Added notifications state
+let isLoggedIn = false;
+let currentUser = null;
+let cartItems = [];
+const notifications = [];
 
 // Elementos
-const sidebar = document.getElementById("sidebar")
-const sidebarToggle = document.getElementById("sidebarToggle")
-const mobileMenuBtn = document.getElementById("mobileMenuBtn")
-const overlay = document.getElementById("overlay")
-const themeToggle = document.getElementById("themeToggle")
-const mainContent = document.getElementById("mainContent")
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+const overlay = document.getElementById("overlay");
+const themeToggle = document.getElementById("themeToggle");
+const mainContent = document.getElementById("mainContent");
 
 // Auth elements
-const authButtons = document.getElementById("authButtons")
-const userMenu = document.getElementById("userMenu")
-const userAvatar = document.getElementById("userAvatar")
-const dropdownMenu = document.getElementById("dropdownMenu")
-const btnLogin = document.getElementById("btnLogin")
-const btnRegister = document.getElementById("btnRegister")
-const btnLogout = document.getElementById("btnLogout")
-const userName = document.getElementById("userName")
+const authButtons = document.getElementById("authButtons");
+const userMenu = document.getElementById("userMenu");
+const userAvatar = document.getElementById("userAvatar");
+const dropdownMenu = document.getElementById("dropdownMenu");
+const btnLogin = document.getElementById("btnLogin");
+const btnRegister = document.getElementById("btnRegister");
+const btnLogout = document.getElementById("btnLogout");
+const userName = document.getElementById("userName");
 
-const cartBtn = document.getElementById("cartBtn")
-const cartBadge = document.getElementById("cartBadge")
-const notificationsBtn = document.getElementById("notificationsBtn")
-const notificationBadge = document.getElementById("notificationBadge")
-const notificationsDropdown = document.getElementById("notificationsDropdown")
-const navHistorico = document.getElementById("navHistorico")
+const cartBtn = document.getElementById("cartBtn");
+const cartBadge = document.getElementById("cartBadge");
+const notificationsBtn = document.getElementById("notificationsBtn");
+const notificationBadge = document.getElementById("notificationBadge");
+const notificationsDropdown = document.getElementById("notificationsDropdown");
+const navHistorico = document.getElementById("navHistorico");
 
 // Modals
-const loginModal = document.getElementById("loginModal")
-const registerModal = document.getElementById("registerModal")
-const loginForm = document.getElementById("loginForm")
-const registerForm = document.getElementById("registerForm")
-const switchToRegister = document.getElementById("switchToRegister")
-const switchToLogin = document.getElementById("switchToLogin")
-const productModal = document.getElementById("productModal")
-const purchaseModal = document.getElementById("purchaseModal")
-const productForm = document.getElementById("productForm")
-const purchaseForm = document.getElementById("purchaseForm")
+const loginModal = document.getElementById("loginModal");
+const registerModal = document.getElementById("registerModal");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const switchToRegister = document.getElementById("switchToRegister");
+const switchToLogin = document.getElementById("switchToLogin");
+const productModal = document.getElementById("productModal");
+const purchaseModal = document.getElementById("purchaseModal");
+const productForm = document.getElementById("productForm");
+const purchaseForm = document.getElementById("purchaseForm");
 
 // Navegação
-const navItems = document.querySelectorAll(".nav-item")
+const navItems = document.querySelectorAll(".nav-item");
 
 // Inicialização
 document.addEventListener("DOMContentLoaded", () => {
-  initTheme()
-  initAuth()
-  initNavigation()
-  initSidebar()
-  initModals()
-  initCart() // Initialize cart
-  initNotifications() // Initialize notifications
-  addTooltips()
-})
+  initTheme();
+  initAuth();
+  initNavigation();
+  initSidebar();
+  initModals();
+  initCart();
+  initNotifications();
+  addTooltips();
+});
 
-// Tema Dark/Light
+// ------------------- TEMA -------------------
 function initTheme() {
-  const savedTheme = localStorage.getItem("theme") || "light"
-  document.documentElement.setAttribute("data-theme", savedTheme)
-  updateThemeIcon(savedTheme)
-
-  themeToggle.addEventListener("click", toggleTheme)
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  updateThemeIcon(savedTheme);
+  themeToggle.addEventListener("click", toggleTheme);
 }
 
 function toggleTheme() {
-  const currentTheme = document.documentElement.getAttribute("data-theme")
-  const newTheme = currentTheme === "light" ? "dark" : "light"
-
-  document.documentElement.setAttribute("data-theme", newTheme)
-  localStorage.setItem("theme", newTheme)
-  updateThemeIcon(newTheme)
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+  updateThemeIcon(newTheme);
 }
 
 function updateThemeIcon(theme) {
-  const icon = themeToggle.querySelector("i")
-  icon.className = theme === "light" ? "ri-moon-line" : "ri-sun-line"
+  const icon = themeToggle.querySelector("i");
+  icon.className = theme === "light" ? "ri-moon-line" : "ri-sun-line";
 }
 
-// Autenticação
+// ------------------- AUTENTICAÇÃO -------------------
 function initAuth() {
-  // Verificar se há usuário logado no localStorage
-  const savedUser = localStorage.getItem("currentUser")
+  const savedUser = localStorage.getItem("currentUser");
   if (savedUser) {
-    currentUser = JSON.parse(savedUser)
-    isLoggedIn = true
-    showUserMenu()
+    currentUser = JSON.parse(savedUser);
+    isLoggedIn = true;
+    showUserMenu();
   }
 
-  // Event listeners para botões de auth
-  btnLogin.addEventListener("click", () => openModal("loginModal"))
-  btnRegister.addEventListener("click", () => openModal("registerModal"))
-  btnLogout.addEventListener("click", logout)
+  btnLogin.addEventListener("click", () => openModal("loginModal"));
+  btnRegister.addEventListener("click", () => openModal("registerModal"));
+  btnLogout.addEventListener("click", logout);
+  userAvatar.addEventListener("click", toggleDropdown);
 
-  // Toggle do dropdown
-  userAvatar.addEventListener("click", toggleDropdown)
-
-  // Fechar dropdown ao clicar fora
   document.addEventListener("click", (e) => {
     if (!userMenu.contains(e.target)) {
-      dropdownMenu.classList.add("hidden")
-      notificationsDropdown.classList.add("hidden")
+      dropdownMenu.classList.add("hidden");
+      notificationsDropdown.classList.add("hidden");
     }
-  })
+  });
+
+  // Login
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const dados = {
+      email: document.getElementById("loginEmail").value,
+      senha: document.getElementById("loginPassword").value,
+    };
+    try {
+      const resposta = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados),
+      });
+      const resultado = await resposta.json();
+      if (resposta.ok) {
+        currentUser = resultado;
+        isLoggedIn = true;
+        localStorage.setItem("currentUser", JSON.stringify(resultado));
+        showUserMenu();
+        closeModal("loginModal");
+        loginForm.reset();
+        showNotification("Login realizado com sucesso!");
+      } else {
+        alert("Erro: " + resultado.mensagem);
+      }
+    } catch (erro) {
+      alert("Erro ao conectar com servidor");
+    }
+  });
+
+  // Registro
+  registerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const dados = {
+      name: document.getElementById("registerName").value,
+      email: document.getElementById("registerEmail").value,
+      senha: document.getElementById("registerPassword").value,
+    };
+    try {
+      const resposta = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados),
+      });
+      const resultado = await resposta.json();
+      if (resposta.ok) {
+        currentUser = resultado;
+        isLoggedIn = true;
+        localStorage.setItem("currentUser", JSON.stringify(resultado));
+        showUserMenu();
+        closeModal("registerModal");
+        registerForm.reset();
+        showNotification("Cadastro realizado com sucesso!");
+      } else {
+        alert("Erro: " + resultado.mensagem);
+      }
+    } catch (erro) {
+      alert("Erro ao conectar com servidor");
+    }
+  });
 }
 
 function showUserMenu() {
-  authButtons.classList.add("hidden")
-  userMenu.classList.remove("hidden")
-  userName.textContent = currentUser.name
-  navHistorico.classList.remove("hidden") // Show history link when logged in
-  updateCartBadge() // Update cart count
-  updateNotificationBadge() // Update notification count
+  authButtons.classList.add("hidden");
+  userMenu.classList.remove("hidden");
+  userName.textContent = currentUser.name;
+  navHistorico.classList.remove("hidden");
+  updateCartBadge();
+  updateNotificationBadge();
 }
 
 function showAuthButtons() {
-  userMenu.classList.add("hidden")
-  authButtons.classList.remove("hidden")
-  navHistorico.classList.add("hidden") // Hide history link when logged out
+  userMenu.classList.add("hidden");
+  authButtons.classList.remove("hidden");
+  navHistorico.classList.add("hidden");
 }
 
 function toggleDropdown(e) {
-  e.stopPropagation()
-  dropdownMenu.classList.toggle("hidden")
-  notificationsDropdown.classList.add("hidden") // Close notifications when opening user menu
+  e.stopPropagation();
+  dropdownMenu.classList.toggle("hidden");
+  notificationsDropdown.classList.add("hidden");
 }
 
 function logout() {
-  isLoggedIn = false
-  currentUser = null
-  cartItems = [] // Clear cart on logout
-  localStorage.removeItem("currentUser")
-  localStorage.removeItem("cartItems")
-  showAuthButtons()
-  dropdownMenu.classList.add("hidden")
-  updateCartBadge()
+  isLoggedIn = false;
+  currentUser = null;
+  cartItems = [];
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("cartItems");
+  showAuthButtons();
+  dropdownMenu.classList.add("hidden");
+  updateCartBadge();
 }
 
+// ------------------- CARRINHO -------------------
 function initCart() {
-  // Load cart from localStorage
-  const savedCart = localStorage.getItem("cartItems")
+  const savedCart = localStorage.getItem("cartItems");
   if (savedCart) {
-    cartItems = JSON.parse(savedCart)
-    updateCartBadge()
+    cartItems = JSON.parse(savedCart);
+    updateCartBadge();
   }
 
-  // Cart button click
   cartBtn.addEventListener("click", (e) => {
-    e.stopPropagation()
-    showPage("carrinho")
-    navItems.forEach((nav) => nav.classList.remove("active"))
-    renderCart()
-  })
+    e.stopPropagation();
+    showPage("carrinho");
+    navItems.forEach((nav) => nav.classList.remove("active"));
+    renderCart();
+  });
 }
 
 function addToCart(productId) {
   if (!isLoggedIn) {
-    alert("Faça login para adicionar produtos ao carrinho")
-    openModal("loginModal")
-    return
+    alert("Faça login para adicionar produtos ao carrinho");
+    openModal("loginModal");
+    return;
   }
 
-  // TODO: Get product data from database
   const product = {
     id: productId,
     name: "Produto Exemplo",
     price: 99.9,
     quantity: 1,
     image: "/placeholder.svg?height=100&width=100",
-  }
+  };
 
-  // Check if product already in cart
-  const existingItem = cartItems.find((item) => item.id === productId)
-  if (existingItem) {
-    existingItem.quantity++
-  } else {
-    cartItems.push(product)
-  }
+  const existingItem = cartItems.find((item) => item.id === productId);
+  if (existingItem) existingItem.quantity++;
+  else cartItems.push(product);
 
-  localStorage.setItem("cartItems", JSON.stringify(cartItems))
-  updateCartBadge()
-
-  // Show feedback
-  showNotification("Produto adicionado ao carrinho!")
-}
-
-function buyNow(productId) {
-  if (!isLoggedIn) {
-    alert("Faça login para realizar a compra")
-    openModal("loginModal")
-    return
-  }
-
-  // Add to cart and go to purchase
-  addToCart(productId)
-  showPage("carrinho")
-  navItems.forEach((nav) => nav.classList.remove("active"))
-  renderCart()
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  updateCartBadge();
+  showNotification("Produto adicionado ao carrinho!");
 }
 
 function removeFromCart(productId) {
-  cartItems = cartItems.filter((item) => item.id !== productId)
-  localStorage.setItem("cartItems", JSON.stringify(cartItems))
-  updateCartBadge()
-  renderCart()
+  cartItems = cartItems.filter((item) => item.id !== productId);
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  updateCartBadge();
+  renderCart();
 }
 
 function updateCartQuantity(productId, change) {
-  const item = cartItems.find((item) => item.id === productId)
+  const item = cartItems.find((item) => item.id === productId);
   if (item) {
-    item.quantity += change
-    if (item.quantity <= 0) {
-      removeFromCart(productId)
-    } else {
-      localStorage.setItem("cartItems", JSON.stringify(cartItems))
-      renderCart()
+    item.quantity += change;
+    if (item.quantity <= 0) removeFromCart(productId);
+    else {
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      renderCart();
     }
   }
 }
 
 function updateCartBadge() {
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   if (totalItems > 0) {
-    cartBadge.textContent = totalItems
-    cartBadge.classList.remove("hidden")
+    cartBadge.textContent = totalItems;
+    cartBadge.classList.remove("hidden");
   } else {
-    cartBadge.classList.add("hidden")
+    cartBadge.classList.add("hidden");
   }
 }
 
 function renderCart() {
-  const cartItemsList = document.getElementById("cartItemsList")
-  const btnFinalizePurchase = document.getElementById("btnFinalizePurchase")
+  const cartItemsList = document.getElementById("cartItemsList");
+  const btnFinalizePurchase = document.getElementById("btnFinalizePurchase");
 
   if (cartItems.length === 0) {
     cartItemsList.innerHTML = `
@@ -241,17 +271,16 @@ function renderCart() {
         <p>Seu carrinho está vazio</p>
         <small>Adicione produtos para continuar</small>
       </div>
-    `
-    btnFinalizePurchase.disabled = true
-    updateCartSummary(0)
-    return
+    `;
+    btnFinalizePurchase.disabled = true;
+    updateCartSummary(0);
+    return;
   }
 
-  btnFinalizePurchase.disabled = false
-
-  let html = ""
+  btnFinalizePurchase.disabled = false;
+  let html = "";
   cartItems.forEach((item) => {
-    const itemTotal = item.price * item.quantity
+    const itemTotal = item.price * item.quantity;
     html += `
       <div class="cart-item">
         <img src="${item.image}" alt="${item.name}" class="cart-item-image">
@@ -275,67 +304,60 @@ function renderCart() {
           </button>
         </div>
       </div>
-    `
-  })
+    `;
+  });
 
-  cartItemsList.innerHTML = html
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  updateCartSummary(subtotal)
+  cartItemsList.innerHTML = html;
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  updateCartSummary(subtotal);
 }
 
 function updateCartSummary(subtotal) {
-  document.getElementById("cartSubtotal").textContent = `R$ ${subtotal.toFixed(2)}`
-  document.getElementById("cartTotal").textContent = `R$ ${subtotal.toFixed(2)}`
+  document.getElementById("cartSubtotal").textContent = `R$ ${subtotal.toFixed(2)}`;
+  document.getElementById("cartTotal").textContent = `R$ ${subtotal.toFixed(2)}`;
 }
 
 function finalizePurchase() {
   if (cartItems.length === 0) {
-    alert("Seu carrinho está vazio")
-    return
+    alert("Seu carrinho está vazio");
+    return;
   }
-  openModal("purchaseModal")
+  openModal("purchaseModal");
 }
 
+// ------------------- NOTIFICAÇÕES -------------------
 function initNotifications() {
-  // Load notifications from localStorage or database
-  // TODO: Fetch from database
-
   notificationsBtn.addEventListener("click", (e) => {
-    e.stopPropagation()
-    notificationsDropdown.classList.toggle("hidden")
-    dropdownMenu.classList.add("hidden")
-    renderNotifications()
-  })
+    e.stopPropagation();
+    notificationsDropdown.classList.toggle("hidden");
+    dropdownMenu.classList.add("hidden");
+    renderNotifications();
+  });
 }
 
 function updateNotificationBadge() {
-  // TODO: Get unread count from database
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length;
   if (unreadCount > 0) {
-    notificationBadge.textContent = unreadCount
-    notificationBadge.classList.remove("hidden")
+    notificationBadge.textContent = unreadCount;
+    notificationBadge.classList.remove("hidden");
   } else {
-    notificationBadge.classList.add("hidden")
+    notificationBadge.classList.add("hidden");
   }
 }
 
 function renderNotifications() {
-  const notificationsList = document.getElementById("notificationsList")
-
-  // TODO: Fetch from database
+  const notificationsList = document.getElementById("notificationsList");
   if (notifications.length === 0) {
     notificationsList.innerHTML = `
       <div class="empty-state-small">
         <i class="ri-notification-3-line"></i>
         <p>Nenhuma notificação</p>
       </div>
-    `
-    return
+    `;
+    return;
   }
 
-  // Render notifications
-  let html = ""
+  let html = "";
   notifications.forEach((notif) => {
     html += `
       <div class="notification-item ${notif.read ? "read" : "unread"}">
@@ -345,154 +367,61 @@ function renderNotifications() {
           <small>${notif.time}</small>
         </div>
       </div>
-    `
-  })
-  notificationsList.innerHTML = html
+    `;
+  });
+  notificationsList.innerHTML = html;
 }
 
-function showNotification(message) {
-  // Simple toast notification
-  const toast = document.createElement("div")
-  toast.className = "toast-notification"
-  toast.textContent = message
-  document.body.appendChild(toast)
-
-  setTimeout(() => {
-    toast.classList.add("show")
-  }, 100)
-
-  setTimeout(() => {
-    toast.classList.remove("show")
-    setTimeout(() => {
-      document.body.removeChild(toast)
-    }, 300)
-  }, 3000)
-}
-
-// Modals
+// ------------------- MODALS -------------------
 function initModals() {
-  // Event listeners para formulários
-  loginForm.addEventListener("submit", handleLogin)
-  registerForm.addEventListener("submit", handleRegister)
-  productForm.addEventListener("submit", handleProductSubmit)
-  purchaseForm.addEventListener("submit", handlePurchaseSubmit)
-
-  // Switch entre modals
   switchToRegister.addEventListener("click", (e) => {
-    e.preventDefault()
-    closeModal("loginModal")
-    openModal("registerModal")
-  })
+    e.preventDefault();
+    closeModal("loginModal");
+    openModal("registerModal");
+  });
 
   switchToLogin.addEventListener("click", (e) => {
-    e.preventDefault()
-    closeModal("registerModal")
-    openModal("loginModal")
-  })
+    e.preventDefault();
+    closeModal("registerModal");
+    openModal("loginModal");
+  });
 
-  // Fechar modal ao clicar no overlay
-  loginModal.addEventListener("click", (e) => {
-    if (e.target === loginModal) closeModal("loginModal")
-  })
+  [loginModal, registerModal, productModal, purchaseModal].forEach((modal) => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal(modal.id);
+    });
+  });
 
-  registerModal.addEventListener("click", (e) => {
-    if (e.target === registerModal) closeModal("registerModal")
-  })
-
-  productModal.addEventListener("click", (e) => {
-    if (e.target === productModal) closeModal("productModal")
-  })
-
-  purchaseModal.addEventListener("click", (e) => {
-    if (e.target === purchaseModal) closeModal("purchaseModal")
-  })
+  productForm.addEventListener("submit", handleProductSubmit);
+  purchaseForm.addEventListener("submit", handlePurchaseSubmit);
 }
 
 function openModal(modalId) {
-  const modal = document.getElementById(modalId)
-  if (modal) {
-    modal.classList.remove("hidden")
-  }
+  const modal = document.getElementById(modalId);
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closeModal(modalId) {
-  const modal = document.getElementById(modalId)
-  if (modal) {
-    modal.classList.add("hidden")
-  }
-}
-
-function openProductModal() {
-  openModal("productModal")
-}
-
-function openPurchaseModal() {
-  openModal("purchaseModal")
-}
-
-function handleLogin(e) {
-  e.preventDefault()
-
-  const email = document.getElementById("loginEmail").value
-  const password = document.getElementById("loginPassword").value
-
-  // Simulação de login
-  currentUser = {
-    name: email.split("@")[0],
-    email: email,
-  }
-
-  isLoggedIn = true
-  localStorage.setItem("currentUser", JSON.stringify(currentUser))
-
-  showUserMenu()
-  closeModal("loginModal")
-  loginForm.reset()
-}
-
-function handleRegister(e) {
-  e.preventDefault()
-
-  const name = document.getElementById("registerName").value
-  const email = document.getElementById("registerEmail").value
-  const password = document.getElementById("registerPassword").value
-
-  // Simulação de cadastro
-  currentUser = {
-    name: name,
-    email: email,
-  }
-
-  isLoggedIn = true
-  localStorage.setItem("currentUser", JSON.stringify(currentUser))
-
-  showUserMenu()
-  closeModal("registerModal")
-  registerForm.reset()
+  const modal = document.getElementById(modalId);
+  if (modal) modal.classList.add("hidden");
 }
 
 function handleProductSubmit(e) {
-  e.preventDefault()
-
+  e.preventDefault();
   const productData = {
     name: document.getElementById("productName").value,
     price: document.getElementById("productPrice").value,
     description: document.getElementById("productDescription").value,
     image: document.getElementById("productImage").files[0],
-  }
-
-  console.log("[v0] Produto cadastrado:", productData)
-
-  // TODO: Salvar no banco de dados
-
-  showNotification("Produto cadastrado com sucesso!")
-  closeModal("productModal")
-  productForm.reset()
+  };
+  console.log("Produto cadastrado:", productData);
+  showNotification("Produto cadastrado com sucesso!");
+  closeModal("productModal");
+  productForm.reset();
 }
 
 function handlePurchaseSubmit(e) {
-  e.preventDefault()
-
+  e.preventDefault();
   const purchaseData = {
     buyer: {
       name: document.getElementById("buyerName").value,
@@ -512,109 +441,73 @@ function handlePurchaseSubmit(e) {
     label: document.getElementById("shippingLabel").files[0],
     items: cartItems,
     total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-  }
+  };
+  console.log("Compra realizada:", purchaseData);
 
-  console.log("[v0] Compra realizada:", purchaseData)
+  cartItems = [];
+  localStorage.removeItem("cartItems");
+  updateCartBadge();
 
-  // TODO: Salvar no banco de dados
+  closeModal("purchaseModal");
+  purchaseForm.reset();
+  showPage("chat");
+  navItems.forEach((nav) => nav.classList.remove("active"));
+  const chatNav = document.querySelector('[data-page="chat"]');
+  if (chatNav) chatNav.classList.add("active");
 
-  // Clear cart
-  cartItems = []
-  localStorage.removeItem("cartItems")
-  updateCartBadge()
-
-  // Fechar modal de compra
-  closeModal("purchaseModal")
-  purchaseForm.reset()
-
-  // Abrir página de chat após compra
-  showPage("chat")
-
-  // Atualizar navegação
-  navItems.forEach((nav) => nav.classList.remove("active"))
-  const chatNav = document.querySelector('[data-page="chat"]')
-  if (chatNav) chatNav.classList.add("active")
-
-  showNotification("Compra realizada com sucesso! O chat foi aberto para suporte.")
+  showNotification("Compra realizada com sucesso! O chat foi aberto para suporte.");
 }
 
-// Sidebar
+// ------------------- SIDEBAR -------------------
 function initSidebar() {
-  const savedCollapsed = localStorage.getItem("sidebarCollapsed") === "true"
-  if (savedCollapsed) {
-    sidebar.classList.add("collapsed")
-  }
+  const savedCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+  if (savedCollapsed) sidebar.classList.add("collapsed");
 
-  // Toggle sidebar (desktop)
   sidebarToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed")
-    localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"))
-  })
+    sidebar.classList.toggle("collapsed");
+    localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"));
+  });
 
-  // Toggle sidebar (mobile)
   mobileMenuBtn.addEventListener("click", () => {
-    sidebar.classList.add("active")
-    overlay.classList.add("active")
-  })
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
 
-  // Fechar sidebar mobile
-  overlay.addEventListener("click", closeMobileSidebar)
+  overlay.addEventListener("click", closeMobileSidebar);
 }
 
 function closeMobileSidebar() {
-  sidebar.classList.remove("active")
-  overlay.classList.remove("active")
+  sidebar.classList.remove("active");
+  overlay.classList.remove("active");
 }
 
-// Navegação
+// ------------------- NAVEGAÇÃO -------------------
 function initNavigation() {
   navItems.forEach((item) => {
     item.addEventListener("click", (e) => {
-      e.preventDefault()
-
-      // Remover active de todos
-      navItems.forEach((nav) => nav.classList.remove("active"))
-
-      // Adicionar active no clicado
-      item.classList.add("active")
-
-      const pageId = item.getAttribute("data-page")
-      showPage(pageId)
-
-      // Fechar sidebar em mobile
-      if (window.innerWidth <= 768) {
-        closeMobileSidebar()
-      }
-    })
-  })
+      e.preventDefault();
+      navItems.forEach((nav) => nav.classList.remove("active"));
+      item.classList.add("active");
+      const pageId = item.getAttribute("data-page");
+      showPage(pageId);
+      if (window.innerWidth <= 768) closeMobileSidebar();
+    });
+  });
 }
 
 function showPage(pageId) {
-  // Esconder todas as páginas
-  const allPages = document.querySelectorAll(".page-content")
-  allPages.forEach((page) => page.classList.remove("active"))
-
-  // Mostrar a página selecionada
-  const selectedPage = document.getElementById(pageId + "Page")
-  if (selectedPage) {
-    selectedPage.classList.add("active")
-
-    if (pageId === "carrinho") {
-      renderCart()
-    }
-
-    if (pageId === "historico") {
-      renderOrderHistory()
-    }
-  }
+  const allPages = document.querySelectorAll(".page-content");
+  allPages.forEach((page) => page.classList.remove("active"));
+  const selectedPage = document.getElementById(pageId + "Page");
+  if (selectedPage) selectedPage.classList.add("active");
+  if (pageId === "carrinho") renderCart();
+  if (pageId === "historico") renderOrderHistory();
 }
 
+// ------------------- HISTÓRICO -------------------
 function renderOrderHistory() {
-  const orderHistoryList = document.getElementById("orderHistoryList")
-
-  // TODO: Fetch from database
-  const orders = [] // Will be populated from database
-
+  const orderHistoryList = document.getElementById("orderHistoryList");
+  const orders = [];
   if (orders.length === 0) {
     orderHistoryList.innerHTML = `
       <div class="empty-state">
@@ -622,12 +515,10 @@ function renderOrderHistory() {
         <p>Nenhum pedido realizado ainda</p>
         <small>Seus pedidos aparecerão aqui</small>
       </div>
-    `
-    return
+    `;
+    return;
   }
-
-  // Render orders with tracking
-  let html = '<div class="orders-list">'
+  let html = '<div class="orders-list">';
   orders.forEach((order) => {
     html += `
       <div class="order-item" onclick="showOrderDetails(${order.id})">
@@ -641,119 +532,35 @@ function renderOrderHistory() {
           <p class="order-value">R$ ${order.total.toFixed(2)}</p>
         </div>
       </div>
-    `
-  })
-  html += "</div>"
-  orderHistoryList.innerHTML = html
+    `;
+  });
+  html += "</div>";
+  orderHistoryList.innerHTML = html;
 }
 
-function showOrderDetails(orderId) {
-  // TODO: Fetch order details from database
-  console.log("[v0] Showing order details for:", orderId)
-
-  const orderDetailsContent = document.getElementById("orderDetailsContent")
-  orderDetailsContent.innerHTML = `
-    <div class="order-tracking">
-      <h3>Pedido #${orderId}</h3>
-      <div class="tracking-status">
-        <div class="status-step completed">
-          <i class="ri-checkbox-circle-line"></i>
-          <p>Pedido Confirmado</p>
-          <small>01/01/2024</small>
-        </div>
-        <div class="status-step completed">
-          <i class="ri-checkbox-circle-line"></i>
-          <p>Pagamento Aprovado</p>
-          <small>01/01/2024</small>
-        </div>
-        <div class="status-step active">
-          <i class="ri-truck-line"></i>
-          <p>Em Transporte</p>
-          <small>02/01/2024</small>
-        </div>
-        <div class="status-step">
-          <i class="ri-home-line"></i>
-          <p>Entregue</p>
-          <small>Aguardando</small>
-        </div>
-      </div>
-    </div>
-  `
-
-  openModal("orderDetailsModal")
+// ------------------- UTILS -------------------
+function showNotification(message) {
+  const notificationArea = document.getElementById("toastContainer");
+  if (!notificationArea) return;
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  notificationArea.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
 }
 
-// Tooltips para sidebar colapsada
 function addTooltips() {
-  navItems.forEach((item) => {
-    const text = item.querySelector(".nav-text").textContent
-    item.setAttribute("data-tooltip", text)
-  })
-
-  const themeText = themeToggle.querySelector(".nav-text").textContent
-  themeToggle.setAttribute("data-tooltip", themeText)
+  const tooltipElements = document.querySelectorAll("[data-tooltip]");
+  tooltipElements.forEach((el) => {
+    el.addEventListener("mouseenter", () => {
+      const tooltip = document.createElement("span");
+      tooltip.className = "tooltip";
+      tooltip.textContent = el.dataset.tooltip;
+      el.appendChild(tooltip);
+    });
+    el.addEventListener("mouseleave", () => {
+      const tooltip = el.querySelector(".tooltip");
+      if (tooltip) tooltip.remove();
+    });
+  });
 }
-
-// Ajustar header quando sidebar colapsa
-const resizeObserver = new ResizeObserver(() => {
-  // Código para ajustes futuros se necessário
-})
-
-resizeObserver.observe(sidebar)
-
-
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const dados = {
-        email: document.getElementById('loginEmail').value,
-        senha: document.getElementById('loginPassword').value
-    };
-
-    try {
-        const resposta = await fetch('http://localhost:8080/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
-        });
-
-        const resultado = await resposta.json();
-
-        if (resposta.ok) {
-            alert('Login realizado com sucesso!');
-            window.location.href = 'menu.html';
-        } else {
-            alert('Erro: ' + resultado.mensagem);
-        }
-    } catch (erro) {
-        alert('Erro ao conectar com servidor');
-    }
-});
-
-document.getElementById('registerForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const dados = {
-        email: document.getElementById('registerEmail').value,
-        senha: document.getElementById('registerPassword').value
-    };
-
-    try {
-        const resposta = await fetch('http://localhost:8080/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
-        });
-
-        const resultado = await resposta.json();
-
-        if (resposta.ok) {
-            alert('Login realizado com sucesso!');
-            window.location.href = 'menu.html';
-        } else {
-            alert('Erro: ' + resultado.mensagem);
-        }
-    } catch (erro) {
-        alert('Erro ao conectar com servidor');
-    }
-});
