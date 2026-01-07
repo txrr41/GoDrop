@@ -24,7 +24,7 @@ public class AuthService {
             throw new Exception("E-mail é obrigatório");
         }
 
-        if (loginRequest.getSenha() == null || loginRequest.getSenha().isEmpty()) {
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
             throw new Exception("Senha é obrigatória");
         }
 
@@ -36,7 +36,7 @@ public class AuthService {
 
         User user = usuarioOptional.get();
 
-        if (!passwordEncoder.matches(loginRequest.getSenha(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
 
             throw new Exception("E-mail ou senha incorretos");
         }
@@ -60,7 +60,7 @@ public class AuthService {
             throw new Exception("E-mail é obrigatório");
         }
 
-        if (request.getSenha() == null || request.getSenha().isEmpty()) {
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
             throw new Exception("Senha é obrigatório");
         }
 
@@ -71,7 +71,7 @@ public class AuthService {
         User user = new User ();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword((passwordEncoder.encode(request.getSenha())));
+        user.setPassword((passwordEncoder.encode(request.getPassword())));
         user.setDataCriacao(LocalDateTime.now());
 
         User savedUser = loginRepository.save(user);

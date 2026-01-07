@@ -18,7 +18,6 @@
                 <button class="btn btn-outline" id="btnLogin">Login</button>
                 <button class="btn btn-primary" id="btnRegister">Cadastre-se</button>
             </div>
-            <!-- Added notifications, cart icons and user menu for logged users -->
             <!-- Menu do usuário quando está logado -->
             <div class="user-menu hidden" id="userMenu">
                 <!-- Notifications Icon -->
@@ -139,8 +138,6 @@
         <p>Confira nossos produtos e faça sua compra</p>
 
         <div class="products-grid">
-            <!-- Updated product card with cart and buy buttons -->
-            <!-- Produto de exemplo - lista virá do banco -->
             <div class="product-card">
                 <div class="product-image">
                     <img src="/placeholder.svg?height=300&width=300" alt="Produto Exemplo">
@@ -247,7 +244,6 @@
         </div>
     </div>
 
-    <!-- Added cart page for logged users -->
     <!-- Carrinho -->
     <div id="carrinhoPage" class="page-content">
         <h2>Meu Carrinho</h2>
@@ -284,7 +280,6 @@
         </div>
     </div>
 
-    <!-- Added order history page -->
     <!-- Histórico de Pedidos -->
     <div id="historicoPage" class="page-content">
         <h2>Meu Histórico</h2>
@@ -317,24 +312,23 @@
 <!-- Modal de Login -->
 <div class="modal hidden" id="loginModal">
     <div class="modal-content modal-auth">
-        <!-- Added logo and centered title layout -->
         <div class="modal-auth-header">
             <div class="modal-auth-logo">
                 <img src="img/Sh__3_-removebg-preview.png" alt="logo" style="width: 150px;">
             </div>
             <h2>Login</h2>
-            <button class="modal-close" data-modal="loginModal">
+            <button class="modal-close" onclick="closeModal('loginModal')">
                 <i class="ri-close-line"></i>
             </button>
         </div>
         <form class="modal-body" id="loginForm">
             <div class="form-group">
                 <label for="loginEmail">Email</label>
-                <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                <input type="email" id="loginEmail" name="email" placeholder="seu@email.com" required>
             </div>
             <div class="form-group">
                 <label for="loginPassword">Senha</label>
-                <input type="password" id="loginPassword" placeholder="********" required>
+                <input type="password" id="loginPassword" name="password" placeholder="********" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Entrar</button>
         </form>
@@ -347,28 +341,27 @@
 <!-- Modal de Cadastro -->
 <div class="modal hidden" id="registerModal">
     <div class="modal-content modal-auth">
-        <!-- Added logo and centered title layout -->
         <div class="modal-auth-header">
             <div class="modal-auth-logo">
                 <img src="img/Sh__3_-removebg-preview.png" alt="logo" style="width: 150px;">
             </div>
             <h2>Cadastro</h2>
-            <button class="modal-close" data-modal="registerModal">
+            <button class="modal-close" onclick="closeModal('registerModal')">
                 <i class="ri-close-line"></i>
             </button>
         </div>
         <form class="modal-body" id="registerForm">
             <div class="form-group">
                 <label for="registerName">Nome</label>
-                <input type="text" id="registerName" placeholder="Seu nome" required>
+                <input type="text" id="registerName" name="name" placeholder="Seu nome" required>
             </div>
             <div class="form-group">
                 <label for="registerEmail">Email</label>
-                <input type="email" id="registerEmail" placeholder="seu@email.com" required>
+                <input type="email" id="registerEmail" name="email" placeholder="seu@email.com" required>
             </div>
             <div class="form-group">
                 <label for="registerPassword">Senha</label>
-                <input type="password" id="registerPassword" placeholder="********" required>
+                <input type="password" id="registerPassword" name="password" placeholder="********" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
         </form>
@@ -378,7 +371,6 @@
     </div>
 </div>
 
-<!-- Fixed product modal by ensuring proper close function -->
 <!-- Modal de Cadastro de Produto -->
 <div class="modal hidden" id="productModal">
     <div class="modal-content modal-large">
@@ -492,7 +484,6 @@
     </div>
 </div>
 
-<!-- Added order details modal with status tracking -->
 <!-- Modal de Detalhes do Pedido -->
 <div class="modal hidden" id="orderDetailsModal">
     <div class="modal-content modal-large">
@@ -548,7 +539,6 @@
             <div class="order-details-info">
                 <h3>Informações do Pedido</h3>
                 <div id="orderDetailsContent">
-                    <!-- Dados do pedido serão carregados do banco -->
                     <p>Carregando informações...</p>
                 </div>
             </div>

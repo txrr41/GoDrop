@@ -6,6 +6,7 @@ const notifications = [];
 
 // ====== Inicialização ======
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ Aplicação iniciada!");
   initTheme();
   initAuth();
   initNavigation();
@@ -13,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initModals();
   initCart();
   initNotifications();
-  addTooltips();
 });
 
 // ====== Tema Dark/Light ======
@@ -44,6 +44,8 @@ function updateThemeIcon(theme) {
 
 // ====== Autenticação ======
 function initAuth() {
+  console.log("🔐 Iniciando autenticação...");
+
   // Carregar usuário
   const savedUser = localStorage.getItem("currentUser");
   if (savedUser) {
@@ -56,10 +58,21 @@ function initAuth() {
 
   // Delegação de clique para login/register/logout/avatar
   document.body.addEventListener("click", (e) => {
-    if (e.target.closest("#btnLogin")) openModal("loginModal");
-    if (e.target.closest("#btnRegister")) openModal("registerModal");
-    if (e.target.closest("#btnLogout")) logout();
-    if (e.target.closest("#userAvatar")) toggleDropdown(e);
+    if (e.target.closest("#btnLogin")) {
+      console.log("🔓 Abrindo login");
+      openModal("loginModal");
+    }
+    if (e.target.closest("#btnRegister")) {
+      console.log("📝 Abrindo cadastro");
+      openModal("registerModal");
+    }
+    if (e.target.closest("#btnLogout")) {
+      console.log("👋 Logout");
+      logout();
+    }
+    if (e.target.closest("#userAvatar")) {
+      toggleDropdown(e);
+    }
   });
 
   // Fechar dropdown ao clicar fora
@@ -67,9 +80,9 @@ function initAuth() {
     const userMenu = document.getElementById("userMenu");
     const dropdownMenu = document.getElementById("dropdownMenu");
     const notificationsDropdown = document.getElementById("notificationsDropdown");
-    if (!userMenu.contains(e.target)) {
-      dropdownMenu.classList.add("hidden");
-      notificationsDropdown.classList.add("hidden");
+    if (userMenu && !userMenu.contains(e.target)) {
+      if (dropdownMenu) dropdownMenu.classList.add("hidden");
+      if (notificationsDropdown) notificationsDropdown.classList.add("hidden");
     }
   });
 
@@ -99,7 +112,10 @@ function showUserMenu() {
 
   if (authButtons) authButtons.classList.add("hidden");
   if (userMenu) userMenu.classList.remove("hidden");
-  if (userName) userName.textContent = currentUser.name;
+  if (userName && currentUser) {
+    // Tenta pegar 'nome' (português) ou 'name' (inglês)
+    userName.textContent = currentUser.nome || currentUser.name || "Usuário";
+  }
   if (navHistorico) navHistorico.classList.remove("hidden");
 
   updateCartBadge();
@@ -132,37 +148,57 @@ function logout() {
   localStorage.removeItem("cartItems");
   showAuthButtons();
   updateCartBadge();
+  showNotification("Logout realizado com sucesso!");
 }
 
 // Função genérica para submit de forms de login/register
 function handleFormSubmit(formId, modalId, type, fetchFunc) {
   const form = document.getElementById(formId);
-  if (!form) return;
+  if (!form) {
+    console.warn(`⚠️ Form ${formId} não encontrado`);
+    return;
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const data = {};
     form.querySelectorAll("input").forEach((input) => {
-      data[input.name || input.id] = input.value;
+      const key = input.name || input.id;
+      // Apenas adiciona se o input tiver um name/id válido
+      if (key && input.type !== "submit" && input.type !== "button") {
+        data[key] = input.value.trim();
+      }
     });
+
+    console.log(`📤 Enviando ${type}:`, data);
 
     try {
       const response = await fetchFunc(data);
       const result = await response.json();
 
+      console.log("📥 Resposta completa do backend:", result);
+      console.log("📋 Propriedades do objeto:", Object.keys(result));
+
       if (response.ok) {
+        console.log("✅ Sucesso:", result);
         currentUser = result;
         isLoggedIn = true;
         localStorage.setItem("currentUser", JSON.stringify(result));
+
+        // Log para debug
+        console.log("👤 Nome do usuário:", result.nome || result.name || "NÃO ENCONTRADO");
+
         showUserMenu();
         closeModal(modalId);
         form.reset();
         showNotification(`${type === "login" ? "Login" : "Cadastro"} realizado com sucesso!`);
       } else {
-        alert("Erro: " + result.mensagem);
+        console.error("❌ Erro:", result);
+        alert("Erro: " + (result.mensagem || result.message || "Erro desconhecido"));
       }
     } catch (err) {
+      console.error("❌ Erro de conexão:", err);
       alert("Erro ao conectar com servidor");
     }
   });
@@ -170,10 +206,15 @@ function handleFormSubmit(formId, modalId, type, fetchFunc) {
 
 // ====== Modals ======
 function initModals() {
-  const modals = ["loginModal", "registerModal", "productModal", "purchaseModal"];
+  console.log("🪟 Inicializando modals");
+
+  const modals = ["loginModal", "registerModal", "productModal", "purchaseModal", "orderDetailsModal"];
   modals.forEach((id) => {
     const modal = document.getElementById(id);
-    if (!modal) return;
+    if (!modal) {
+      console.warn(`⚠️ Modal ${id} não encontrado`);
+      return;
+    }
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal(id);
     });
@@ -182,18 +223,45 @@ function initModals() {
   // Switch login/register
   const switchToRegister = document.getElementById("switchToRegister");
   const switchToLogin = document.getElementById("switchToLogin");
-  if (switchToRegister) switchToRegister.addEventListener("click", (e) => { e.preventDefault(); closeModal("loginModal"); openModal("registerModal"); });
-  if (switchToLogin) switchToLogin.addEventListener("click", (e) => { e.preventDefault(); closeModal("registerModal"); openModal("loginModal"); });
+
+  if (switchToRegister) {
+    switchToRegister.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("🔄 Login -> Cadastro");
+      closeModal("loginModal");
+      openModal("registerModal");
+    });
+  }
+
+  if (switchToLogin) {
+    switchToLogin.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("🔄 Cadastro -> Login");
+      closeModal("registerModal");
+      openModal("loginModal");
+    });
+  }
 }
 
 function openModal(id) {
+  console.log(`👉 Abrindo: ${id}`);
   const modal = document.getElementById(id);
-  if (modal) modal.classList.remove("hidden");
+  if (modal) {
+    modal.classList.remove("hidden");
+  } else {
+    console.error(`❌ Modal ${id} não existe!`);
+  }
 }
 
 function closeModal(id) {
+  console.log(`👈 Fechando: ${id}`);
   const modal = document.getElementById(id);
   if (modal) modal.classList.add("hidden");
+}
+
+// Função para abrir modal de produto (chamada pelo botão "Novo Produto")
+function openProductModal() {
+  openModal("productModal");
 }
 
 // ====== Cart ======
@@ -253,6 +321,7 @@ function updateCartQuantity(productId, change) {
   else {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
     renderCart();
+    updateCartBadge();
   }
 }
 
@@ -281,7 +350,7 @@ function renderCart() {
   if (!list || !btnFinalize) return;
 
   if (cartItems.length === 0) {
-    list.innerHTML = `<div class="empty-state"><p>Carrinho vazio</p></div>`;
+    list.innerHTML = `<div class="empty-state"><i class="ri-shopping-cart-line"></i><p>Carrinho vazio</p></div>`;
     btnFinalize.disabled = true;
     return;
   }
@@ -289,14 +358,31 @@ function renderCart() {
   btnFinalize.disabled = false;
   list.innerHTML = cartItems.map(i => `
     <div class="cart-item" data-id="${i.id}">
-      <h4>${i.name}</h4>
-      <p>R$ ${i.price.toFixed(2)}</p>
-      <button class="btn-sub">-</button>
-      <span>${i.quantity}</span>
-      <button class="btn-add">+</button>
-      <button class="btn-remove">Remover</button>
+      <div>
+        <h4>${i.name}</h4>
+        <p>R$ ${i.price.toFixed(2)}</p>
+      </div>
+      <div>
+        <button class="btn-sub">-</button>
+        <span>${i.quantity}</span>
+        <button class="btn-add">+</button>
+        <button class="btn-remove">Remover</button>
+      </div>
     </div>
   `).join('');
+}
+
+function finalizePurchase() {
+  if (cartItems.length === 0) {
+    alert("Seu carrinho está vazio!");
+    return;
+  }
+  openModal("purchaseModal");
+}
+
+function buyNow(productId) {
+  // Função para comprar diretamente um produto
+  alert("Funcionalidade 'Comprar agora' em desenvolvimento!");
 }
 
 // ====== Notificações ======
@@ -349,7 +435,11 @@ function showNotification(message) {
   setTimeout(() => toast.classList.add("show"), 100);
   setTimeout(() => {
     toast.classList.remove("show");
-    setTimeout(() => document.body.removeChild(toast), 300);
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
+    }, 300);
   }, 3000);
 }
 
@@ -397,6 +487,7 @@ function initNavigation() {
 }
 
 function showPage(pageId) {
+  console.log(`📄 Página: ${pageId}`);
   document.querySelectorAll(".page-content").forEach(p => p.classList.remove("active"));
   const page = document.getElementById(pageId + "Page");
   if (page) page.classList.add("active");
