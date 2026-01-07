@@ -11,4 +11,5 @@ public class LoginResponse {
     private String mensagem;
     private Long userId;
     private String email;
+    private String token;
 }
