@@ -1,13 +1,14 @@
-package com.project.shiphub.login.dto;
+package com.project.shiphub.dto.auth;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class RegisterRequest {
+    private String name;
     private String email;
     private String password;
 }

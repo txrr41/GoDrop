@@ -2,21 +2,15 @@
   <div class="menu">
     <div class="logo">ShipHub</div>
     <ul>
-      <li><a href="/" @click.prevent="goHome">Home</a></li>
+      <li>
+        <router-link to="/">Home</router-link>
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
-import { Inertia } from '@inertiajs/inertia'
-
-export default {
-  methods: {
-    goHome() {
-      Inertia.visit('/')
-    }
-  }
-}
+export default {}
 </script>
 
 <style scoped>

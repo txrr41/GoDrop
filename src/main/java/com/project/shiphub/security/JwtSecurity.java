@@ -1,4 +1,4 @@
-package com.project.shiphub.login.security;
+package com.project.shiphub.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

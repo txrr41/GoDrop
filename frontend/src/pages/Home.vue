@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Bem-vindo ao ShipHub!</h1>
+    <h1>Bem-vindo a GoHome!</h1>
     <p>Esta é a tela inicial da aplicação.</p>
   </div>
 </template>

@@ -25,14 +25,14 @@ export default {
 
 <style scoped>
 .layout {
-  display: flex;       /* Menu + conteúdo lado a lado */
-  height: 100vh;       /* Ocupa a tela inteira */
+  display: flex;
+  height: 100vh;
 }
 
 .main-content {
-  flex: 1;             /* Ocupa todo o espaço restante */
+  flex: 1;
   display: flex;
-  flex-direction: column; /* Header no topo e página abaixo */
-  overflow-y: auto;       /* Permite scroll se o conteúdo crescer */
+  flex-direction: column;
+  overflow-y: auto;
 }
 </style>

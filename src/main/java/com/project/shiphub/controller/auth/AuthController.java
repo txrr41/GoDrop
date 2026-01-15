@@ -1,17 +1,16 @@
-package com.project.shiphub.login.controller;
+package com.project.shiphub.controller.auth;
 
-import com.project.shiphub.login.dto.LoginRequest;
-import com.project.shiphub.login.dto.LoginResponse;
-import com.project.shiphub.login.dto.RegisterRequest;
-import com.project.shiphub.login.dto.RegisterResponse;
-import com.project.shiphub.login.service.AuthService;
+import com.project.shiphub.dto.auth.LoginRequest;
+import com.project.shiphub.dto.auth.LoginResponse;
+import com.project.shiphub.dto.auth.RegisterRequest;
+import com.project.shiphub.dto.auth.RegisterResponse;
+import com.project.shiphub.service.auth.AuthService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @RestController

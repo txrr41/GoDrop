@@ -1,11 +1,11 @@
-package com.project.shiphub.login.service;
+package com.project.shiphub.service.auth;
 
-import com.project.shiphub.login.dto.LoginRequest;
-import com.project.shiphub.login.dto.LoginResponse;
-import com.project.shiphub.login.dto.RegisterRequest;
-import com.project.shiphub.login.dto.RegisterResponse;
-import com.project.shiphub.login.model.User;
-import com.project.shiphub.login.repository.LoginRepository;
+import com.project.shiphub.dto.auth.LoginRequest;
+import com.project.shiphub.dto.auth.LoginResponse;
+import com.project.shiphub.dto.auth.RegisterRequest;
+import com.project.shiphub.dto.auth.RegisterResponse;
+import com.project.shiphub.model.auth.User;
+import com.project.shiphub.repository.auth.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

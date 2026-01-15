@@ -1,6 +1,6 @@
-package com.project.shiphub.login.repository;
+package com.project.shiphub.repository.auth;
 
-import com.project.shiphub.login.model.User;
+import com.project.shiphub.model.auth.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
