@@ -1,6 +1,6 @@
 <template>
   <div class="menu">
-    <div class="logo">ShipHub</div>
+    <div class="logo"><img src="../assets/Sh__2_-removebg-preview.png" style="width: 180px; padding: 0 0 0 0"></div>
     <ul>
       <li>
         <router-link to="/">Home</router-link>
@@ -16,7 +16,7 @@ export default {}
 <style scoped>
 .menu {
   width: 200px;
-  background-color: #1e1e2f;
+  background-color: #ffffff;
   color: white;
   padding: 20px;
   height: 100vh;
