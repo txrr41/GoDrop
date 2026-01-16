@@ -1,23 +1,21 @@
 <template>
   <header class="header">
 
-    <!-- LADO ESQUERDO (futuro: breadcrumbs / título) -->
-    <div class="header-left">
-      <!-- vazio por enquanto -->
-    </div>
+    <!-- ESQUERDA -->
+    <div class="header-left"></div>
 
-    <!-- LADO DIREITO -->
+    <!-- DIREITA -->
     <div class="header-right">
 
       <!-- NÃO LOGADO -->
       <div v-if="!auth.isLogged" class="auth-actions">
-        <RouterLink to="/login" class="btn-outline">
+        <button class="btn-outline" @click="openLogin">
           Login
-        </RouterLink>
+        </button>
 
-        <RouterLink to="/register" class="btn-primary">
+        <button class="btn-primary" @click="openRegister">
           Cadastrar
-        </RouterLink>
+        </button>
       </div>
 
       <!-- LOGADO -->
@@ -45,43 +43,54 @@
       </div>
 
     </div>
+
+    <!-- MODAL AUTH -->
+    <AuthModal
+        v-if="showAuth"
+        :start-sign-up="startSignUp"
+        @close="closeAuth"
+    />
   </header>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth.js'
+import { useAuthStore } from '../stores/auth'
+import AuthModal from '../components/Auth.vue'
 
-export default {
-  name: 'Header',
+const auth = useAuthStore()
 
-  setup() {
-    const auth = useAuthStore()
-    const menuOpen = ref(false)
+const menuOpen = ref(false)
+const showAuth = ref(false)
+const startSignUp = ref(false)
 
-    function toggleMenu() {
-      menuOpen.value = !menuOpen.value
-    }
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
 
-    function logout() {
-      auth.logout()
-      menuOpen.value = false
-    }
+function logout() {
+  auth.logout()
+  menuOpen.value = false
+}
 
-    return {
-      auth,
-      menuOpen,
-      toggleMenu,
-      logout
-    }
-  }
+function openLogin() {
+  startSignUp.value = false
+  showAuth.value = true
+}
+
+function openRegister() {
+  startSignUp.value = true
+  showAuth.value = true
+}
+
+function closeAuth() {
+  showAuth.value = false
 }
 </script>
 
 <style scoped>
-
 * {
-  font-family: "Roboto" ;
+  font-family: "Roboto";
 }
 
 .header {
@@ -92,13 +101,11 @@ export default {
   align-items: center;
   padding: 0 24px;
   justify-content: space-between;
-
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
 }
 
 .header-right {
@@ -120,8 +127,8 @@ export default {
   border-radius: 6px;
   color: #309cf4;
   font-size: 14px;
-  text-decoration: none;
-  transition: background 0.2s ease;
+  background: transparent;
+  cursor: pointer;
 }
 
 .btn-outline:hover {
@@ -134,7 +141,8 @@ export default {
   border-radius: 6px;
   color: white;
   font-size: 14px;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
 }
 
 /* ===== LOGADO ===== */
@@ -152,7 +160,6 @@ export default {
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 8px;
-  transition: background 0.2s ease;
 }
 
 .user-button:hover {
@@ -163,7 +170,6 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  object-fit: cover;
 }
 
 .name {
@@ -203,7 +209,6 @@ export default {
 
 .dropdown hr {
   margin: 8px 0;
-  border: none;
   border-top: 1px solid #e5e7eb;
 }
 
@@ -222,3 +227,4 @@ export default {
   background: #fee2e2;
 }
 </style>
+s

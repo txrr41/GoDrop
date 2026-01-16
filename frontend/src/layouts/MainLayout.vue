@@ -2,13 +2,10 @@
   <div class="layout">
     <Sidebar />
 
-    <div class="main">
-      <!-- HEADER SEM PADDING -->
+    <div class="right">
       <Header />
-
-      <!-- CONTEÚDO COM PADDING -->
       <main class="content">
-        <RouterView />
+        <router-view />
       </main>
     </div>
   </div>
@@ -23,21 +20,20 @@ import Header from '../components/Header.vue'
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #eeefef;
 }
 
-/* coluna direita */
-.main {
+/* tudo que NÃO é sidebar */
+.right {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-/* SOMENTE O CONTEÚDO TEM PADDING */
+/* área do conteúdo */
 .content {
   flex: 1;
   padding: 24px;
-  overflow-y: auto;
+  background: #e5e5e5;
 }
 </style>
