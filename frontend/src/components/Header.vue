@@ -96,7 +96,7 @@ function closeAuth() {
 .header {
   height: 64px;
   background: rgba(255, 255, 255, 0.49);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #d6d6d6;
   display: flex;
   align-items: center;
   padding: 0 24px;

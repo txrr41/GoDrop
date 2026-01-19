@@ -5,30 +5,31 @@
       <div class="card-wrap">
         <div class="card">
           <div class="head">
-            <h1 class="title">{{ isSignUp ? 'Create Account' : 'Welcome Back' }}</h1>
+            <h1 class="title">{{ isSignUp ? 'Crie sua conta' : 'Bem-Vindo de volta' }}</h1>
             <p class="sub">
-              {{ isSignUp ? 'Sign up to get started' : 'Sign in to your account' }}
+              {{ isSignUp ? 'Cadastre-se para continuar' : 'Registre-se com sua conta' +
+                '' }}
             </p>
           </div>
 
           <div class="tabs">
             <button @click="isSignUp = false" :class="['tab', !isSignUp && 'active']">
-              Sign In
+              Login
             </button>
             <button @click="isSignUp = true" :class="['tab', isSignUp && 'active']">
-              Sign Up
+              Cadastro
             </button>
           </div>
 
           <form @submit.prevent="handleSubmit" class="form">
             <div v-if="isSignUp" class="field">
-              <label class="label">Full Name</label>
-              <input v-model="name" type="text" placeholder="John Doe" class="input" />
+              <label class="label">Nome</label>
+              <input v-model="name" type="text" placeholder="Alec" class="input" />
             </div>
 
             <div class="field">
               <label class="label">Email</label>
-              <input v-model="email" type="email" placeholder="you@example.com" class="input" />
+              <input v-model="email" type="email" placeholder="alec@gmail.com" class="input" />
             </div>
 
             <div class="field">
@@ -60,11 +61,11 @@
             </div>
 
             <div v-if="!isSignUp" class="forgot">
-              <button type="button" class="link">Forgot password?</button>
+              <button type="button" class="link">Esqueceu sua senha?</button>
             </div>
 
             <button type="submit" class="btn">
-              {{ isSignUp ? 'Create Account' : 'Sign In' }}
+              {{ isSignUp ? 'Criar conta' : 'Entrar' }}
             </button>
           </form>
         </div>
@@ -78,7 +79,6 @@ import { ref, computed } from 'vue'
 
 defineEmits(['close'])
 
-const isSignUp = ref(false)
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -102,6 +102,16 @@ const str = computed(() => {
 const handleSubmit = () => {
   console.log(isSignUp.value ? 'Sign up' : 'Sign in')
 }
+
+const props = defineProps({
+  startSignUp: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const isSignUp = ref(props.startSignUp)
+
 </script>
 
 <style scoped>
@@ -163,7 +173,7 @@ const handleSubmit = () => {
 .bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom right, #0f172a, #581c87, #0f172a);
+  background: linear-gradient(to bottom right, #009cfd, #f4f4f4, #3467dd);
 }
 
 .bg-img {
@@ -233,7 +243,7 @@ const handleSubmit = () => {
 }
 
 .input::placeholder { color: rgba(255,255,255,0.4); }
-.input:focus { box-shadow: 0 0 0 2px rgba(168,85,247,0.5); border-color: transparent; }
+.input:focus { box-shadow: 0 0 0 2px rgba(61, 157, 195, 0.5); border-color: transparent; }
 
 .pw-wrap { position: relative; }
 .pw-input { padding-right: 3rem; }
@@ -280,20 +290,20 @@ const handleSubmit = () => {
 
 .link {
   font-size: 0.875rem;
-  color: #c084fc;
+  color: #ffffff;
   background: none;
   border: none;
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.link:hover { color: #d8b4fe; }
+.link:hover { color: #6fbcdd; }
 
 .btn {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(to right, #9333ea, #db2777);
-  color: #fff;
+  background-color: #6fbcdd;
+  color: #ffffff;
   font-weight: 500;
   border: none;
   border-radius: 0.5rem;
@@ -301,7 +311,7 @@ const handleSubmit = () => {
   transition: all 0.2s;
 }
 
-.btn:hover { background: linear-gradient(to right, #a855f7, #ec4899); transform: scale(1.02); }
+.btn:hover { background: linear-gradient(to right, #6fbcdd, #6fafdd); transform: scale(1.02); }
 .btn:active { transform: scale(0.98); }
 
 .divider { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
@@ -322,7 +332,7 @@ const handleSubmit = () => {
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
-  color: #fff;
+  color: #ffffff;
 }
 
 .soc-btn:hover { background: rgba(255,255,255,0.1); }

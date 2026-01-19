@@ -1,17 +1,17 @@
 package com.project.shiphub.model.auth;
+
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,4 @@ public class User {
 
     @Column(nullable = false)
     private String password;
-
-    @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao;
 }

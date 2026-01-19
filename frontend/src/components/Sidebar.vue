@@ -154,7 +154,7 @@ export default {
 .logo-icon {
   width: 200px;
 
-  margin: 0 0 0 90px;
+  margin: 0 0 23px 75px;
 
 }
 
