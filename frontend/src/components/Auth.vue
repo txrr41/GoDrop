@@ -76,8 +76,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useAuthStore} from "../stores/auth.js";
 
 defineEmits(['close'])
+
+const auth = useAuthStore()
 
 const name = ref('')
 const email = ref('')
@@ -99,9 +102,27 @@ const str = computed(() => {
   return s
 })
 
-const handleSubmit = () => {
-  console.log(isSignUp.value ? 'Sign up' : 'Sign in')
+const handleSubmit = async () => {
+  try {
+    if (isSignUp.value) {
+
+      await auth.register({
+        name: name.value,
+        email: email.value,
+        password: password.value
+      })
+    } else {
+
+      await auth.login(email.value, password.value)
+    }
+
+    defineEmits('close')
+
+  } catch (err) {
+    console.error('Erro', err)
+  }
 }
+
 
 const props = defineProps({
   startSignUp: {

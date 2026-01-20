@@ -8,4 +8,5 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthService {
     AuthResponse login(LoginRequest request, HttpServletResponse response);
     AuthResponse register(RegisterRequest request, HttpServletResponse response);
+    void clearCookie(HttpServletResponse response);
 }
