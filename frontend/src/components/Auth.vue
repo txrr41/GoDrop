@@ -78,7 +78,7 @@
 import { ref, computed } from 'vue'
 import { useAuthStore} from "../stores/auth.js";
 
-defineEmits(['close'])
+const emit = defineEmits(['close'])
 
 const auth = useAuthStore()
 
@@ -116,10 +116,11 @@ const handleSubmit = async () => {
       await auth.login(email.value, password.value)
     }
 
-    defineEmits('close')
+    emit('close')
 
   } catch (err) {
     console.error('Erro', err)
+    alert('Erro ao realizar operação: ' + (err.message || 'Erro desconhecido'))
   }
 }
 
