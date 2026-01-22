@@ -6,7 +6,7 @@
       <!-- Sidebar fechada -->
       <img
           v-if="!isOpen"
-          src="../assets/Sh__4_-removebg-preview.png"
+          src="../assets/logo2.png"
           alt="GoHome"
           class="logo-icon-close"
       />
@@ -14,7 +14,7 @@
       <!-- Sidebar aberta -->
       <div v-else class="logo-open">
         <img
-            src="../assets/Sh__2_-removebg-preview.png"
+            src="../assets/logo.png"
             alt="GoHome"
             class="logo-icon"
         />

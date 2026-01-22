@@ -1,6 +1,6 @@
 <template>
   <div class="menu">
-    <div class="logo"><img src="../assets/Sh__2_-removebg-preview.png" style="width: 180px; padding: 0 0 0 0"></div>
+    <div class="logo"><img src="../assets/logo.png" style="width: 180px; padding: 0 0 0 0"></div>
     <ul>
       <li>
         <router-link to="/">Home</router-link>

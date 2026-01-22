@@ -1,8 +1,9 @@
 <template>
-  <div>
-    <h1>Home</h1>
-    <p>Conteúdo da home</p>
-  </div>
+  <v-app>
+    <v-main>
+
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
