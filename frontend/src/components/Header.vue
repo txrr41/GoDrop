@@ -2,11 +2,11 @@
   <v-app>
 
     <v-app-bar elevation="1">
-      <div class="d-flex align-center" style="margin: 20px" >
-        <img :src="logo" alt="" style="width: 200px" >
-
-        <v-app-bar-nav-icon style="position: relative; left: -70px;"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="emit('toggle-sidebar')" ></v-app-bar-nav-icon>
+      <div class="d-flex align-center"  >
+        <img class="ml-0" :src="LogoDrop" alt="" style="width: 150px" >
       </div>
+
 
 
 
@@ -24,6 +24,8 @@
 
       <v-menu v-else>
         <template #activator="{ props }">
+          <v-icon class="ma-7">mdi-magnify</v-icon>
+          <v-icon>mdi-cart-minus</v-icon>
           <v-btn v-bind="props" variant="text">
             <v-avatar size="32" class="mr-2">
               <v-img
@@ -37,6 +39,7 @@
         <v-list>
           <v-list-item to="/profile" title="Meu perfil" />
           <v-list-item to="/settings" title="Configurações" />
+          <v-list-item to="/orders" title="Meus Pedidos" />
 
           <v-divider />
 
@@ -65,15 +68,16 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import AuthModal from '../components/Auth.vue'
-import logo from '../assets/logo.png'
+import LogoDrop from '../assets/LogoDrop.png'
+
 
 
 const auth = useAuthStore()
 
+const emit = defineEmits(['toggle-sidebar'])
 
 const showAuth = ref(false)
 const startSignUp = ref(false)
-
 
 function openLogin() {
   startSignUp.value = false

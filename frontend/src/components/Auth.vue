@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAuthStore} from "../stores/auth.js";
 
 const emit = defineEmits(['close'])
@@ -134,6 +134,13 @@ const props = defineProps({
 
 const isSignUp = ref(props.startSignUp)
 
+watch(
+    () => props.startSignUp,
+    (val) => {
+      isSignUp.value = val
+    }
+)
+
 </script>
 
 <style scoped>
@@ -191,6 +198,7 @@ const isSignUp = ref(props.startSignUp)
   position: relative;
   overflow: hidden;
 }
+
 
 .bg {
   position: absolute;
