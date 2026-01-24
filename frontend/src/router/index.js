@@ -6,15 +6,10 @@ import Auth from "../components/Auth.vue";
 
 const routes = [
     {
-        path: '/',
-        component: MainLayout,
-        children: [
-            {
-                path: '',
-                component: Home
-            }
-        ]
+        path: '/home',
+        component: MainLayout
     },
+
     {
         path: '/login',
         component: Auth

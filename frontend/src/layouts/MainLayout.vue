@@ -5,6 +5,8 @@
     <Header @toggle-sidebar="openSidebar" />
 
     <v-main>
+
+      <HeroSection />
       <RouterView />
     </v-main>
   </v-app>
@@ -14,6 +16,7 @@
 import { ref } from 'vue'
 import Header from '../components/Header.vue'
 import Sidebar from '../components/Sidebar.vue'
+import HeroSection from "../components/HeroSection.vue";
 
 const sidebarRef = ref(null)
 

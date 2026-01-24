@@ -12,6 +12,9 @@
 
       <v-spacer />
 
+      <v-icon class="ma-1">mdi-magnify</v-icon>
+      <v-icon class="ma-6">mdi-cart-minus</v-icon>
+
       <div v-if="!auth.isLogged">
         <v-btn variant="outlined" color="primary" @click="openLogin">
           Login
@@ -24,8 +27,6 @@
 
       <v-menu v-else>
         <template #activator="{ props }">
-          <v-icon class="ma-7">mdi-magnify</v-icon>
-          <v-icon>mdi-cart-minus</v-icon>
           <v-btn v-bind="props" variant="text">
             <v-avatar size="32" class="mr-2">
               <v-img

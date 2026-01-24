@@ -83,35 +83,45 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import LogoDrop from '../assets/LogoDrop.png'
 
 const drawer = ref(false)
+const router = useRouter()
 
 const principalItems = reactive([
-  { title: 'Home', icon: 'mdi-home', active: true },
-  { title: 'Dashboard', icon: 'mdi-finance', active: false },
-  { title: 'Produtos', icon: 'mdi-package', active: false },
-  { title: 'Etiquetas', icon: 'mdi-tag', active: false },
-  { title: 'Envios', icon: 'mdi-truck', active: false },
-  { title: 'Usuários', icon: 'mdi-account', active: false},
+  { title: 'Home', path: '/home', icon: 'mdi-home', active: true },
+  { title: 'Dashboard', path: '/dashboard', icon: 'mdi-finance', active: false },
+  { title: 'Produtos', path: '/produtos', icon: 'mdi-package', active: false },
+  { title: 'Etiquetas', path: '/etiquetas', icon: 'mdi-tag', active: false },
+  { title: 'Envios', path: '/envios', icon: 'mdi-truck', active: false },
+  { title: 'Usuários', path: '/usuarios', icon: 'mdi-account', active: false},
 ])
 
 const contaItems = reactive([
-  { title: 'Ajuda', icon: 'mdi-help-circle', active: false },
-  { title: 'Configurações', icon: 'mdi-cog', active: false },
+  { title: 'Ajuda', path: '/ajuda', icon: 'mdi-help-circle', active: false },
+  { title: 'Configurações', path: '/configuracoes', icon: 'mdi-cog', active: false },
 ])
 
 const emit = defineEmits(['page-change'])
 
 function selectItem(item) {
-
+  // Desativa todos os itens
   principalItems.forEach(i => i.active = false)
   contaItems.forEach(i => i.active = false)
 
+  // Ativa o item selecionado
   item.active = true
 
+  // Emite o evento
   emit('page-change', item.title)
 
+  // Navega para a rota se existir
+  if (item.path) {
+    router.push(item.path)
+  }
+
+  // Fecha o drawer
   drawer.value = false
 }
 
@@ -119,43 +129,3 @@ defineExpose({
   drawer
 })
 </script>
-
-<style scoped>
-
-
-.sidebar
-{
-  border-radius: 0 16px 16px 0 !important;
-}
-
-.sidebar-header
-{
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-}
-
-.section-label
-{
-  letter-spacing: 0.5px;
-}
-
-.active-item {
-  background: linear-gradient(135deg, #00BCD4 0%, #0097b2 100%) !important;
-  color: white !important;
-}
-
-.active-item :deep(.v-icon) {
-  color: white !important;
-}
-
-.active-item :deep(.v-list-item-title) {
-  color: white !important;
-}
-
-:deep(.v-list-item):not(.active-item):hover {
-  background: #f5f5f5 !important;
-}
-
-:deep(.v-navigation-drawer) {
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12) !important;
-}
-</style>
