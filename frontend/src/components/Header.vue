@@ -1,7 +1,5 @@
 <template>
-  <v-app>
-
-    <v-app-bar elevation="1">
+    <v-app-bar elevation="1" fixed>
       <v-app-bar-nav-icon @click="emit('toggle-sidebar')" ></v-app-bar-nav-icon>
       <div class="d-flex align-center"  >
         <img class="ml-0" :src="LogoDrop" alt="" style="width: 150px" >
@@ -53,9 +51,6 @@
       </v-menu>
     </v-app-bar>
 
-    <v-main>
-      <RouterView />
-    </v-main>
 
     <AuthModal
         v-if="showAuth"
@@ -63,7 +58,6 @@
         @close="closeAuth"
     />
 
-  </v-app>
 </template>
 <script setup>
 import { ref } from 'vue'
