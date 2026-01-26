@@ -188,30 +188,12 @@ watch(
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.page {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  position: relative;
-  overflow: hidden;
-}
 
 
-.bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom right, #009cfd, #f4f4f4, #3467dd);
-}
 
-.bg-img {
-  position: absolute;
-  inset: 0;
 
-  opacity: 0.4;
-}
+
+
 
 .card-wrap {
   position: relative;
@@ -254,7 +236,7 @@ watch(
 }
 
 .tab:hover { color: #fff; }
-.tab.active { background: rgba(255,255,255,0.2); color: #fff; }
+
 
 .form { display: flex; flex-direction: column; gap: 1rem; }
 .field { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -292,7 +274,7 @@ watch(
 
 .pw-btn:hover { color: rgba(255,255,255,0.8); }
 
-.icon { width: 1.25rem; height: 1.25rem; }
+
 
 .strength { display: flex; flex-direction: column; gap: 0.5rem; }
 .bars { display: flex; gap: 0.25rem; }
@@ -305,16 +287,6 @@ watch(
   transition: all 0.3s;
 }
 
-.bar.red { background: #ef4444; }
-.bar.orange { background: #f97316; }
-.bar.yellow { background: #eab308; }
-.bar.green { background: #22c55e; }
-
-.msg { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
-.msg.red { color: #f87171; }
-.msg.orange { color: #fb923c; }
-.msg.yellow { color: #facc15; }
-.msg.green { color: #4ade80; }
 
 .forgot { display: flex; justify-content: flex-end; }
 
@@ -344,26 +316,4 @@ watch(
 .btn:hover { background: linear-gradient(to right, #6fbcdd, #6fafdd); transform: scale(1.02); }
 .btn:active { transform: scale(0.98); }
 
-.divider { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
-.line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
-.txt { color: rgba(255,255,255,0.4); font-size: 0.875rem; }
-
-.social { display: flex; gap: 0.75rem; }
-
-.soc-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #ffffff;
-}
-
-.soc-btn:hover { background: rgba(255,255,255,0.1); }
 </style>
