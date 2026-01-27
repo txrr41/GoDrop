@@ -10,4 +10,5 @@ public class ProductRequest {
     private BigDecimal preco;
     private String descricao;
     private Integer estoque;
+    private Boolean ativo;
 }

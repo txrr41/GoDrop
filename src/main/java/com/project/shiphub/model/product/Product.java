@@ -33,6 +33,9 @@ public class Product {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

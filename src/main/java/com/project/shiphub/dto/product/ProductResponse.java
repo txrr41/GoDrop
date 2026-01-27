@@ -1,7 +1,7 @@
 package com.project.shiphub.dto.product;
 
+import com.project.shiphub.model.product.Product;
 import lombok.Data;
-import org.springframework.context.annotation.Bean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,6 +14,16 @@ public class ProductResponse {
     private BigDecimal preco;
     private String descricao;
     private Integer estoque;
+    private Boolean ativo;
     private LocalDateTime createdAt;
+
+    public ProductResponse(Product product) {
+        this.id = product.getId();
+        this.nome = product.getNome();
+        this.preco = product.getPreco();
+        this.descricao = product.getDescricao();
+        this.estoque = product.getEstoque();
+        this.ativo = product.getAtivo();
+    }
 
 }
