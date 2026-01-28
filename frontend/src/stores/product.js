@@ -35,7 +35,38 @@ export const useProductStore = defineStore('product', {
         },
 
         async createProducts(productData){
+            try {
+                this.loading = true
+                this.error = null
+                const { data} = await api.post('/produtos', productData)
+                this.products.push(data)
+                console.log('Produto criado:', data)
+            } catch (error){
+                console.log('Erro ao criar produto', error)
+                this.error = 'Erro ao criar produto'
+                throw error
+            } finally {
+                this.loading = false
+            }
+        },
 
+        async updateProduct(productId, updatedData) {
+            try {
+                this.loading = true
+                this.error = null
+                const { data } = await api.put(`/produtos/${productId}`, updatedData)
+                const index = this.products.findIndex(p => p.id === productId)
+                if (index !== -1){
+                    this.products[index] = data
+                }
+                console.log('Produto atualizado:', data)
+            } catch (error){
+                console.log('Erro ao atualizar produto', error)
+                this.error = 'Erro ao atualizar produto'
+                throw error
+            } finally {
+                this.loading = false
+            }
         }
     }
 })
