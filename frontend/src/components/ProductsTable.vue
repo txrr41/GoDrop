@@ -16,27 +16,27 @@
       <tr v-for="product in products" :key="product.id" class="product-row">
         <td>
           <div class="product-thumb">
-            <img :src="product.image" :alt="product.name" />
+            <img :src="product.imagem" :alt="product.nome" />
           </div>
         </td>
         <td>
           <div class="product-info">
-            <p class="product-name">{{ product.name }}</p>
-            <p class="product-description">{{ product.description }}</p>
+            <p class="product-name">{{ product.nome }}</p>
+            <p class="product-description">{{ product.descricao}}</p>
           </div>
         </td>
         <td>
-          <v-chip size="small" variant="outlined">{{ product.category }}</v-chip>
+          <v-chip size="small" variant="outlined">{{ product.categoria }}</v-chip>
         </td>
-        <td class="text-right font-medium">{{ formatCurrency(product.price) }}</td>
-        <td class="text-center font-medium">{{ product.stock }}</td>
+        <td class="text-right font-medium">{{ formatCurrency(product.preco) }}</td>
+        <td class="text-center font-medium">{{ product.estoque }}</td>
         <td class="text-center">
           <v-chip
               size="small"
-              :color="getStockColor(product.stock)"
-              :variant="product.stock < 10 ? 'flat' : 'outlined'"
+              :color="getStockColor(product.estoque)"
+              :variant="product.estoque < 10 ? 'flat' : 'outlined'"
           >
-            {{ getStockLabel(product.stock) }}
+            {{ getStockLabel(product.estoque) }}
           </v-chip>
         </td>
         <td class="text-center">
@@ -89,14 +89,14 @@ export default {
     formatCurrency(value) {
       return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
     },
-    getStockColor(stock) {
-      if (stock < 10) return 'error'
-      if (stock < 20) return 'warning'
+    getStockColor(estoque) {
+      if (estoque < 10) return 'error'
+      if (estoque < 20) return 'warning'
       return 'success'
     },
-    getStockLabel(stock) {
-      if (stock < 10) return 'Critico'
-      if (stock < 20) return 'Baixo'
+    getStockLabel(estoque) {
+      if (estoque < 10) return 'Critico'
+      if (estoque < 20) return 'Baixo'
       return 'Normal'
     }
   }

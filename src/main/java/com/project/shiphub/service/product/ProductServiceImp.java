@@ -22,6 +22,7 @@ public class ProductServiceImp implements ProductService {
         product.setPreco(request.getPreco());
         product.setDescricao(request.getDescricao());
         product.setEstoque(request.getEstoque());
+        product.setImagem(request.getImagem());
         product.setAtivo(request.getAtivo());
         Product savedProduct = productRepository.save(product);
         return new ProductResponse(savedProduct);

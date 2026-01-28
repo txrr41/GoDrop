@@ -2,32 +2,32 @@
   <div class="products-grid">
     <div v-for="product in products" :key="product.id" class="product-card">
       <div class="card-image">
-        <img :src="product.image" :alt="product.name" />
+        <img :src="product.imagem" :alt="product.nome" />
         <div class="card-overlay">
           <v-btn icon variant="flat" color="white" size="small" @click="$emit('edit', product)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-          <v-btn icon variant="flat" color="error" size="small" @click="$emit('delete', product)">
+          <v-btn icon variant="flat" color="error" size="small" @click="$emit('delete', product)" >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
-        <v-chip class="category-badge" size="small">{{ product.category }}</v-chip>
+        <v-chip class="category-badge" size="small">{{ product.categoria }}</v-chip>
       </div>
       <div class="card-content">
-        <h3 class="card-title">{{ product.name }}</h3>
-        <p class="card-description">{{ product.description }}</p>
+        <h3 class="card-title">{{ product.nome }}</h3>
+        <p class="card-description">{{ product.descricao }}</p>
         <div class="card-footer">
-          <span class="card-price">{{ formatCurrency(product.price) }}</span>
+          <span class="card-price">{{ formatCurrency(product.preco) }}</span>
           <v-chip
               size="small"
-              :color="getStockColor(product.stock)"
-              :variant="product.stock < 10 ? 'flat' : 'outlined'"
+              :color="getStockColor(product.estoque)"
+              :variant="product.estoque < 10 ? 'flat' : 'outlined'"
           >
-            {{ getStockLabel(product.stock) }}
+            {{ getStockLabel(product.estoque) }}
           </v-chip>
         </div>
         <div class="card-stock">
-          <span>Estoque: <strong>{{ product.stock }} unidades</strong></span>
+          <span>Estoque: <strong>{{ product.estoque }} unidades</strong></span>
         </div>
         <v-btn
             color="primary"

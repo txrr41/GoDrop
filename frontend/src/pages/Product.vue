@@ -2,10 +2,10 @@
   <div class="products-page">
 
     <DashboardCards
-        :total-products="totalProducts"
-        :total-stock="totalStock"
-        :total-value="totalValue"
-        :low-stock-count="lowStockCount"
+        :total-products="productStore.totalProducts"
+        :total-stock="productStore.totalStock"
+        :total-value="productStore.totalValue"
+        :low-stock-count="productStore.lowStockCount"
     />
 
 
@@ -16,6 +16,7 @@
         :category-options="categoryOptions"
         @open-category-modal="categoryModal = true"
         @open-product-modal="openNewProduct"
+        :disabled="productStore.loading"
     />
 
 
@@ -25,7 +26,6 @@
         @edit="editProduct"
         @delete="confirmDelete"
     />
-
 
     <ProductsGrid
         v-else
@@ -39,20 +39,18 @@
     <ProductModal
         v-model="productModal"
         :editing-product="editingProduct"
-        :categories="categories"
+        :categories="productStore.categories"
         @save="saveProduct"
     />
-
 
     <CategoryModal
         v-model="categoryModal"
         @save="saveCategory"
     />
 
-
     <DeleteDialog
         v-model="deleteDialog"
-        :product-name="productToDelete?.name || ''"
+        :product-name="productToDelete?.nome || ''"
         @confirm="deleteProduct"
     />
 
@@ -66,7 +64,9 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useProductStore } from '../stores/product'
 import DashboardCards from '../components/DashboardCards.vue'
 import ActionsBar from '../components/ActionsBar.vue'
 import ProductsTable from '../components/ProductsTable.vue'
@@ -75,102 +75,100 @@ import ProductModal from '../components/ProductModal.vue'
 import CategoryModal from '../components/CategoryModal.vue'
 import DeleteDialog from '../components/DeleteDialog.vue'
 
-export default {
-  name: 'ProductsPage',
-  components: {
-    DashboardCards,
-    ActionsBar,
-    ProductsTable,
-    ProductsGrid,
-    ProductModal,
-    CategoryModal,
-    DeleteDialog
-  },
-  data() {
-    return {
-      viewMode: 'list',
-      searchTerm: '',
-      selectedCategory: 'all',
+const productStore = useProductStore()
 
-      productModal: false,
-      categoryModal: false,
-      deleteDialog: false,
+const viewMode = ref('list')
+const searchTerm = ref('')
+const selectedCategory = ref('all')
+const productModal = ref(false)
+const categoryModal = ref(false)
+const deleteDialog = ref(false)
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+const snackbarColor = ref('success')
+const editingProduct = ref(null)
+const productToDelete = ref(null)
 
-      snackbar: false,
-      snackbarMessage: '',
-      snackbarColor: 'success',
+const categoryOptions = computed(() => {
+  return [
+    { name: 'Todas as categorias', value: 'all' },
+    ...productStore.categories
+  ]
+})
 
-      editingProduct: null,
-      productToDelete: null,
+const filteredProducts = computed(() => {
+  return productStore.products.filter(product => {
+    const matchesSearch = product.nome.toLowerCase().includes(searchTerm.value.toLowerCase())
+    const matchesCategory = selectedCategory.value === 'all' || product.category === selectedCategory.value
+    return matchesSearch && matchesCategory
+  })
+})
 
-      products: [],
-      categories: []
+
+const openNewProduct = () => {
+  editingProduct.value = null
+  productModal.value = true
+}
+
+const editProduct = (product) => {
+  editingProduct.value = { ...product }
+  productModal.value = true
+}
+
+const saveProduct = async (formData) => {
+  try {
+    if (editingProduct.value) {
+      await productStore.updateProduct(editingProduct.value.id, formData)
+      showSnackbar('Produto atualizado com sucesso!', 'success')
+    } else {
+      await productStore.createProduct(formData)
+      showSnackbar('Produto criado com sucesso!', 'success')
     }
-  },
-  computed: {
-    categoryOptions() {
-      return [{ name: 'Todas as categorias', value: 'all' }, ...this.categories]
-    },
-    filteredProducts() {
-      return this.products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-        const matchesCategory = this.selectedCategory === 'all' || product.category === this.selectedCategory
-        return matchesSearch && matchesCategory
-      })
-    },
-    totalProducts() {
-      return this.products.length
-    },
-    totalStock() {
-      return this.products.reduce((acc, p) => acc + p.stock, 0)
-    },
-    totalValue() {
-      return this.products.reduce((acc, p) => acc + (p.price * p.stock), 0)
-    },
-    lowStockCount() {
-      return this.products.filter(p => p.stock < 20).length
-    }
-  },
-  methods: {
-    openNewProduct() {
-      this.editingProduct = null
-      this.productModal = true
-    },
-    editProduct(product) {
-      this.editingProduct = product
-      this.productModal = true
-    },
-    saveProduct(formData) {
-      console.log('Salvando produto:', formData)
-    },
-
-    confirmDelete(product) {
-      this.productToDelete = product
-      this.deleteDialog = true
-    },
-    deleteProduct() {
-      console.log('Excluindo produto:', this.productToDelete)
-      this.showSnackbar('Produto excluido com sucesso!', 'success')
-      this.productToDelete = null
-    },
-
-
-    saveCategory(categoryName) {
-      console.log('Salvando categoria:', categoryName)
-    },
-
-    addToCart(product) {
-      console.log('Adicionando ao carrinho:', product)
-      this.showSnackbar(`${product.name} adicionado ao carrinho!`, 'success')
-    },
-
-    showSnackbar(message, color = 'success') {
-      this.snackbarMessage = message
-      this.snackbarColor = color
-      this.snackbar = true
-    }
+    productModal.value = false
+  } catch (error) {
+    showSnackbar('Erro ao salvar produto', 'error')
   }
 }
+
+const confirmDelete = (product) => {
+  productToDelete.value = product
+  deleteDialog.value = true
+}
+
+const deleteProduct = async () => {
+  try {
+    await productStore.deleteProduct(productToDelete.value.id)
+    showSnackbar('Produto excluído com sucesso!', 'success')
+    productToDelete.value = null
+  } catch (error) {
+    showSnackbar('Erro ao excluir produto', 'error')
+  }
+}
+
+const saveCategory = (categoryName) => {
+  productStore.addCategory(categoryName)
+  showSnackbar('Categoria adicionada com sucesso!', 'success')
+}
+
+const addToCart = (product) => {
+  console.log('Adicionando ao carrinho:', product)
+  showSnackbar(`${product.nome} adicionado ao carrinho!`, 'success')
+}
+
+const showSnackbar = (message, color = 'success') => {
+  snackbarMessage.value = message
+  snackbarColor.value = color
+  snackbar.value = true
+}
+
+onMounted(async () => {
+  try {
+    await productStore.fetchProducts()
+  } catch (error) {
+    showSnackbar('Erro ao carregar produtos', 'error')
+  }
+
+})
 </script>
 
 <style scoped>

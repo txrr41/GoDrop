@@ -36,6 +36,10 @@ public class Product {
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String imagem;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

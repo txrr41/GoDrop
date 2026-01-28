@@ -8,8 +8,8 @@
         <div class="form-group">
           <label class="form-label">Imagem do Produto</label>
           <div class="image-upload-area">
-            <div v-if="formData.image" class="image-preview">
-              <img :src="formData.image" alt="Preview" />
+            <div v-if="formData.imagem" class="image-preview">
+              <img :src="formData.imagem" alt="Preview" />
               <v-btn icon variant="flat" color="error" size="x-small" class="remove-image" @click="removeImage">
                 <v-icon size="16">mdi-close</v-icon>
               </v-btn>
@@ -102,6 +102,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'ProductModal',
   props: {
@@ -143,13 +144,32 @@ export default {
     resetForm() {
       this.formData = { name: '', description: '', price: 0, stock: 0, category: '', image: '' }
     },
+
     closeModal() {
       this.$emit('update:modelValue', false)
     },
+
     saveProduct() {
-      this.$emit('save', { ...this.formData })
-      this.closeModal()
+      if (!this.formData.name || !this.formData.price || !this.formData.stock) {
+        alert('Preencha todos os campos obrigatórios')
+        return
+      }
+
+      const productData = {
+        nome: this.formData.name,
+        preco: parseFloat(this.formData.price),
+        descricao: this.formData.description || '',
+        estoque: parseInt(this.formData.stock),
+        imagem: this.formData.image || '',
+        categoria: this.formData.category || 'Uncategorized',
+        ativo: true
+
+      }
+
+      this.$emit('save', productData)
+      console.log(productData)
     },
+
     handleImageUpload(event) {
       const file = event.target.files[0]
       if (file) {
@@ -165,6 +185,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style scoped>

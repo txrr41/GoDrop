@@ -14,6 +14,7 @@ public class ProductResponse {
     private BigDecimal preco;
     private String descricao;
     private Integer estoque;
+    private String imagem;
     private Boolean ativo;
     private LocalDateTime createdAt;
 
@@ -24,6 +25,7 @@ public class ProductResponse {
         this.descricao = product.getDescricao();
         this.estoque = product.getEstoque();
         this.ativo = product.getAtivo();
+        this.imagem = product.getImagem();
     }
 
 }

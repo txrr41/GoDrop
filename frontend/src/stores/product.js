@@ -10,11 +10,11 @@ export const useProductStore = defineStore('product', {
     }),
 
     getters: {
-        totalProducts: (state) => state.products.length,
-        totalStock: (state) => state.products.reduce((acc, p) => acc + p.estoque, 0),
-        totalValue: (state) => state.products.reduce((acc, p) => acc + (p.preco * p.estoque), 0),
-        lowStockCount: (state) => state.products.filter(p => p.estoque < 20).length,
-        activeProducts: (state) => state.products.filter(p => p.ativo)
+        totalProducts: ({ products }) => products.length,
+        totalStock: ({ products }) => products.reduce((acc, p) => acc + p.estoque, 0),
+        totalValue: ({ products }) => products.reduce((acc, p) => acc + (p.preco * p.estoque), 0),
+        lowStockCount: ({ products }) => products.filter(p => p.estoque < 20).length,
+        activeProducts: ({ products }) => products.filter(p => p.ativo)
     },
 
     actions: {
@@ -34,11 +34,11 @@ export const useProductStore = defineStore('product', {
            }
         },
 
-        async createProducts(productData){
+        async createProduct(productData){
             try {
                 this.loading = true
                 this.error = null
-                const { data} = await api.post('/produtos', productData)
+                const { data } = await api.post('/produtos', productData)
                 this.products.push(data)
                 console.log('Produto criado:', data)
             } catch (error){
@@ -50,12 +50,12 @@ export const useProductStore = defineStore('product', {
             }
         },
 
-        async updateProduct(productId, updatedData) {
+        async updateProduct(id, updatedData) {
             try {
                 this.loading = true
                 this.error = null
-                const { data } = await api.put(`/produtos/${productId}`, updatedData)
-                const index = this.products.findIndex(p => p.id === productId)
+                const { data } = await api.put(`/produtos/${id}`, updatedData)
+                const index = this.products.findIndex(p => p.id === id)
                 if (index !== -1){
                     this.products[index] = data
                 }
@@ -66,6 +66,28 @@ export const useProductStore = defineStore('product', {
                 throw error
             } finally {
                 this.loading = false
+            }
+        },
+
+        async deleteProduct(id) {
+            try {
+                this.loading = true
+                this.error = null
+                await api.delete(`/produtos/${id}`)
+                this.products = this.products.filter(p => p.id !== id)
+                console.log('Produto deletado:', id)
+            } catch (error){
+                console.log('Erro ao deletar produto', error)
+                this.error = 'Erro ao deletar produto'
+                throw error
+            } finally {
+                this.loading = false
+            }
+        },
+
+        addCategory(categoryName) {
+            if (!this.categories.find(c => c.name === categoryName)) {
+                this.categories.push({ name: categoryName, value: categoryName })
             }
         }
     }
