@@ -7,7 +7,8 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 import App from './App.vue'
 import router from './router'
-import { useAuthStore } from './stores/auth' // ← IMPORTAR
+import { useAuthStore } from './stores/auth'
+import { vMaska} from "maska/vue";
 
 const vuetify = createVuetify({
     components,
@@ -20,6 +21,7 @@ const app = createApp(App)
 app.use(vuetify)
 app.use(pinia)
 app.use(router)
+app.directive('maska', vMaska)
 
 const authStore = useAuthStore()
 authStore.init().finally(() => {

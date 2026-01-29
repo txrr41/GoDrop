@@ -3,6 +3,7 @@ import MainLayout from '../layouts/MainLayout.vue'
 import Home from '../pages/Home.vue'
 import Auth from "../components/Auth.vue"
 import Product from "../pages/Product.vue";
+import Checkout from "../pages/Checkout.vue";
 
 const routes = [
     {
@@ -32,7 +33,13 @@ const routes = [
                 component: Product
             }
         ]
+    },
+    {
+        path: '/checkout',
+        component: Checkout,
+
     }
+
 ];
 
 export default createRouter({

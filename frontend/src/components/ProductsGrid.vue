@@ -34,41 +34,87 @@
             variant="outlined"
             block
             class="cart-btn"
-            @click="$emit('addToCart', product)"
+            @click="handleAddToCart(product)"
+            :disabled="product.estoque === 0"
         >
           <v-icon start>mdi-cart-plus</v-icon>
-          Adicionar ao Carrinho
+          {{ product.estoque === 0 ? 'Sem Estoque' : 'Adicionar ao Carrinho' }}
         </v-btn>
       </div>
     </div>
     <div v-if="products.length === 0" class="empty-grid">
       <p>Nenhum produto encontrado</p>
     </div>
+
+    <!-- Snackbar de confirmação -->
+    <v-snackbar
+        v-model="snackbar"
+        :timeout="3000"
+        color="success"
+        location="bottom right"
+    >
+      <div class="snackbar-content">
+        <v-icon start>mdi-check-circle</v-icon>
+        {{ snackbarMessage }}
+      </div>
+      <template v-slot:actions>
+        <v-btn variant="text" @click="snackbar = false">
+          Fechar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ProductsGrid',
-  props: {
-    products: { type: Array, default: () => [] }
-  },
-  emits: ['edit', 'delete', 'addToCart'],
-  methods: {
-    formatCurrency(value) {
-      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-    },
-    getStockColor(stock) {
-      if (stock < 10) return 'error'
-      if (stock < 20) return 'warning'
-      return 'success'
-    },
-    getStockLabel(stock) {
-      if (stock < 10) return 'Critico'
-      if (stock < 20) return 'Baixo'
-      return 'Normal'
+<script setup>
+import { ref } from 'vue'
+import { useCartStore } from '../stores/cart'
+import { useAuthStore } from '../stores/auth'
+defineProps({
+  products: { type: Array, default: () => [] }
+});
+const emit = defineEmits(['edit', 'delete', 'openLogin'])
+
+const cartStore = useCartStore()
+const authStore = useAuthStore()
+
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+
+const handleAddToCart = (product) => {
+  // Verifica se o usuário está logado
+  if (!authStore.isLogged) {
+    if (confirm('Você precisa estar logado para adicionar itens ao carrinho. Deseja fazer login?')) {
+      emit('openLogin')
     }
+    return
   }
+
+  try {
+    cartStore.addItem(product)
+    snackbarMessage.value = `${product.nome} adicionado ao carrinho!`
+    snackbar.value = true
+  } catch (error) {
+    alert(error.message)
+  }
+}
+
+const formatCurrency = (value) => {
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+const getStockColor = (stock) => {
+  if (stock === 0) return 'error'
+  if (stock < 10) return 'error'
+  if (stock < 20) return 'warning'
+  return 'success'
+}
+
+const getStockLabel = (stock) => {
+  if (stock === 0) return 'Esgotado'
+  if (stock < 10) return 'Crítico'
+  if (stock < 20) return 'Baixo'
+  return 'Normal'
 }
 </script>
 
@@ -205,6 +251,7 @@ export default {
 
 .cart-btn {
   margin-top: 8px;
+  font-weight: 600;
 }
 
 .empty-grid {
@@ -216,5 +263,11 @@ export default {
   background: #FFFFFF;
   border-radius: 16px;
   color: #9AA5B5;
+}
+
+.snackbar-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>
