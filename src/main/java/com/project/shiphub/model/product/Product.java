@@ -36,9 +36,11 @@ public class Product {
     @Column(nullable = false)
     private Boolean ativo = true;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String imagem;
+
+    @Column
+    private String categoria;
 
     @PrePersist
     protected void onCreate() {

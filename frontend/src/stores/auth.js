@@ -5,14 +5,26 @@ export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: null,
         loading: false,
+        initialized: false
     }),
 
     getters: {
-
-        isLogged: (state) => !!state.user,
+        isLogged: ({ user }) => user,
     },
 
     actions: {
+        async init() {
+            if (this.initialized) return
+
+            try {
+                await this.fetchUser()
+            } catch (error) {
+                console.log('Usuário não autenticado')
+            } finally {
+                this.initialized = true
+            }
+        },
+
         async login(email, password) {
             try {
                 this.loading = true
@@ -55,6 +67,7 @@ export const useAuthStore = defineStore('auth', {
             } catch (error) {
                 console.error('Erro ao buscar usuário:', error)
                 this.user = null
+                throw error
             }
         },
 

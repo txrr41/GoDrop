@@ -16,6 +16,7 @@ public class ProductResponse {
     private Integer estoque;
     private String imagem;
     private Boolean ativo;
+    private String categoria;
     private LocalDateTime createdAt;
 
     public ProductResponse(Product product) {
@@ -26,6 +27,7 @@ public class ProductResponse {
         this.estoque = product.getEstoque();
         this.ativo = product.getAtivo();
         this.imagem = product.getImagem();
+        this.categoria = product.getCategoria();
     }
 
 }
