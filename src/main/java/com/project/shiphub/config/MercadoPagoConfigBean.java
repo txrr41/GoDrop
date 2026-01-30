@@ -13,8 +13,13 @@ public class MercadoPagoConfigBean {
 
     @PostConstruct
     public void init() {
-        System.out.println("MP TOKEN CARREGADO: " + accessToken);
-        MercadoPagoConfig.setAccessToken(accessToken);
+        // Log para verificar se o token está sendo carregado
+        if (accessToken == null || accessToken.isEmpty() || accessToken.equals("${MP_ACCESS_TOKEN}")) {
+            System.err.println("❌ ERRO: Access Token do Mercado Pago NÃO foi carregado!");
+            System.err.println("❌ Verifique as variáveis de ambiente!");
+        } else {
+            System.out.println("✅ MP TOKEN CARREGADO: " + accessToken.substring(0, 20) + "...");
+            MercadoPagoConfig.setAccessToken(accessToken);
+        }
     }
 }
-
