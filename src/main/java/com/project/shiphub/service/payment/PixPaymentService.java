@@ -21,18 +21,18 @@ public class PixPaymentService {
             PaymentClient client = new PaymentClient();
 
             PaymentCreateRequest request = PaymentCreateRequest.builder()
-                    .transactionAmount(new BigDecimal("10.00"))
-                    .description("Teste PIX Mercado Pago")
+                    .transactionAmount(new BigDecimal("100.00"))
+                    .description("Teste PIX - Produto Exemplo")
                     .paymentMethodId("pix")
                     .payer(
                             PaymentPayerRequest.builder()
-                                    .email("test_user_123456@testuser.com")
+                                    .email("TESTUSER2263584545784725993@teste.com")  // ← Email padrão de teste
                                     .firstName("Test")
                                     .lastName("User")
                                     .identification(
                                             IdentificationRequest.builder()
                                                     .type("CPF")
-                                                    .number("19119119100")
+                                                    .number("02648684045")  // ← CPF de teste válido
                                                     .build()
                                     )
                                     .build()
