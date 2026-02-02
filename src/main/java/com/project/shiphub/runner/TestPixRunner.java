@@ -1,6 +1,5 @@
 package com.project.shiphub.runner;
 
-import com.project.shiphub.service.payment.PixPaymentService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;

@@ -69,14 +69,16 @@ public class ServiceImp implements AuthService {
         response.addCookie(cookie);
     }
 
-    // ServiceImp.java
     private void addTokenCookie(String token, HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
-        cookie.setAttribute("SameSite", "Lax");
-        response.addCookie(cookie);
+        String cookieValue = String.format(
+                "token=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Lax",
+                token,
+                60 * 60 * 24  // 24 horas em segundos
+        );
+
+        response.setHeader("Set-Cookie", cookieValue);
+
+        // Debug log
+        System.out.println("🍪 Set-Cookie header: " + cookieValue.substring(0, Math.min(60, cookieValue.length())) + "...");
     }
 }

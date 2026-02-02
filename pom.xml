@@ -69,9 +69,9 @@
             <version>0.11.5</version>
         </dependency>
 		<dependency>
-			<groupId>com.mercadopago</groupId>
-			<artifactId>sdk-java</artifactId>
-			<version>2.1.29</version>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>24.16.0</version>
 		</dependency>
 		<dependency>
             <groupId>io.jsonwebtoken</groupId>
