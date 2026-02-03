@@ -9,7 +9,6 @@ import com.project.shiphub.model.payment.PaymentMethod;
 import com.project.shiphub.model.payment.PaymentStatus;
 import com.project.shiphub.repository.order.OrderRepository;
 import com.project.shiphub.repository.payment.PaymentRepository;
-import com.project.shiphub.service.payment.StripePaymentService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -38,22 +37,22 @@ public class StripePaymentServiceImp implements StripePaymentService {
 
     @Override
     public PaymentResponse createPayment(CreatePaymentRequest request) {
-        log.info("💳 Criando pagamento para pedido: {}", request.getOrderId());
+        log.info("Criando pagamento para pedido: {}", request.getOrderId());
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> {
-                    log.error("❌ Pedido não encontrado: {}", request.getOrderId());
+                    log.error("Pedido não encontrado: {}", request.getOrderId());
                     return new RuntimeException("Pedido não encontrado");
                 });
 
         if (order.getStatus() != OrderStatus.PENDING) {
-            log.error("❌ Pedido já foi processado: {}", order.getId());
+            log.error("Pedido já foi processado: {}", order.getId());
             throw new RuntimeException("Pedido já foi processado");
         }
 
         long totalCents = request.getAmountInCents();
         long platformFee = calculatePlatformFee(totalCents);
 
-        log.info("💰 Total: {} centavos | Taxa: {} centavos", totalCents, platformFee);
+        log.info("Total: {} centavos | Taxa: {} centavos", totalCents, platformFee);
 
         try {
             PaymentIntent paymentIntent = createStripePaymentIntent(
@@ -65,7 +64,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
                     null
             );
 
-            log.info("✅ PaymentIntent criado: {}", paymentIntent.getId());
+            log.info("PaymentIntent criado: {}", paymentIntent.getId());
 
             Payment payment = new Payment();
             payment.setStripePaymentId(paymentIntent.getId());
@@ -77,23 +76,23 @@ public class StripePaymentServiceImp implements StripePaymentService {
             payment.setPlatformFeeInCents(platformFee);
 
             Payment savedPayment = paymentRepository.save(payment);
-            log.info("💾 Pagamento salvo no banco: {}", savedPayment.getId());
+            log.info("Pagamento salvo no banco: {}", savedPayment.getId());
 
             return new PaymentResponse(savedPayment, paymentIntent.getClientSecret());
 
         } catch (StripeException e) {
-            log.error("❌ Erro ao criar pagamento no Stripe: {}", e.getMessage(), e);
+            log.error("Erro ao criar pagamento no Stripe: {}", e.getMessage(), e);
             throw new RuntimeException("Erro ao processar pagamento: " + e.getMessage());
         }
     }
 
     @Override
     public void confirmPayment(String paymentIntentId) {
-        log.info("✅ Confirmando pagamento: {}", paymentIntentId);
+        log.info("Confirmando pagamento: {}", paymentIntentId);
 
         Payment payment = paymentRepository.findByStripePaymentId(paymentIntentId)
                 .orElseThrow(() -> {
-                    log.error("❌ Pagamento não encontrado: {}", paymentIntentId);
+                    log.error("Pagamento não encontrado: {}", paymentIntentId);
                     return new RuntimeException("Pagamento não encontrado");
                 });
 
@@ -104,12 +103,12 @@ public class StripePaymentServiceImp implements StripePaymentService {
         order.setStatus(OrderStatus.PAYMENT_APPROVED);
         orderRepository.save(order);
 
-        log.info("🎉 Pagamento confirmado com sucesso!");
+        log.info("Pagamento confirmado com sucesso!");
     }
 
     @Override
     public void failPayment(String paymentIntentId, String errorMessage) {
-        log.error("❌ Pagamento falhou: {} - {}", paymentIntentId, errorMessage);
+        log.error("Pagamento falhou: {} - {}", paymentIntentId, errorMessage);
 
         Payment payment = paymentRepository.findByStripePaymentId(paymentIntentId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
@@ -125,7 +124,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
 
     @Override
     public PaymentResponse refundPayment(Long paymentId) {
-        log.info("↩️ Processando reembolso para pagamento: {}", paymentId);
+        log.info("↩Processando reembolso para pagamento: {}", paymentId);
 
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
@@ -138,15 +137,15 @@ public class StripePaymentServiceImp implements StripePaymentService {
             PaymentIntent paymentIntent = PaymentIntent.retrieve(
                     payment.getStripePaymentId()
             );
-            // Criar Refund (implementar depois)
+
             payment.setStatus(PaymentStatus.REFUNDED);
             Payment savedPayment = paymentRepository.save(payment);
 
-            log.info("✅ Reembolso processado com sucesso");
+            log.info("Reembolso processado com sucesso");
             return new PaymentResponse(savedPayment);
 
         } catch (StripeException e) {
-            log.error("❌ Erro ao processar reembolso: {}", e.getMessage(), e);
+            log.error("Erro ao processar reembolso: {}", e.getMessage(), e);
             throw new RuntimeException("Erro ao processar reembolso: " + e.getMessage());
         }
     }
