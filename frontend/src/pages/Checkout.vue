@@ -309,6 +309,10 @@ const showSnackbar = (m, c) => {
   snackbar.value = true
 }
 
+// ADICIONE ESTAS LINHAS NO SEU Checkout.vue
+
+// Na função finalizarCompra, após o resultado do pagamento:
+
 const finalizarCompra = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return showSnackbar('Preencha os campos obrigatórios', 'error')
@@ -347,15 +351,39 @@ const finalizarCompra = async () => {
       })
 
       if (result.success) {
-        showSnackbar('Pagamento aprovado!', 'success')
-        cartStore.clearCart()
-        setTimeout(() => router.push('/produtos'), 2000)
+        // ✅ REDIRECIONA PARA PÁGINA DE SUCESSO
+        router.push({
+          path: '/payment-success',
+          query: {
+            orderId: result.paymentIntent?.metadata?.order_id || 'N/A',
+            amount: cartStore.total,
+            email: formData.email,
+            method: formData.pagamento
+          }
+        })
       } else {
-        showSnackbar(result.error, 'error')
+        // ❌ REDIRECIONA PARA PÁGINA DE FALHA
+        router.push({
+          path: '/payment-failed',
+          query: {
+            message: result.error || 'Erro ao processar pagamento',
+            amount: cartStore.total,
+            errorCode: 'PAY_' + Date.now()
+          }
+        })
       }
     }
   } catch (e) {
-    showSnackbar('Erro ao processar pedido', 'error')
+    console.error('Erro:', e)
+    // ❌ REDIRECIONA PARA PÁGINA DE FALHA
+    router.push({
+      path: '/payment-failed',
+      query: {
+        message: 'Erro ao processar pedido. Tente novamente.',
+        amount: cartStore.total,
+        errorCode: 'SYS_' + Date.now()
+      }
+    })
   } finally {
     loading.value = false
   }

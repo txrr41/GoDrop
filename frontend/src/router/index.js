@@ -4,6 +4,8 @@ import Home from '../pages/Home.vue'
 import Auth from "../components/Auth.vue"
 import Product from "../pages/Product.vue";
 import Checkout from "../pages/Checkout.vue";
+import PaymentSuccess from "../pages/PaymentSuccess.vue";
+import PaymentFailed from "../pages/PaymentFailed.vue";
 
 const routes = [
     {
@@ -37,9 +39,15 @@ const routes = [
     {
         path: '/checkout',
         component: Checkout,
-
+    },
+    {
+        path: '/payment-success',
+        component: PaymentSuccess,
+    },
+    {
+        path: '/payment-failed',
+        component: PaymentFailed,
     }
-
 ];
 
 export default createRouter({
