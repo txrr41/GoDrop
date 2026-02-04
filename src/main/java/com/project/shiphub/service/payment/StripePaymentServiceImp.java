@@ -9,6 +9,7 @@ import com.project.shiphub.model.payment.PaymentMethod;
 import com.project.shiphub.model.payment.PaymentStatus;
 import com.project.shiphub.repository.order.OrderRepository;
 import com.project.shiphub.repository.payment.PaymentRepository;
+import com.project.shiphub.service.email.EmailServiceImp;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -30,9 +31,11 @@ import java.util.Map;
 public class StripePaymentServiceImp implements StripePaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final EmailServiceImp emailServiceImp;
 
     @Value("${stripe.platform.fee.percent:30}")
     private int platformFeePercent;
+
 
 
     @Override
@@ -101,6 +104,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
 
         Order order = payment.getOrder();
         order.setStatus(OrderStatus.PAYMENT_APPROVED);
+
         orderRepository.save(order);
 
         log.info("Pagamento confirmado com sucesso!");
