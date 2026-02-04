@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class CreatePaymentRequest {
 
-    @NotNull(message = "Order ID é obrigatorio")
     private Long orderId;
 
     @NotNull(message = "Método de pagamento é obrigatório")

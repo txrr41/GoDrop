@@ -174,11 +174,18 @@ public class StripePaymentServiceImp implements StripePaymentService {
             Long platformFee,
             String sellerAccountId
     ) throws StripeException {
+
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("order_id", orderId.toString());
+        metadata.put("platform_fee", platformFee.toString());
+
         PaymentIntentCreateParams.Builder paramsBuilder =
                 PaymentIntentCreateParams.builder()
                         .setAmount(amountCents)
                         .setCurrency("brl")
-                        .setReceiptEmail(customerEmail);
+                        .setReceiptEmail(customerEmail)
+                        .putAllMetadata(metadata);  // ✅ AQUI: metadata correto
+
         switch (paymentMethod.toUpperCase()) {
             case "CREDIT_CARD":
             case "DEBIT_CARD":
@@ -193,11 +200,6 @@ public class StripePaymentServiceImp implements StripePaymentService {
             default:
                 throw new IllegalArgumentException("Método de pagamento inválido: " + paymentMethod);
         }
-
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("order_id", orderId.toString());
-        metadata.put("platform_fee", platformFee.toString());
-        paramsBuilder.setMandate(metadata.toString());
 
         if (sellerAccountId != null) {
             paramsBuilder

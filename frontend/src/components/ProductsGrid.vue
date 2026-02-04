@@ -2,16 +2,13 @@
   <div class="products-grid">
     <div v-for="product in products" :key="product.id" class="product-card">
       <div class="card-image">
-        <img :src="product.imagem" :alt="product.nome" />
-        <div class="card-overlay">
-          <v-btn icon variant="flat" color="white" size="small" @click="$emit('edit', product)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon variant="flat" color="error" size="small" @click="$emit('delete', product)" >
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </div>
-        <v-chip class="category-badge" size="small">{{ product.categoria }}</v-chip>
+        <!-- ✅ Adicionado fallback e tratamento de erro -->
+        <img
+            :src="getImageUrl(product.imagem)"
+            :alt="product.nome"
+            @error="handleImageError"
+            loading="lazy"
+        />
       </div>
       <div class="card-content">
         <h3 class="card-title">{{ product.nome }}</h3>
@@ -46,7 +43,6 @@
       <p>Nenhum produto encontrado</p>
     </div>
 
-    <!-- Snackbar de confirmação -->
     <v-snackbar
         v-model="snackbar"
         :timeout="3000"
@@ -70,9 +66,10 @@
 import { ref } from 'vue'
 import { useCartStore } from '../stores/cart'
 import { useAuthStore } from '../stores/auth'
+
 defineProps({
   products: { type: Array, default: () => [] }
-});
+})
 const emit = defineEmits(['edit', 'delete', 'openLogin'])
 
 const cartStore = useCartStore()
@@ -81,8 +78,41 @@ const authStore = useAuthStore()
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 
+// ✅ NOVA FUNÇÃO: Trata URLs de imagens
+const getImageUrl = (imageUrl) => {
+  // Se não tem imagem, retorna placeholder
+  if (!imageUrl) {
+    console.warn('⚠️ Produto sem imagem, usando placeholder')
+    return 'https://via.placeholder.com/400x300/e0e0e0/666666?text=Sem+Imagem'
+  }
+
+  // Se já é Base64 válido, retorna direto
+  if (imageUrl.startsWith('data:image/')) {
+    return imageUrl
+  }
+
+  // Se é URL válida, retorna direto
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl
+  }
+
+  // Se é caminho relativo, tenta construir URL
+  if (imageUrl.startsWith('/')) {
+    return imageUrl
+  }
+
+  // Caso contrário, assume que está quebrado e usa placeholder
+  console.error('❌ Formato de imagem inválido:', imageUrl.substring(0, 50))
+  return 'https://via.placeholder.com/400x300/ffcccc/cc0000?text=Erro+na+Imagem'
+}
+
+// ✅ NOVA FUNÇÃO: Trata erros de carregamento
+const handleImageError = (event) => {
+  console.error('❌ Erro ao carregar imagem:', event.target.src)
+  event.target.src = 'https://via.placeholder.com/400x300/ffcccc/cc0000?text=Falha+ao+Carregar'
+}
+
 const handleAddToCart = (product) => {
-  // Verifica se o usuário está logado
   if (!authStore.isLogged) {
     if (confirm('Você precisa estar logado para adicionar itens ao carrinho. Deseja fazer login?')) {
       emit('openLogin')
@@ -170,6 +200,11 @@ const getStockLabel = (stock) => {
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+}
+
+/* ✅ NOVO: Estado de loading para imagens */
+.card-image img[src*="placeholder"] {
+  opacity: 0.7;
 }
 
 .product-card:hover .card-image img {
