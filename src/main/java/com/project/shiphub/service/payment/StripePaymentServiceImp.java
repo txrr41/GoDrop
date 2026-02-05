@@ -104,6 +104,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
 
         Order order = payment.getOrder();
         order.setStatus(OrderStatus.PAYMENT_APPROVED);
+        emailServiceImp.sendEmail(order.getBuyerEmail(), order.getBuyerName(), payment.getStripePaymentId(), order.getTotalAmount(),  String.valueOf(payment.getMethod()),payment.getCreatedAt());
 
         orderRepository.save(order);
 
