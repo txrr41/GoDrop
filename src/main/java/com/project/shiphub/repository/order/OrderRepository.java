@@ -9,24 +9,22 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    // ✅ NOVO: Buscar pedido com itens carregados
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.items WHERE o.id = :id")
+    Optional<Order> findByIdWithItems(@Param("id") Long id);
+
     List<Order> findByUserId(Long userId);
-
     List<Order> findByUserIdOrderByCreatedAtDesc(Long userId);
-
     List<Order> findByStatus(OrderStatus status);
-
     List<Order> findByCreatedAtAfter(LocalDateTime date);
-
     List<Order> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
-
     List<Order> findByUserIdAndStatus(Long userId, OrderStatus status);
-
     long countByUserId(Long userId);
-
     boolean existsByUserIdAndStatus(Long userId, OrderStatus status);
 
     @Query("SELECT o FROM Order o WHERE o.status = 'PENDING' AND o.createdAt < :date")

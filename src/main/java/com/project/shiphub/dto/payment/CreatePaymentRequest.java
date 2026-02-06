@@ -1,10 +1,10 @@
 package com.project.shiphub.dto.payment;
 
-
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
 
 @Data
 public class CreatePaymentRequest {
@@ -18,7 +18,6 @@ public class CreatePaymentRequest {
     private Long amountInCents;
 
     private String paymentMethodId;
-
     private String customerEmail;
     private String buyerName;
     private String buyerEmail;
@@ -31,4 +30,14 @@ public class CreatePaymentRequest {
     private String shippingNeighborhood;
     private String shippingCity;
     private String shippingState;
+
+    // ✅ NOVO: Lista de itens do carrinho
+    private List<CartItemDTO> items;
+
+    @Data
+    public static class CartItemDTO {
+        private Long productId;
+        private Integer quantity;
+        private Double unitPrice;
+    }
 }

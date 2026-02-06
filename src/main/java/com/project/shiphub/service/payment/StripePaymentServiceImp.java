@@ -80,6 +80,8 @@ public class StripePaymentServiceImp implements StripePaymentService {
 
             Payment savedPayment = paymentRepository.save(payment);
             log.info("Pagamento salvo no banco: {}", savedPayment.getId());
+            emailServiceImp.sendOrderConfirmationEmail(order, payment.getCreatedAt());
+            emailServiceImp.sendTrackingEmail(order);
 
             return new PaymentResponse(savedPayment, paymentIntent.getClientSecret());
 
@@ -102,11 +104,20 @@ public class StripePaymentServiceImp implements StripePaymentService {
         payment.setStatus(PaymentStatus.SUCCEEDED);
         paymentRepository.save(payment);
 
-        Order order = payment.getOrder();
-        order.setStatus(OrderStatus.PAYMENT_APPROVED);
-        emailServiceImp.sendEmail(order.getBuyerEmail(), order.getBuyerName(), payment.getStripePaymentId(), order.getTotalAmount(),  String.valueOf(payment.getMethod()),payment.getCreatedAt());
+        // ✅ Buscar pedido com itens carregados
+        Order order = orderRepository.findByIdWithItems(payment.getOrder().getId())
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
+        order.setStatus(OrderStatus.PAYMENT_APPROVED);
         orderRepository.save(order);
+
+        // ✅ Log para debug
+        log.info("📧 Enviando email com {} itens", order.getItems().size());
+        order.getItems().forEach(item ->
+                log.info("   • {} x{}", item.getProduct().getNome(), item.getQuantity())
+        );
+
+        emailServiceImp.sendOrderConfirmationEmail(order, payment.getCreatedAt());
 
         log.info("Pagamento confirmado com sucesso!");
     }

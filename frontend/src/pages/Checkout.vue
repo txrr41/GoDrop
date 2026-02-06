@@ -319,6 +319,13 @@ const finalizarCompra = async () => {
 
   loading.value = true
   try {
+    // ✅ Preparar os itens do carrinho no formato correto
+    const cartItems = cartStore.cartItems.map(item => ({
+      productId: item.id,
+      quantity: item.quantity,
+      unitPrice: item.preco
+    }))
+
     const paymentData = {
       paymentMethod: formData.pagamento,
       amountInCents: Math.round(cartStore.total * 100),
@@ -333,8 +340,11 @@ const finalizarCompra = async () => {
       shippingComplement: formData.complemento,
       shippingNeighborhood: formData.bairro,
       shippingCity: formData.cidade,
-      shippingState: formData.estado
+      shippingState: formData.estado,
+      items: cartItems  // ✅ NOVO: Enviando os itens
     }
+
+    console.log('📤 Enviando pedido com itens:', paymentData)
 
     const { clientSecret } = await paymentService.createPaymentIntent(paymentData)
 
@@ -351,8 +361,10 @@ const finalizarCompra = async () => {
       })
 
       if (result.success) {
-        // ✅ REDIRECIONA PARA PÁGINA DE SUCESSO
-        router.push({
+        // ✅ Limpar carrinho após sucesso
+        cartStore.clearCart()
+
+        await router.push({
           path: '/payment-success',
           query: {
             orderId: result.paymentIntent?.metadata?.order_id || 'N/A',
@@ -362,8 +374,7 @@ const finalizarCompra = async () => {
           }
         })
       } else {
-        // ❌ REDIRECIONA PARA PÁGINA DE FALHA
-        router.push({
+        await router.push({
           path: '/payment-failed',
           query: {
             message: result.error || 'Erro ao processar pagamento',
@@ -374,9 +385,8 @@ const finalizarCompra = async () => {
       }
     }
   } catch (e) {
-    console.error('Erro:', e)
-    // ❌ REDIRECIONA PARA PÁGINA DE FALHA
-    router.push({
+    console.error('❌ Erro:', e)
+    await router.push({
       path: '/payment-failed',
       query: {
         message: 'Erro ao processar pedido. Tente novamente.',
