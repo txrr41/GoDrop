@@ -38,6 +38,7 @@ public class PaymentController {
             BigDecimal total = BigDecimal.valueOf(request.getAmountInCents()).divide(new BigDecimal(100));
             Order order = orderService.createOrder(user, total, request);
             request.setOrderId(order.getId());
+            request.setBuyerEmail(order.getBuyerEmail());
             PaymentResponse response = stripePaymentService.createPayment(request);
 
             return ResponseEntity.ok(response);

@@ -31,7 +31,6 @@ public class CreatePaymentRequest {
     private String shippingCity;
     private String shippingState;
 
-    // ✅ NOVO: Lista de itens do carrinho
     private List<CartItemDTO> items;
 
     @Data
@@ -40,4 +39,5 @@ public class CreatePaymentRequest {
         private Integer quantity;
         private Double unitPrice;
     }
+
 }

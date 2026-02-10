@@ -6,6 +6,7 @@ import Product from "../pages/Product.vue";
 import Checkout from "../pages/Checkout.vue";
 import PaymentSuccess from "../pages/PaymentSuccess.vue";
 import PaymentFailed from "../pages/PaymentFailed.vue";
+import Order from "../pages/Order.vue";
 
 const routes = [
     {
@@ -47,6 +48,20 @@ const routes = [
     {
         path: '/payment-failed',
         component: PaymentFailed,
+    },
+    {
+        path: '/orders',
+        component: Order,
+    },
+    {
+        path: '/admin',
+        component: MainLayout,
+        children: [
+            {
+                path: 'pedidos',
+                component: () => import('../pages/AdminOrder.vue')
+            }
+        ]
     }
 ];
 

@@ -83,4 +83,7 @@ public class Order {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @Column(name = "tracking_code", length = 50)
+    private String trackingCode;
 }

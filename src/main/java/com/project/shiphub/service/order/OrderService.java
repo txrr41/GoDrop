@@ -8,12 +8,16 @@ import com.project.shiphub.model.order.OrderStatus;
 import com.project.shiphub.model.product.Product;
 import com.project.shiphub.repository.order.OrderRepository;
 import com.project.shiphub.repository.product.ProductRepository;
+import com.project.shiphub.service.email.EmailServiceImp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final EmailServiceImp emailServiceImp;
 
     public Order createOrder(User user, BigDecimal totalAmount, CreatePaymentRequest request) {
         log.info("📦 Criando pedido para usuário: {}", user.getEmail());
@@ -43,7 +48,6 @@ public class OrderService {
         order.setShippingCity(request.getShippingCity());
         order.setShippingState(request.getShippingState());
 
-        // ✅ Adicionar os itens do carrinho ao pedido
         if (request.getItems() != null && !request.getItems().isEmpty()) {
             log.info("🛒 Adicionando {} itens ao pedido", request.getItems().size());
 
@@ -51,7 +55,6 @@ public class OrderService {
                 Product product = productRepository.findById(cartItem.getProductId())
                         .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + cartItem.getProductId()));
 
-                // Verificar estoque
                 if (product.getEstoque() < cartItem.getQuantity()) {
                     throw new RuntimeException("Estoque insuficiente para: " + product.getNome());
                 }
@@ -76,4 +79,101 @@ public class OrderService {
 
         return savedOrder;
     }
+
+    public List<Order> getUserOrders(User user) {
+        log.info("📋 Buscando pedidos do usuário: {}", user.getEmail());
+
+        List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+
+        log.info("✅ Encontrados {} pedidos", orders.size());
+        return orders;
+    }
+
+    public Order getOrderById(Long orderId, User user) {
+        log.info("🔍 Buscando pedido #{} para usuário {}", orderId, user.getEmail());
+
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            log.warn("⚠️ Tentativa de acesso não autorizado ao pedido #{}", orderId);
+            throw new RuntimeException("Acesso negado");
+        }
+
+        return order;
+    }
+
+    public List<Order> getAllOrders() {
+        log.info("👨‍💼 Buscando todos os pedidos do sistema");
+
+        List<Order> orders = orderRepository.findAllByOrderByCreatedAtDesc();
+
+        log.info("✅ Encontrados {} pedidos no total", orders.size());
+        return orders;
+    }
+
+    @Transactional
+    public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        log.info("🔄 Atualizando status do pedido #{} para {}", orderId, newStatus);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        order.setStatus(newStatus);
+
+        Order updatedOrder = orderRepository.save(order);
+
+        log.info("✅ Status atualizado: Pedido #{} → {}", orderId, newStatus);
+
+        return updatedOrder;
+    }
+
+    @Transactional
+    public Order markAsShipped(Long orderId, String trackingCode) {
+        log.info("📦 Despachando pedido #{} com rastreio {}", orderId, trackingCode);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        // Valida se pode ser despachado
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new RuntimeException("Não é possível despachar pedido cancelado");
+        }
+
+        if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED) {
+            throw new RuntimeException("Pedido já foi despachado");
+        }
+
+        order.setStatus(OrderStatus.SHIPPED);
+        order.setTrackingCode(trackingCode.trim().toUpperCase());
+
+        Order shippedOrder = orderRepository.save(order);
+
+        log.info("✅ Pedido #{} despachado com sucesso", orderId);
+
+        emailServiceImp.sendTrackingEmail(shippedOrder);
+
+        return shippedOrder;
+    }
+
+    public Map<String, Long> getOrderStatsByStatus() {
+        log.info("📊 Calculando estatísticas de pedidos");
+
+        List<Order> allOrders = orderRepository.findAll();
+
+        Map<String, Long> stats = allOrders.stream()
+                .collect(Collectors.groupingBy(
+                        order -> order.getStatus().toString(),
+                        Collectors.counting()
+                ));
+
+        return stats;
+    }
+
+    public Long getTotalOrders() {
+        return orderRepository.count();
+    }
+
+
+
 }
