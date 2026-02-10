@@ -82,7 +82,6 @@ public class EmailServiceImp implements EmailService {
         body.append("💰 RESUMO DO PAGAMENTO:\n\n");
         body.append("  Subtotal: R$ ").append(order.getTotalAmount()).append("\n");
         body.append("  Frete: GRÁTIS\n");
-        body.append("  ─────────────────────────────\n");
         body.append("  TOTAL: R$ ").append(order.getTotalAmount()).append("\n\n");
 
         body.append("📅 Data do pagamento: ").append(paymentHour.format(formatter)).append("\n");

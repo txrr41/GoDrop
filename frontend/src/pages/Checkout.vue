@@ -361,7 +361,6 @@ const finalizarCompra = async () => {
       })
 
       if (result.success) {
-        // ✅ Limpar carrinho após sucesso
         cartStore.clearCart()
 
         await router.push({

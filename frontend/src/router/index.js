@@ -50,10 +50,6 @@ const routes = [
         component: PaymentFailed,
     },
     {
-        path: '/orders',
-        component: Order,
-    },
-    {
         path: '/admin',
         component: MainLayout,
         children: [
@@ -62,6 +58,10 @@ const routes = [
                 component: () => import('../pages/AdminOrder.vue')
             }
         ]
+    },
+    {
+        path: '/orders',
+        component: Order
     }
 ];
 

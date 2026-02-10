@@ -119,13 +119,31 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
+        OrderStatus currentStatus = order.getStatus();
+        log.info("🔍 Status atual do pedido: {}", currentStatus);
+        
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new RuntimeException(
+                    "Transição inválida: " + currentStatus + " → " + newStatus
+            );
+        }
+
         order.setStatus(newStatus);
+        Order updated = orderRepository.save(order);
 
-        Order updatedOrder = orderRepository.save(order);
+        log.info("✅ Status atualizado: {} → {}", currentStatus, newStatus);
+        return updated;
+    }
 
-        log.info("✅ Status atualizado: Pedido #{} → {}", orderId, newStatus);
-
-        return updatedOrder;
+    private boolean isValidTransition(OrderStatus from, OrderStatus to) {
+        return switch (from) {
+            case PENDING -> false; // só webhook muda
+            case PAYMENT_APPROVED -> to == OrderStatus.PROCESSING;
+            case PAYMENT_FAILED -> false;
+            case PROCESSING -> to == OrderStatus.SHIPPED;
+            case SHIPPED, DELIVERED, CANCELLED -> false;
+            case REFUNDED -> false;
+        };
     }
 
     @Transactional
@@ -135,7 +153,6 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
-        // Valida se pode ser despachado
         if (order.getStatus() == OrderStatus.CANCELLED) {
             throw new RuntimeException("Não é possível despachar pedido cancelado");
         }
