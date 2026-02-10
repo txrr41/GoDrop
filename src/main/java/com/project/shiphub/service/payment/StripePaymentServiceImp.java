@@ -9,7 +9,6 @@ import com.project.shiphub.model.payment.PaymentMethod;
 import com.project.shiphub.model.payment.PaymentStatus;
 import com.project.shiphub.repository.order.OrderRepository;
 import com.project.shiphub.repository.payment.PaymentRepository;
-import com.project.shiphub.service.email.EmailServiceImp;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -29,33 +28,32 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class StripePaymentServiceImp implements StripePaymentService {
+
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
-    private final EmailServiceImp emailServiceImp;
 
     @Value("${stripe.platform.fee.percent:30}")
     private int platformFeePercent;
 
-
-
     @Override
     public PaymentResponse createPayment(CreatePaymentRequest request) {
-        log.info("Criando pagamento para pedido: {}", request.getOrderId());
+        log.info("💳 Criando pagamento para pedido: {}", request.getOrderId());
+
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> {
-                    log.error("Pedido não encontrado: {}", request.getOrderId());
+                    log.error("❌ Pedido não encontrado: {}", request.getOrderId());
                     return new RuntimeException("Pedido não encontrado");
                 });
 
         if (order.getStatus() != OrderStatus.PENDING) {
-            log.error("Pedido já foi processado: {}", order.getId());
+            log.error("❌ Pedido já foi processado: {}", order.getId());
             throw new RuntimeException("Pedido já foi processado");
         }
 
         long totalCents = request.getAmountInCents();
         long platformFee = calculatePlatformFee(totalCents);
 
-        log.info("Total: {} centavos | Taxa: {} centavos", totalCents, platformFee);
+        log.info("💰 Total: {} centavos | Taxa: {} centavos", totalCents, platformFee);
 
         try {
             PaymentIntent paymentIntent = createStripePaymentIntent(
@@ -67,8 +65,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
                     null
             );
 
-            log.info("PaymentIntent criado: {}", paymentIntent.getId());
-
+            log.info("✅ PaymentIntent criado: {}", paymentIntent.getId());
             Payment payment = new Payment();
             payment.setStripePaymentId(paymentIntent.getId());
             payment.setOrder(order);
@@ -79,52 +76,41 @@ public class StripePaymentServiceImp implements StripePaymentService {
             payment.setPlatformFeeInCents(platformFee);
 
             Payment savedPayment = paymentRepository.save(payment);
-            log.info("Pagamento salvo no banco: {}", savedPayment.getId());
-            emailServiceImp.sendOrderConfirmationEmail(order, payment.getCreatedAt());
-            emailServiceImp.sendTrackingEmail(order);
+            log.info("💾 Pagamento salvo no banco: {}", savedPayment.getId());
 
             return new PaymentResponse(savedPayment, paymentIntent.getClientSecret());
 
         } catch (StripeException e) {
-            log.error("Erro ao criar pagamento no Stripe: {}", e.getMessage(), e);
+            log.error("❌ Erro ao criar pagamento no Stripe: {}", e.getMessage(), e);
             throw new RuntimeException("Erro ao processar pagamento: " + e.getMessage());
         }
     }
 
     @Override
     public void confirmPayment(String paymentIntentId) {
-        log.info("Confirmando pagamento: {}", paymentIntentId);
+        log.info("✅ Confirmando pagamento: {}", paymentIntentId);
 
         Payment payment = paymentRepository.findByStripePaymentId(paymentIntentId)
                 .orElseThrow(() -> {
-                    log.error("Pagamento não encontrado: {}", paymentIntentId);
+                    log.error("❌ Pagamento não encontrado: {}", paymentIntentId);
                     return new RuntimeException("Pagamento não encontrado");
                 });
 
         payment.setStatus(PaymentStatus.SUCCEEDED);
         paymentRepository.save(payment);
 
-        // ✅ Buscar pedido com itens carregados
         Order order = orderRepository.findByIdWithItems(payment.getOrder().getId())
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
         order.setStatus(OrderStatus.PAYMENT_APPROVED);
         orderRepository.save(order);
 
-        // ✅ Log para debug
-        log.info("📧 Enviando email com {} itens", order.getItems().size());
-        order.getItems().forEach(item ->
-                log.info("   • {} x{}", item.getProduct().getNome(), item.getQuantity())
-        );
-
-        emailServiceImp.sendOrderConfirmationEmail(order, payment.getCreatedAt());
-
-        log.info("Pagamento confirmado com sucesso!");
+        log.info("✅ Pagamento confirmado com sucesso!");
     }
 
     @Override
     public void failPayment(String paymentIntentId, String errorMessage) {
-        log.error("Pagamento falhou: {} - {}", paymentIntentId, errorMessage);
+        log.error("❌ Pagamento falhou: {} - {}", paymentIntentId, errorMessage);
 
         Payment payment = paymentRepository.findByStripePaymentId(paymentIntentId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
@@ -140,7 +126,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
 
     @Override
     public PaymentResponse refundPayment(Long paymentId) {
-        log.info("↩Processando reembolso para pagamento: {}", paymentId);
+        log.info("↩️ Processando reembolso para pagamento: {}", paymentId);
 
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
@@ -150,18 +136,16 @@ public class StripePaymentServiceImp implements StripePaymentService {
         }
 
         try {
-            PaymentIntent paymentIntent = PaymentIntent.retrieve(
-                    payment.getStripePaymentId()
-            );
+            PaymentIntent.retrieve(payment.getStripePaymentId());
 
             payment.setStatus(PaymentStatus.REFUNDED);
             Payment savedPayment = paymentRepository.save(payment);
 
-            log.info("Reembolso processado com sucesso");
+            log.info("✅ Reembolso processado com sucesso");
             return new PaymentResponse(savedPayment);
 
         } catch (StripeException e) {
-            log.error("Erro ao processar reembolso: {}", e.getMessage(), e);
+            log.error("❌ Erro ao processar reembolso: {}", e.getMessage(), e);
             throw new RuntimeException("Erro ao processar reembolso: " + e.getMessage());
         }
     }
@@ -170,7 +154,6 @@ public class StripePaymentServiceImp implements StripePaymentService {
     public PaymentResponse getPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
-
         return new PaymentResponse(payment);
     }
 
@@ -178,7 +161,6 @@ public class StripePaymentServiceImp implements StripePaymentService {
     public PaymentResponse getPaymentByStripeId(String stripePaymentId) {
         Payment payment = paymentRepository.findByStripePaymentId(stripePaymentId)
                 .orElseThrow(() -> new RuntimeException("Pagamento não encontrado"));
-
         return new PaymentResponse(payment);
     }
 
@@ -192,15 +174,17 @@ public class StripePaymentServiceImp implements StripePaymentService {
     ) throws StripeException {
 
         Map<String, String> metadata = new HashMap<>();
-        metadata.put("order_id", orderId.toString());
+        metadata.put("order_id", orderId.toString());  // ✅ snake_case
         metadata.put("platform_fee", platformFee.toString());
+
+        log.info("📋 Metadata do PaymentIntent: {}", metadata);
 
         PaymentIntentCreateParams.Builder paramsBuilder =
                 PaymentIntentCreateParams.builder()
                         .setAmount(amountCents)
                         .setCurrency("brl")
                         .setReceiptEmail(customerEmail)
-                        .putAllMetadata(metadata);  // ✅ AQUI: metadata correto
+                        .putAllMetadata(metadata);
 
         switch (paymentMethod.toUpperCase()) {
             case "CREDIT_CARD":

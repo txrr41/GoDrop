@@ -3,7 +3,7 @@ package com.project.shiphub.controller.webhook;
 import com.project.shiphub.repository.order.OrderRepository;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
-import com.stripe.model.checkout.Session;
+import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
 import com.project.shiphub.model.order.Order;
 import com.project.shiphub.model.order.OrderStatus;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 public class WebhookController {
 
     private final OrderRepository orderRepository;
-
     private final EmailService emailService;
 
     @Value("${stripe.webhook.secret}")
@@ -52,89 +51,118 @@ public class WebhookController {
         String eventType = event.getType();
         log.info("📬 Tipo de evento: {}", eventType);
 
-        switch (eventType) {
+        try {
+            switch (eventType) {
 
-            // PAGAMENTO APROVADO )
-            case "checkout.session.completed":
-                handleCheckoutCompleted(event);
-                break;
+                // PAGAMENTO APROVADO (PaymentIntent succeeded)
+                case "payment_intent.succeeded":
+                    handlePaymentSucceeded(event);
+                    break;
 
-            // PAGAMENTO RECEBIDO
-            case "payment_intent.succeeded":
-                log.info("💰 Pagamento recebido com sucesso");
-                break;
+                // PAGAMENTO FALHOU
+                case "payment_intent.payment_failed":
+                    log.warn("❌ Pagamento falhou");
+                    handlePaymentFailed(event);
+                    break;
 
-            // PAGAMENTO FALHOU
-            case "payment_intent.payment_failed":
-                log.warn("❌ Pagamento falhou");
-                handlePaymentFailed(event);
-                break;
+                // REEMBOLSO
+                case "charge.refunded":
+                    log.info("🔄 Reembolso processado");
+                    handleRefund(event);
+                    break;
 
-            // REEMBOLSO
-            case "charge.refunded":
-                log.info("🔄 Reembolso processado");
-                handleRefund(event);
-                break;
+                default:
+                    log.info("ℹ️ Evento não processado: {}", eventType);
+            }
 
-            default:
-                log.info("ℹ️ Evento não processado: {}", eventType);
+            return ResponseEntity.ok("Webhook processed successfully");
+
+        } catch (Exception e) {
+            log.error("❌ Erro ao processar webhook: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body("Webhook processing failed");
         }
-        return ResponseEntity.ok("Webhook processed successfully");
     }
 
-    private void handleCheckoutCompleted(Event event) {
+    private void handlePaymentSucceeded(Event event) {
         try {
-            Session session = (Session) event.getDataObjectDeserializer()
+            PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
                     .getObject()
-                    .orElseThrow(() -> new RuntimeException("Failed to deserialize event"));
+                    .orElseThrow(() -> new RuntimeException("Failed to deserialize PaymentIntent"));
 
-            log.info("🎉 Checkout completado!");
-            log.info("   Session ID: {}", session.getId());
-            log.info("   Payment Status: {}", session.getPaymentStatus());
-            log.info("   Customer Email: {}", session.getCustomerDetails().getEmail());
-            String orderIdStr = session.getMetadata().get("orderId");
+            log.info("🎉 Pagamento aprovado!");
+            log.info("   PaymentIntent ID: {}", paymentIntent.getId());
+            log.info("   Valor recebido: R$ {}", paymentIntent.getAmountReceived() / 100.0);
+
+            String orderIdStr = paymentIntent.getMetadata().get("order_id");
 
             if (orderIdStr == null || orderIdStr.isEmpty()) {
                 log.error("❌ orderId não encontrado nos metadata!");
+                log.error("   Metadata disponível: {}", paymentIntent.getMetadata());
                 return;
             }
 
             Long orderId = Long.parseLong(orderIdStr);
             log.info("📦 Pedido encontrado: #{}", orderId);
 
-            Order order = orderRepository.findById(orderId)
+            // Buscar pedido com itens
+            Order order = orderRepository.findByIdWithItems(orderId)
                     .orElseThrow(() -> new RuntimeException("Pedido #" + orderId + " não encontrado"));
 
+            // Atualizar status do pedido
             order.setStatus(OrderStatus.PAYMENT_APPROVED);
             orderRepository.save(order);
 
             log.info("✅ Pedido #{} atualizado para PAYMENT_APPROVED", orderId);
 
+            // Enviar email de confirmação
             try {
                 emailService.sendOrderConfirmationEmail(order, LocalDateTime.now());
-                log.info("📧 Email de confirmação enviado");
+                log.info("📧 Email de confirmação enviado para {}", order.getBuyerEmail());
             } catch (Exception e) {
                 log.error("⚠️ Erro ao enviar email: {}", e.getMessage());
             }
 
         } catch (Exception e) {
-            log.error("❌ Erro ao processar checkout completed: {}", e.getMessage(), e);
+            log.error("❌ Erro ao processar payment_intent.succeeded: {}", e.getMessage(), e);
+            throw new RuntimeException("Erro ao processar pagamento aprovado", e);
         }
     }
 
     private void handlePaymentFailed(Event event) {
         try {
-            log.warn("⚠️ Pagamento falhou - implementar lógica se necessário");
+            PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
+                    .getObject()
+                    .orElseThrow(() -> new RuntimeException("Failed to deserialize PaymentIntent"));
+
+            String errorMessage = paymentIntent.getLastPaymentError() != null
+                    ? paymentIntent.getLastPaymentError().getMessage()
+                    : "Erro desconhecido";
+
+            log.error("❌ Pagamento falhou!");
+            log.error("   PaymentIntent ID: {}", paymentIntent.getId());
+            log.error("   Motivo: {}", errorMessage);
+
+            String orderIdStr = paymentIntent.getMetadata().get("order_id");
+            if (orderIdStr == null) return;
+
+            Long orderId = Long.parseLong(orderIdStr);
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+            order.setStatus(OrderStatus.PAYMENT_FAILED);
+            orderRepository.save(order);
+
+            log.info("💾 Pedido #{} marcado como PAYMENT_FAILED", orderId);
 
         } catch (Exception e) {
-            log.error("❌ Erro ao processar pagamento falho: {}", e.getMessage());
+            log.error("❌ Erro ao processar payment_intent.payment_failed: {}", e.getMessage());
         }
     }
 
     private void handleRefund(Event event) {
         try {
             log.info("🔄 Reembolso processado - implementar lógica se necessário");
-
+            // Implementar lógica de reembolso
         } catch (Exception e) {
             log.error("❌ Erro ao processar reembolso: {}", e.getMessage());
         }

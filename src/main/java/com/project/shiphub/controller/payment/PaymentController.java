@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 public class PaymentController {
 
     private final StripePaymentService stripePaymentService;
-
     private final OrderService orderService;
 
     @PostMapping("/create")
@@ -36,14 +35,19 @@ public class PaymentController {
             User user = (User) authentication.getPrincipal();
 
             BigDecimal total = BigDecimal.valueOf(request.getAmountInCents()).divide(new BigDecimal(100));
+
             Order order = orderService.createOrder(user, total, request);
             request.setOrderId(order.getId());
             request.setBuyerEmail(order.getBuyerEmail());
+
             PaymentResponse response = stripePaymentService.createPayment(request);
 
+            log.info("✅ PaymentIntent criado para pedido #{}", order.getId());
+
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            log.error("Erro ao processar pedido/pagamento", e);
+            log.error("❌ Erro ao processar pedido/pagamento", e);
             return ResponseEntity.badRequest().build();
         }
     }
