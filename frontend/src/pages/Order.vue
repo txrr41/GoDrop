@@ -1,154 +1,161 @@
-
 <template>
   <div class="my-orders-page">
-    <div class="page-header">
-      <h1>Meus Pedidos</h1>
-      <p>Acompanhe o status de todos os seus pedidos</p>
-    </div>
+    <header class="page-header">
+      <div class="title-section">
+        <div class="title-icon-wrapper">
+          <v-icon color="indigo-accent-3" size="32">mdi-package-variant-closed</v-icon>
+        </div>
+        <div class="title-text-group">
+          <h1>Meus Pedidos</h1>
+          <p>Acompanhe o status de todos os seus pedidos em tempo real</p>
+        </div>
+      </div>
+    </header>
 
     <div v-if="orderStore.loading" class="loading-state">
-      <v-progress-circular indeterminate color="primary" size="64" />
-      <p>Carregando seus pedidos...</p>
+      <div class="loader-visual">
+        <v-progress-circular indeterminate color="indigo-accent-3" size="64" width="3" />
+      </div>
+      <p>Sincronizando seus pedidos...</p>
     </div>
 
-
     <div v-else-if="orderStore.orders.length > 0" class="orders-list">
-      <v-card
+      <div
           v-for="order in orderStore.orders"
           :key="order.id"
-          class="order-card"
-          elevation="2"
+          class="order-card-premium"
           @click="showOrderDetails(order.id)"
       >
-        <v-card-title class="order-header">
+        <div class="order-header-custom">
           <div class="header-left">
-            <v-icon color="primary" class="mr-2">mdi-package-variant</v-icon>
-            <span class="order-id">Pedido #{{ order.id }}</span>
+            <span class="order-label">PEDIDO</span>
+            <span class="order-id">#{{ order.id }}</span>
           </div>
-          <v-chip
-              :color="getStatusColor(order.status)"
-              variant="flat"
-              size="small"
-          >
+          <div :class="['status-badge-glow', getStatusColor(order.status)]">
+            <span class="status-dot"></span>
             {{ getStatusLabel(order.status) }}
-          </v-chip>
-        </v-card-title>
+          </div>
+        </div>
 
-        <v-divider />
+        <v-divider class="divider-minimal" />
 
-        <v-card-text>
-          <div class="order-info">
-            <div class="info-section">
+        <div class="order-body-content">
+          <div class="info-grid">
+            <div class="info-block">
               <div class="info-row">
-                <v-icon size="20" class="mr-2">mdi-currency-usd</v-icon>
-                <span class="label">Total:</span>
-                <span class="value">{{ formatCurrency(order.totalAmount) }}</span>
+                <v-icon size="18" class="info-icon">mdi-currency-usd</v-icon>
+                <div class="info-data">
+                  <span class="label">Total do Pedido</span>
+                  <span class="value">{{ formatCurrency(order.totalAmount) }}</span>
+                </div>
               </div>
 
               <div class="info-row">
-                <v-icon size="20" class="mr-2">mdi-calendar</v-icon>
-                <span class="label">Data:</span>
-                <span class="value">{{ formatDate(order.createdAt) }}</span>
-              </div>
-
-              <div class="info-row">
-                <v-icon size="20" class="mr-2">mdi-map-marker</v-icon>
-                <span class="label">Endereço:</span>
-                <span class="value">{{ order.shippingAddress }}</span>
+                <v-icon size="18" class="info-icon">mdi-calendar-month</v-icon>
+                <div class="info-data">
+                  <span class="label">Realizado em</span>
+                  <span class="value">{{ formatDate(order.createdAt) }}</span>
+                </div>
               </div>
             </div>
 
-            <v-alert
-                v-if="order.trackingCode"
-                type="info"
-                variant="tonal"
-                class="tracking-alert"
-            >
-              <div class="tracking-content">
-                <div class="tracking-header">
-                  <v-icon size="24">mdi-truck-fast</v-icon>
-                  <span class="tracking-label">Código de Rastreio</span>
+            <div class="info-block">
+              <div class="info-row address">
+                <v-icon size="18" class="info-icon">mdi-map-marker-outline</v-icon>
+                <div class="info-data">
+                  <span class="label">Endereço de Entrega</span>
+                  <span class="value address-text">{{ order.shippingAddress }}</span>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div class="tracking-code-wrapper">
+          <div v-if="order.trackingCode" class="tracking-container" @click.stop>
+            <div class="tracking-main">
+              <div class="tracking-info">
+                <v-icon color="indigo-accent-3" class="mr-3">mdi-truck-delivery-outline</v-icon>
+                <div class="code-group">
+                  <span class="tracking-tag">CÓDIGO DE RASTREIO</span>
                   <span class="tracking-code">{{ order.trackingCode }}</span>
-                  <v-btn
-                      size="small"
-                      variant="outlined"
-                      color="primary"
-                      @click.stop="copyTrackingCode(order.trackingCode)"
-                  >
-                    <v-icon start size="16">mdi-content-copy</v-icon>
-                    Copiar
-                  </v-btn>
                 </div>
-
+              </div>
+              <div class="tracking-actions">
                 <v-btn
+                    variant="tonal"
+                    color="indigo-accent-3"
                     size="small"
-                    color="primary"
-                    variant="text"
+                    class="action-btn"
+                    @click.stop="copyTrackingCode(order.trackingCode)"
+                >
+                  <v-icon start size="16">mdi-content-copy</v-icon>
+                  Copiar
+                </v-btn>
+                <v-btn
+                    color="indigo-accent-3"
+                    variant="flat"
+                    size="small"
+                    class="action-btn"
                     :href="getCorreiosLink(order.trackingCode)"
                     target="_blank"
                     @click.stop
                 >
                   <v-icon start size="16">mdi-open-in-new</v-icon>
-                  Rastrear nos Correios
+                  Rastrear
                 </v-btn>
               </div>
-            </v-alert>
+            </div>
           </div>
 
-          <div class="order-items">
-            <p class="items-title">
-              <v-icon size="18" class="mr-1">mdi-cart</v-icon>
-              Produtos ({{ order.items.length }})
+          <div class="order-items-minimal">
+            <p class="items-header">
+              <v-icon size="16" class="mr-2">mdi-basket-outline</v-icon>
+              Resumo dos Itens ({{ order.items.length }})
             </p>
-            <ul class="items-list">
-              <li v-for="item in order.items" :key="item.productName" class="item">
-                <span class="item-quantity">{{ item.quantity }}x</span>
-                <span class="item-name">{{ item.productName }}</span>
-                <span class="item-price">{{ formatCurrency(item.totalPrice) }}</span>
-              </li>
-            </ul>
+            <div class="items-scroller">
+              <div v-for="item in order.items" :key="item.productName" class="mini-item">
+                <span class="qty">{{ item.quantity }}x</span>
+                <span class="name">{{ item.productName }}</span>
+                <span class="price">{{ formatCurrency(item.totalPrice) }}</span>
+              </div>
+            </div>
           </div>
-        </v-card-text>
+        </div>
 
-        <v-card-actions class="order-actions">
-          <v-btn
-              variant="text"
-              color="primary"
-              @click.stop="showOrderDetails(order.id)"
-          >
-            Ver Detalhes
-            <v-icon end>mdi-arrow-right</v-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+        <div class="card-footer-interactive">
+          <span class="footer-msg">Toque para ver detalhes completos</span>
+          <v-icon size="20" class="footer-arrow">mdi-chevron-right</v-icon>
+        </div>
+      </div>
     </div>
 
     <div v-else class="empty-state">
-      <div class="empty-icon">
-        <v-icon size="120" color="grey-lighten-1">mdi-package-variant-closed</v-icon>
+      <div class="empty-visual-box">
+        <v-icon size="80" color="indigo-lighten-4">mdi-package-variant-closed</v-icon>
       </div>
-      <h2>Nenhum pedido encontrado</h2>
-      <p>Você ainda não realizou nenhuma compra</p>
+      <h2>Sua lista de pedidos está vazia</h2>
+      <p>Você ainda não realizou nenhuma compra. Explore nossos produtos!</p>
       <v-btn
-          color="primary"
-          size="large"
+          color="indigo-accent-4"
+          size="x-large"
           to="/produtos"
-          class="mt-4"
+          class="explore-btn"
+          elevation="0"
       >
-        <v-icon start>mdi-shopping</v-icon>
         Começar a Comprar
+        <v-icon end>mdi-shopping-outline</v-icon>
       </v-btn>
     </div>
 
     <v-snackbar
         v-model="snackbar"
         :timeout="2000"
-        color="success"
+        color="indigo-darken-4"
+        class="custom-snackbar"
     >
-      Código de rastreio copiado!
+      <div class="d-flex align-center">
+        <v-icon class="mr-3">mdi-check-circle</v-icon>
+        Código de rastreio copiado com sucesso!
+      </div>
     </v-snackbar>
   </div>
 </template>
@@ -230,27 +237,304 @@ const showOrderDetails = (orderId) => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 .my-orders-page {
-  padding: 24px;
-  max-width: 1200px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 40px 24px;
+  max-width: 1000px;
   margin: 0 auto;
-  min-height: calc(100vh - 64px);
+  background-color: #ffffff;
+  min-height: 100vh;
 }
 
+/* --- Header --- */
 .page-header {
+  margin-bottom: 48px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 32px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.title-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.title-text-group h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.title-text-group p {
+  font-size: 16px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.orders-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.order-card-premium {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.order-card-premium:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  border-color: #e2e8f0;
+}
+
+.order-header-custom {
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.1em;
+}
+
+.order-id {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Status Badges */
+.status-badge-glow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.divider-minimal {
+  border-color: #f8fafc !important;
+  opacity: 1;
+}
+
+.order-body-content {
+  padding: 32px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 32px;
   margin-bottom: 32px;
 }
 
-.page-header h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1A2332;
-  margin-bottom: 8px;
+.info-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
 }
 
-.page-header p {
-  font-size: 16px;
-  color: #5E6D82;
+.info-icon {
+  margin-top: 4px;
+  color: #94a3b8;
+}
+
+.info-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-data .label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.info-data .value {
+  font-size: 15px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.address-text {
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- Tracking --- */
+.tracking-container {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.tracking-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tracking-info {
+  display: flex;
+  align-items: center;
+}
+
+.code-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.tracking-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.tracking-code {
+  font-size: 18px;
+  font-weight: 800;
+  color: #4338ca;
+  letter-spacing: 0.05em;
+}
+
+.tracking-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+
+.order-items-minimal {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.items-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.items-scroller {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #f1f5f9;
+}
+
+.mini-item:last-child { border: none; }
+
+.mini-item .qty {
+  color: #94a3b8;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.mini-item .name {
+  flex: 1;
+  color: #475569;
+  font-weight: 500;
+}
+
+.mini-item .price {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.card-footer-interactive {
+  padding: 16px 32px;
+  background: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f8fafc;
+}
+
+.footer-msg {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.footer-arrow {
+  color: #cbd5e1;
+  transition: transform 0.3s ease;
+}
+
+.order-card-premium:hover .footer-arrow {
+  transform: translateX(5px);
+  color: #4338ca;
+}
+
+.order-card-premium:hover .footer-msg {
+  color: #4338ca;
 }
 
 .loading-state {
@@ -258,208 +542,53 @@ const showOrderDetails = (orderId) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
-  gap: 20px;
-}
-
-.loading-state p {
-  font-size: 16px;
-  color: #5E6D82;
-}
-
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.order-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 12px !important;
-}
-
-.order-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-}
-
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px !important;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.order-id {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1A2332;
-}
-
-.order-info {
-  margin-bottom: 20px;
-}
-
-.info-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-}
-
-.info-row .label {
-  color: #5E6D82;
+  padding: 100px 0;
+  gap: 24px;
+  color: #64748b;
   font-weight: 500;
 }
 
-.info-row .value {
-  color: #1A2332;
-  font-weight: 600;
-}
-
-.tracking-alert {
-  margin-top: 16px;
-}
-
-.tracking-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.tracking-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tracking-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1976D2;
-}
-
-.tracking-code-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.tracking-code {
-  font-family: 'Courier New', monospace;
-  font-size: 18px;
-  font-weight: 700;
-  color: #1565C0;
-  background: rgba(25, 118, 210, 0.1);
-  padding: 8px 16px;
-  border-radius: 6px;
-  letter-spacing: 1px;
-}
-
-.order-items {
-  background: #F5F7FA;
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.items-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1A2332;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-}
-
-.items-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-}
-
-.item-quantity {
-  color: #5E6D82;
-  font-weight: 600;
-  min-width: 30px;
-}
-
-.item-name {
-  flex: 1;
-  color: #1A2332;
-}
-
-.item-price {
-  color: #1565C0;
-  font-weight: 600;
-}
-
-.order-actions {
-  padding: 16px 24px !important;
-  border-top: 1px solid #E3E8EF;
-}
-
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
   text-align: center;
+  padding: 80px 40px;
+  background: #f8fafc;
+  border-radius: 40px;
+  border: 2px dashed #e2e8f0;
 }
 
-.empty-icon {
-  margin-bottom: 24px;
-  opacity: 0.5;
+.empty-visual-box {
+  margin-bottom: 32px;
 }
 
 .empty-state h2 {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1A2332;
-  margin-bottom: 8px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 12px;
 }
 
 .empty-state p {
-  font-size: 16px;
-  color: #5E6D82;
-  margin-bottom: 24px;
+  color: #64748b;
+  margin-bottom: 40px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (max-width: 768px) {
-  .my-orders-page {
-    padding: 16px;
-  }
+.explore-btn {
+  height: 64px !important;
+  padding: 0 48px !important;
+  border-radius: 20px !important;
+  text-transform: none !important;
+  font-weight: 800 !important;
+  font-size: 18px !important;
+}
 
-  .page-header h1 {
-    font-size: 24px;
-  }
-
-  .tracking-code {
-    font-size: 14px;
-  }
+@media (max-width: 600px) {
+  .my-orders-page { padding: 24px 16px; }
+  .title-section { flex-direction: column; text-align: center; }
+  .order-header-custom { padding: 20px; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .tracking-main { flex-direction: column; align-items: stretch; }
+  .tracking-actions { flex-direction: column; }
 }
 </style>

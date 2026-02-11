@@ -94,7 +94,7 @@ const principalItems = reactive([
   { title: 'Dashboard', path: '/dashboard', icon: 'mdi-finance', active: false },
   { title: 'Produtos', path: '/produtos', icon: 'mdi-package', active: false },
   { title: 'Etiquetas', path: '/etiquetas', icon: 'mdi-tag', active: false },
-  { title: 'Envios', path: '/envios', icon: 'mdi-truck', active: false },
+  { title: 'Pedidos', path: '/admin/pedidos', icon: 'mdi-truck', active: false },
   { title: 'Usuários', path: '/usuarios', icon: 'mdi-account', active: false},
 ])
 

@@ -7,6 +7,7 @@ import Checkout from "../pages/Checkout.vue";
 import PaymentSuccess from "../pages/PaymentSuccess.vue";
 import PaymentFailed from "../pages/PaymentFailed.vue";
 import Order from "../pages/Order.vue";
+import UserPerm from "../pages/UserPerm.vue";
 
 const routes = [
     {
@@ -62,7 +63,20 @@ const routes = [
     {
         path: '/orders',
         component: Order
-    }
+    },
+    {
+        path: '/usuarios',
+        component: MainLayout,
+        children: [
+            {
+                path: '',
+                component: UserPerm
+            }
+        ]
+    },
+
+
+
 ];
 
 export default createRouter({
