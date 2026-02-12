@@ -18,6 +18,7 @@ public class ProductResponse {
     private Boolean ativo;
     private String categoria;
     private LocalDateTime createdAt;
+    private Boolean destaque;
 
     public ProductResponse(Product product) {
         this.id = product.getId();
@@ -28,6 +29,7 @@ public class ProductResponse {
         this.ativo = product.getAtivo();
         this.imagem = product.getImagem();
         this.categoria = product.getCategoria();
+        this.destaque = product.getDestaque();
     }
 
 }

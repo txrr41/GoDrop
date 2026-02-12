@@ -12,6 +12,7 @@ public class ProductRequest {
     private Integer estoque;
     private String imagem;
     private String categoria;
+    private Boolean destaque;
     private Boolean ativo;
 
 }

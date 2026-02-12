@@ -25,7 +25,9 @@ public class ProductServiceImp implements ProductService {
         product.setImagem(request.getImagem());
         product.setAtivo(request.getAtivo());
         product.setCategoria(request.getCategoria());
+        product.setDestaque(request.getDestaque() != null ? request.getDestaque() : false);
         Product savedProduct = productRepository.save(product);
+
         return new ProductResponse(savedProduct);
     }
 
@@ -49,6 +51,9 @@ public class ProductServiceImp implements ProductService {
         product.setPreco(request.getPreco());
         product.setDescricao(request.getDescricao());
         product.setEstoque(request.getEstoque());
+        if (request.getDestaque() != null) {
+            product.setDestaque(request.getDestaque());
+        }
         Product updatedProduct = productRepository.save(product);
         return new ProductResponse(updatedProduct);
     }

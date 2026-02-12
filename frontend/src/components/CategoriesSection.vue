@@ -15,7 +15,7 @@
             md="2"
         >
           <v-card
-              class="category-card pa-10 ptext-center rounded-xl cursor-pointer"
+              class="category-card pa-10 text-center rounded-xl cursor-pointer"
               variant="flat"
               @click="selectCategory(category.name)"
           >
@@ -31,7 +31,9 @@
   </section>
 </template>
 
-<script setup lang="ts">
+<script setup>
+const emit = defineEmits(['category-selected'])
+
 const categories = [
   { name: 'Eletrônicos', icon: 'mdi-cellphone', count: 234, color: 'primary' },
   { name: 'Moda', icon: 'mdi-tshirt-crew', count: 567, color: 'pink' },
@@ -41,8 +43,8 @@ const categories = [
   { name: 'Games', icon: 'mdi-gamepad-variant', count: 98, color: 'red' }
 ]
 
-const selectCategory = (name: string) => {
-  console.log('Selected category:', name)
+const selectCategory = (name) => {
+  emit('category-selected', name)
 }
 </script>
 

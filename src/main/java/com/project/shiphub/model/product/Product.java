@@ -36,6 +36,9 @@ public class Product {
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    @Column(nullable = false)
+    private Boolean destaque = false;
+
     @Column(columnDefinition = "TEXT")
     private String imagem;
 

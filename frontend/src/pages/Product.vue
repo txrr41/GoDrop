@@ -61,11 +61,13 @@
         <v-btn variant="text" @click="snackbar = false">Fechar</v-btn>
       </template>
     </v-snackbar>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useProductStore } from '../stores/product'
 import DashboardCards from '../components/DashboardCards.vue'
 import ActionsBar from '../components/ActionsBar.vue'
@@ -75,6 +77,8 @@ import ProductModal from '../components/ProductModal.vue'
 import CategoryModal from '../components/CategoryModal.vue'
 import DeleteDialog from '../components/DeleteDialog.vue'
 
+
+const route = useRoute()
 const productStore = useProductStore()
 
 const viewMode = ref('list')
@@ -89,6 +93,12 @@ const snackbarColor = ref('success')
 const editingProduct = ref(null)
 const productToDelete = ref(null)
 
+watch(() => route.query.categoria, (newCategoria) => {
+  if (newCategoria) {
+    selectedCategory.value = newCategoria
+  }
+}, { immediate: true })
+
 const categoryOptions = computed(() => {
   return [
     { name: 'Todas as categorias', value: 'all' },
@@ -99,7 +109,7 @@ const categoryOptions = computed(() => {
 const filteredProducts = computed(() => {
   return productStore.products.filter(product => {
     const matchesSearch = product.nome.toLowerCase().includes(searchTerm.value.toLowerCase())
-    const matchesCategory = selectedCategory.value === 'all' || product.category === selectedCategory.value
+    const matchesCategory = selectedCategory.value === 'all' || product.categoria === selectedCategory.value
     return matchesSearch && matchesCategory
   })
 })

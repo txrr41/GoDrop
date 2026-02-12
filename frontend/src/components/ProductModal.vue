@@ -90,6 +90,25 @@
               hide-details
           />
         </div>
+
+        <div class="form-group">
+          <v-checkbox
+              v-model="formData.destaque"
+              label="Exibir este produto na página inicial (Destaque)"
+              color="primary"
+              hide-details
+          >
+            <template v-slot:label>
+              <div class="d-flex align-center">
+                <v-icon color="amber" class="mr-2">mdi-star</v-icon>
+                <span>Exibir na página inicial (Destaque)</span>
+              </div>
+            </template>
+          </v-checkbox>
+          <p class="text-caption text-grey ml-8 mt-1">
+            Produtos marcados como destaque aparecem na seção "Produtos em Destaque" da home
+          </p>
+        </div>
       </v-card-text>
       <v-card-actions class="modal-actions">
         <v-btn variant="outlined" @click="closeModal">Cancelar</v-btn>
@@ -102,7 +121,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ProductModal',
   props: {
@@ -119,7 +137,8 @@ export default {
         price: 0,
         stock: 0,
         category: '',
-        image: ''
+        image: '',
+        destaque: false
       }
     }
   },
@@ -128,7 +147,15 @@ export default {
       immediate: true,
       handler(product) {
         if (product) {
-          this.formData = { ...product }
+          this.formData = {
+            name: product.nome || '',
+            description: product.descricao || '',
+            price: product.preco || 0,
+            stock: product.estoque || 0,
+            category: product.categoria || '',
+            image: product.imagem || '',
+            destaque: product.destaque || false
+          }
         } else {
           this.resetForm()
         }
@@ -142,7 +169,15 @@ export default {
   },
   methods: {
     resetForm() {
-      this.formData = { name: '', description: '', price: 0, stock: 0, category: '', image: '' }
+      this.formData = {
+        name: '',
+        description: '',
+        price: 0,
+        stock: 0,
+        category: '',
+        image: '',
+        destaque: false
+      }
     },
 
     closeModal() {
@@ -162,8 +197,8 @@ export default {
         estoque: parseInt(this.formData.stock),
         imagem: this.formData.image || '',
         categoria: this.formData.category || 'Uncategorized',
-        ativo: true
-
+        ativo: true,
+        destaque: this.formData.destaque
       }
 
       this.$emit('save', productData)
@@ -185,7 +220,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>
