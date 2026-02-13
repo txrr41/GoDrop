@@ -1,219 +1,282 @@
 <template>
-  <div class="checkout-page">
-    <v-container>
-      <div class="checkout-header">
-        <h1>Finalizar Compra</h1>
-        <v-btn variant="text" to="/produtos">
-          <v-icon start>mdi-arrow-left</v-icon>
-          Voltar para produtos
+  <div class="checkout-premium">
+    <!-- Navbar de Checkout (Segura) -->
+    <nav class="checkout-nav">
+      <v-container class="d-flex align-center justify-space-between py-4">
+        <div class="brand-secure">
+          <v-icon color="primary" size="28">mdi-shield-check</v-icon>
+          <span class="brand-text">Checkout Seguro</span>
+        </div>
+        <v-btn variant="text" color="grey-darken-1" @click="router.push('/produtos')" class="text-none">
+          <v-icon start size="18">mdi-arrow-left</v-icon>
+          Continuar Comprando
         </v-btn>
+      </v-container>
+    </nav>
+
+    <v-container class="mt-8 pb-16">
+      <!-- Indicador de Etapas -->
+      <div class="steps-indicator mb-12">
+        <div v-for="(step, index) in ['Entrega', 'Pagamento', 'Revisão']" :key="index"
+             :class="['step-item', { active: currentStep >= index }]">
+          <div class="step-number">{{ index + 1 }}</div>
+          <span class="step-label">{{ step }}</span>
+          <div v-if="index < 2" class="step-line"></div>
+        </div>
       </div>
 
-      <div class="checkout-content">
-        <div class="checkout-main">
+      <v-row>
+        <!-- Coluna Principal (Formulários) -->
+        <v-col cols="12" lg="8">
+          <v-form ref="formRef">
+            <!-- Seção 1: Entrega -->
+            <section class="checkout-section active mb-8">
+              <div class="section-header">
+                <v-icon color="primary" class="mr-3">mdi-map-marker-outline</v-icon>
+                <h2>Endereço de Entrega</h2>
+              </div>
 
-          <v-card class="checkout-card">
-            <v-card-title>
-              <v-icon start>mdi-truck</v-icon>
-              Informações de Entrega
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="formRef">
+              <div class="section-body">
                 <v-row>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.nome"
-                        label="Nome Completo *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.email"
-                        label="E-mail *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required, rules.email]"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.telefone"
-                        label="Telefone *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
-                        placeholder="(00) 00000-0000"
-                        @input="formatTelefone"
-                        maxlength="15"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.cpf"
-                        label="CPF *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
-                        placeholder="000.000.000-00"
-                        @input="formatCPF"
-                        maxlength="14"
-                    />
-                  </v-col>
                   <v-col cols="12" md="4">
                     <v-text-field
                         v-model="formData.cep"
-                        label="CEP *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
+                        label="CEP"
                         placeholder="00000-000"
+                        variant="outlined"
+                        bg-color="grey-lighten-5"
                         @input="formatCEP"
                         @blur="buscarCEP"
                         maxlength="9"
                         :loading="loadingCEP"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.rua"
-                        label="Rua *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="2">
-                    <v-text-field
-                        v-model="formData.numero"
-                        label="Número *"
-                        variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.complemento"
-                        label="Complemento"
-                        variant="outlined"
-                        density="compact"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                        v-model="formData.bairro"
-                        label="Bairro *"
-                        variant="outlined"
-                        density="compact"
                         :rules="[rules.required]"
                     />
                   </v-col>
                   <v-col cols="12" md="8">
                     <v-text-field
-                        v-model="formData.cidade"
-                        label="Cidade *"
+                        v-model="formData.rua"
+                        label="Endereço (Rua/Avenida)"
                         variant="outlined"
-                        density="compact"
+                        bg-color="grey-lighten-5"
                         :rules="[rules.required]"
                     />
                   </v-col>
-                  <v-col cols="12" md="4">
+                  <v-col cols="12" md="3">
+                    <v-text-field
+                        v-model="formData.numero"
+                        label="Número"
+                        variant="outlined"
+                        bg-color="grey-lighten-5"
+                        :rules="[rules.required]"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="9">
+                    <v-text-field
+                        v-model="formData.complemento"
+                        label="Complemento (Opcional)"
+                        variant="outlined"
+                        bg-color="grey-lighten-5"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="5">
+                    <v-text-field
+                        v-model="formData.bairro"
+                        label="Bairro"
+                        variant="outlined"
+                        bg-color="grey-lighten-5"
+                        :rules="[rules.required]"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="5">
+                    <v-text-field
+                        v-model="formData.cidade"
+                        label="Cidade"
+                        variant="outlined"
+                        bg-color="grey-lighten-5"
+                        :rules="[rules.required]"
+                    />
+                  </v-col>
+                  <v-col cols="12" md="2">
                     <v-text-field
                         v-model="formData.estado"
-                        label="Estado *"
+                        label="UF"
                         variant="outlined"
-                        density="compact"
-                        :rules="[rules.required]"
+                        bg-color="grey-lighten-5"
                         maxlength="2"
-                        placeholder="UF"
+                        :rules="[rules.required]"
                     />
                   </v-col>
                 </v-row>
-              </v-form>
-            </v-card-text>
-          </v-card>
+              </div>
+            </section>
 
-          <v-card class="checkout-card mt-6">
-            <v-card-title>
-              <v-icon start>mdi-credit-card</v-icon>
-              Forma de Pagamento
-            </v-card-title>
-            <v-card-text>
-              <v-radio-group v-model="formData.pagamento">
-                <v-radio value="CREDIT_CARD">
-                  <template v-slot:label>
-                    <div class="payment-option">
-                      <v-icon color="primary" class="mr-2">mdi-credit-card</v-icon>
-                      <div>
-                        <strong>Cartão de Crédito</strong>
-                        <p class="text-caption mb-0">Até 12x no cartão</p>
-                      </div>
-                    </div>
-                  </template>
-                </v-radio>
+            <!-- Seção 2: Dados Pessoais -->
+            <section class="checkout-section mb-8">
+              <div class="section-header">
+                <v-icon color="primary" class="mr-3">mdi-account-outline</v-icon>
+                <h2>Informações do Comprador</h2>
+              </div>
+              <div class="section-body">
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-text-field v-model="formData.nome" label="Nome Completo" variant="outlined" bg-color="grey-lighten-5" :rules="[rules.required]" />
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-text-field v-model="formData.email" label="E-mail para notificações" variant="outlined" bg-color="grey-lighten-5" :rules="[rules.required, rules.email]" />
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-text-field v-model="formData.cpf" label="CPF" placeholder="000.000.000-00" variant="outlined" bg-color="grey-lighten-5" @input="formatCPF" maxlength="14" :rules="[rules.required]" />
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-text-field v-model="formData.telefone" label="Celular/WhatsApp" placeholder="(00) 00000-0000" variant="outlined" bg-color="grey-lighten-5" @input="formatTelefone" maxlength="15" :rules="[rules.required]" />
+                  </v-col>
+                </v-row>
+              </div>
+            </section>
 
-                <div v-if="formData.pagamento === 'CREDIT_CARD'" class="mt-4">
-                  <div id="card-element" class="stripe-card-element"></div>
-                  <div id="card-errors" class="stripe-card-errors"></div>
+            <!-- Seção 3: Pagamento -->
+            <section class="checkout-section mb-8">
+              <div class="section-header">
+                <v-icon color="primary" class="mr-3">mdi-credit-card-outline</v-icon>
+                <h2>Método de Pagamento</h2>
+              </div>
+
+              <div class="payment-grid mt-4">
+                <!-- Opção Cartão -->
+                <div
+                    class="payment-card-option"
+                    :class="{ active: formData.pagamento === 'CREDIT_CARD' }"
+                    @click="formData.pagamento = 'CREDIT_CARD'"
+                >
+                  <v-icon size="24">mdi-credit-card</v-icon>
+                  <span>Cartão</span>
+                  <v-icon v-if="formData.pagamento === 'CREDIT_CARD'" class="check-icon">mdi-check-circle</v-icon>
                 </div>
 
-                <v-radio value="PIX" disabled>
-                  <template v-slot:label>
-                    <div class="payment-option">
-                      <v-icon color="primary" class="mr-2">mdi-qrcode</v-icon>
-                      <div><strong>PIX</strong> (Em breve)</div>
-                    </div>
-                  </template>
-                </v-radio>
-              </v-radio-group>
-            </v-card-text>
-          </v-card>
-        </div>
+                <!-- Opção PIX -->
+                <div
+                    class="payment-card-option"
+                    :class="{ active: formData.pagamento === 'PIX' }"
+                    @click="formData.pagamento = 'PIX'"
+                >
+                  <v-icon size="24">mdi-qrcode-scan</v-icon>
+                  <span>PIX</span>
+                  <v-chip size="x-small" color="success" class="promo-badge">5% OFF</v-chip>
+                  <v-icon v-if="formData.pagamento === 'PIX'" class="check-icon">mdi-check-circle</v-icon>
+                </div>
 
-        <div class="checkout-sidebar">
-          <v-card class="summary-card sticky">
-            <v-card-title>Resumo do Pedido</v-card-title>
-            <v-card-text>
-              <div class="summary-items">
-                <div v-for="item in cartStore.cartItems" :key="item.id" class="summary-item">
-                  <div class="item-info">
-                    <img :src="item.imagem || '/placeholder.png'" class="item-thumbnail" alt="item thumbnail"/>
-                    <div>
-                      <p class="item-name">{{ item.nome }}</p>
-                      <p class="item-quantity">Qtd: {{ item.quantity }}</p>
-                    </div>
+                <!-- Opção Boleto -->
+                <div
+                    class="payment-card-option"
+                    :class="{ active: formData.pagamento === 'BOLETO' }"
+                    @click="formData.pagamento = 'BOLETO'"
+                >
+                  <v-icon size="24">mdi-barcode</v-icon>
+                  <span>Boleto</span>
+                  <v-icon v-if="formData.pagamento === 'BOLETO'" class="check-icon">mdi-check-circle</v-icon>
+                </div>
+              </div>
+
+              <div class="payment-details-container mt-6">
+                <!-- Detalhes do Cartão (Stripe) -->
+                <div v-show="formData.pagamento === 'CREDIT_CARD'" class="stripe-container">
+                  <p class="text-caption text-grey-darken-1 mb-3">Insira os dados do seu cartão de forma segura:</p>
+                  <div id="card-element" class="stripe-card-element"></div>
+                  <div id="card-errors" class="stripe-card-errors"></div>
+                  <v-img src="https://vignette.wikia.nocookie.net/p__/images/3/30/Stripe_logo.png/revision/latest?cb=20190521101515&path-prefix=protagonist" width="60" class="mt-4 opacity-50" />
+                </div>
+
+                <!-- Preview PIX -->
+                <div v-if="formData.pagamento === 'PIX'" class="pix-preview text-center py-4">
+                  <v-icon size="48" color="primary">mdi-lightning-bolt</v-icon>
+                  <p class="mt-2 font-weight-bold">Aprovação imediata</p>
+                  <p class="text-caption">O QR Code será gerado após clicar em finalizar.</p>
+                </div>
+
+                <!-- Preview Boleto -->
+                <div v-if="formData.pagamento === 'BOLETO'" class="boleto-preview text-center py-4">
+                  <v-icon size="48" color="grey-darken-2">mdi-file-document-outline</v-icon>
+                  <p class="mt-2 font-weight-bold">Vencimento em 3 dias</p>
+                  <p class="text-caption">A compensação pode levar até 48h úteis.</p>
+                </div>
+              </div>
+            </section>
+          </v-form>
+        </v-col>
+
+        <!-- Coluna Lateral (Resumo) -->
+        <v-col cols="12" lg="4">
+          <aside class="order-summary-sticky">
+            <v-card class="summary-card-v2" elevation="0">
+              <div class="summary-header">
+                <h3>Resumo do Pedido</h3>
+              </div>
+
+              <div class="summary-items-list">
+                <div v-for="item in cartStore.cartItems" :key="item.id" class="mini-product">
+                  <div class="mini-thumb">
+                    <img :src="item.imagem || '/placeholder.png'" />
+                    <span class="mini-qty">{{ item.quantity }}</span>
                   </div>
-                  <p class="item-price">{{ formatCurrency(item.preco * item.quantity) }}</p>
+                  <div class="mini-details">
+                    <p class="mini-name">{{ item.nome }}</p>
+                    <p class="mini-price">{{ formatCurrency(item.preco * item.quantity) }}</p>
+                  </div>
                 </div>
               </div>
 
               <v-divider class="my-4" />
 
-              <div class="summary-totals">
-                <div class="total-row"><span>Subtotal</span><span>{{ formatCurrency(cartStore.subtotal) }}</span></div>
-                <div class="total-row"><span>Frete</span><span>Grátis</span></div>
-                <v-divider class="my-2" />
-                <div class="total-row total"><span>Total</span><span>{{ formatCurrency(cartStore.total) }}</span></div>
+              <div class="summary-totals-v2">
+                <div class="total-row">
+                  <span>Subtotal</span>
+                  <span>{{ formatCurrency(cartStore.subtotal) }}</span>
+                </div>
+                <div class="total-row">
+                  <span>Entrega Estimada</span>
+                  <span class="text-success font-weight-bold">Grátis</span>
+                </div>
+                <div v-if="formData.pagamento === 'PIX'" class="total-row discount">
+                  <span>Desconto PIX (5%)</span>
+                  <span>- {{ formatCurrency(cartStore.subtotal * 0.05) }}</span>
+                </div>
+
+                <div class="grand-total-box mt-6">
+                  <span class="total-label">Total a pagar</span>
+                  <span class="total-value">{{ formatCurrency(formData.pagamento === 'PIX' ? cartStore.total * 0.95 : cartStore.total) }}</span>
+                </div>
               </div>
 
-              <v-btn color="primary" size="large" block class="mt-4" @click="finalizarCompra" :loading="loading" :disabled="!formData.pagamento">
-                <v-icon start>mdi-lock</v-icon> Finalizar Pedido
+              <v-btn
+                  block
+                  color="primary"
+                  height="64"
+                  class="checkout-final-btn mt-6"
+                  @click="finalizarCompra"
+                  :loading="loading"
+              >
+                <v-icon start size="20">mdi-lock-outline</v-icon>
+                Finalizar Compra
               </v-btn>
-            </v-card-text>
-          </v-card>
-        </div>
-      </div>
+
+              <div class="secure-badges mt-6">
+                <v-icon size="14">mdi-shield-check</v-icon>
+                <span>Ambiente 100% criptografado e seguro</span>
+              </div>
+            </v-card>
+          </aside>
+        </v-col>
+      </v-row>
     </v-container>
 
-    <v-snackbar v-model="snackbar" :color="snackbarColor" location="top">{{ snackbarMessage }}</v-snackbar>
+    <v-snackbar v-model="snackbar" :color="snackbarColor" location="top" elevation="24">
+      {{ snackbarMessage }}
+    </v-snackbar>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
 import paymentService, { getStripe } from '../services/paymentService'
@@ -226,6 +289,7 @@ const formRef = ref(null)
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 const snackbarColor = ref('success')
+const currentStep = ref(1)
 
 let cardElement = null
 let stripe = null
@@ -267,13 +331,11 @@ const formatCurrency = (v) => {
 const buscarCEP = async () => {
   const cepValue = String(formData.cep || '')
   const cleanCep = cepValue.replace(/\D/g, '')
-
   if (cleanCep.length === 8) {
     loadingCEP.value = true
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
       const data = await res.json()
-
       if (data && !data.erro) {
         formData.rua = data.logradouro || ''
         formData.bairro = data.bairro || ''
@@ -291,7 +353,17 @@ const buscarCEP = async () => {
 const initializeStripe = async () => {
   stripe = await getStripe()
   const elements = stripe.elements()
-  cardElement = elements.create('card', { style: { base: { fontSize: '16px' } }, hidePostalCode: true })
+  cardElement = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '16px',
+        fontFamily: '"Inter", sans-serif',
+        color: '#1E293B',
+        '::placeholder': { color: '#94A3B8' }
+      }
+    },
+    hidePostalCode: true
+  })
   setTimeout(() => {
     const el = document.getElementById('card-element')
     if (el) cardElement.mount('#card-element')
@@ -309,17 +381,12 @@ const showSnackbar = (m, c) => {
   snackbar.value = true
 }
 
-// ADICIONE ESTAS LINHAS NO SEU Checkout.vue
-
-// Na função finalizarCompra, após o resultado do pagamento:
-
 const finalizarCompra = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return showSnackbar('Preencha os campos obrigatórios', 'error')
 
   loading.value = true
   try {
-    // ✅ Preparar os itens do carrinho no formato correto
     const cartItems = cartStore.cartItems.map(item => ({
       productId: item.id,
       quantity: item.quantity,
@@ -341,10 +408,8 @@ const finalizarCompra = async () => {
       shippingNeighborhood: formData.bairro,
       shippingCity: formData.cidade,
       shippingState: formData.estado,
-      items: cartItems  // ✅ NOVO: Enviando os itens
+      items: cartItems
     }
-
-    console.log('📤 Enviando pedido com itens:', paymentData)
 
     const { clientSecret } = await paymentService.createPaymentIntent(paymentData)
 
@@ -362,37 +427,20 @@ const finalizarCompra = async () => {
 
       if (result.success) {
         cartStore.clearCart()
-
-        await router.push({
-          path: '/payment-success',
-          query: {
-            orderId: result.paymentIntent?.metadata?.order_id || 'N/A',
-            amount: cartStore.total,
-            email: formData.email,
-            method: formData.pagamento
-          }
-        })
+        await router.push({ path: '/payment-success', query: { orderId: result.paymentIntent?.metadata?.order_id || 'N/A', amount: cartStore.total, email: formData.email, method: formData.pagamento } })
       } else {
-        await router.push({
-          path: '/payment-failed',
-          query: {
-            message: result.error || 'Erro ao processar pagamento',
-            amount: cartStore.total,
-            errorCode: 'PAY_' + Date.now()
-          }
-        })
+        await router.push({ path: '/payment-failed', query: { message: result.error || 'Erro ao processar pagamento', amount: cartStore.total, errorCode: 'PAY_' + Date.now() } })
       }
+    } else {
+      // Simulação PIX/Boleto
+      setTimeout(() => {
+        cartStore.clearCart()
+        router.push({ path: '/payment-success', query: { orderId: 'PED' + Date.now(), amount: cartStore.total, email: formData.email, method: formData.pagamento } })
+            , 2000})
     }
   } catch (e) {
     console.error('❌ Erro:', e)
-    await router.push({
-      path: '/payment-failed',
-      query: {
-        message: 'Erro ao processar pedido. Tente novamente.',
-        amount: cartStore.total,
-        errorCode: 'SYS_' + Date.now()
-      }
-    })
+    await router.push({ path: '/payment-failed', query: { message: 'Erro ao processar pedido. Tente novamente.', amount: cartStore.total, errorCode: 'SYS_' + Date.now() } })
   } finally {
     loading.value = false
   }
@@ -404,25 +452,293 @@ watch(() => formData.pagamento, (val) => {
 </script>
 
 <style scoped>
-.checkout-page {
-  min-height: 100vh; background-color: #F5F7FA; padding: 24px 0;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.checkout-premium {
+  background-color: #FAFAFB;
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #1E293B;
 }
-.checkout-content {
-  display: grid; grid-template-columns: 1fr 400px; gap: 24px;
+
+/* NAVBAR */
+.checkout-nav {
+  background: white;
+  border-bottom: 1px solid #F1F5F9;
 }
+
+.brand-secure {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-text {
+  font-weight: 800;
+  font-size: 18px;
+  color: #0F172A;
+  letter-spacing: -0.5px;
+}
+
+/* STEPPER */
+.steps-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.4;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.step-item.active {
+  opacity: 1;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  background: #E2E8F0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.active .step-number {
+  background: #0061FF;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 97, 255, 0.3);
+}
+
+.step-label {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.step-line {
+  width: 100px;
+  height: 2px;
+  background: #E2E8F0;
+  margin-left: 20px;
+}
+
+/* SEÇÕES */
+.checkout-section {
+  background: white;
+  border: 1px solid #F1F5F9;
+  border-radius: 24px;
+  padding: 32px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.checkout-section:hover {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+/* PAYMENT OPTIONS */
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.payment-card-option {
+  border: 2px solid #F1F5F9;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  background: #F8FAFC;
+}
+
+.payment-card-option:hover {
+  background: #F1F5F9;
+  border-color: #E2E8F0;
+}
+
+.payment-card-option.active {
+  border-color: #0061FF;
+  background: #EFF6FF;
+  color: #0061FF;
+}
+
+.payment-card-option span {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.check-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px;
+}
+
+.promo-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .stripe-card-element {
-  border: 1px solid #E3E8EF; border-radius: 8px; padding: 12px; background: white;
+  background: white;
+  padding: 16px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
 }
-.summary-item {
-  display: flex; justify-content: space-between; margin-bottom: 10px;
+
+/* SUMMARY SIDEBAR */
+.order-summary-sticky {
+  position: sticky;
+  top: 32px;
 }
-.item-thumbnail {
-  width: 50px; height: 50px; border-radius: 8px; margin-right: 10px; object-fit: cover;
+
+.summary-card-v2 {
+  background: white;
+  border: 1px solid #F1F5F9;
+  border-radius: 24px;
+  padding: 32px;
 }
-.total-row.total {
-  font-size: 20px; font-weight: bold;
+
+.summary-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 24px;
 }
+
+.mini-product {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mini-thumb {
+  width: 64px;
+  height: 64px;
+  background: #F8FAFC;
+  border-radius: 12px;
+  position: relative;
+  padding: 8px;
+}
+
+.mini-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mini-qty {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #0F172A;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.mini-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1E293B;
+  margin: 0;
+}
+
+.mini-price {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.summary-totals-v2 .total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.total-row.discount span {
+  color: #059669;
+}
+
+.grand-total-box {
+  background: #F8FAFC;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.grand-total-box .total-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94A3B8;
+  margin-bottom: 4px;
+}
+
+.grand-total-box .total-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0061FF;
+  letter-spacing: -1px;
+}
+
+.checkout-final-btn {
+  border-radius: 16px !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  font-size: 18px !important;
+}
+
+.secure-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94A3B8;
+}
+
 @media (max-width: 960px) {
-  .checkout-content { grid-template-columns: 1fr;
-  } }
+  .payment-grid { grid-template-columns: 1fr; }
+  .steps-indicator { gap: 10px; }
+  .step-line { display: none; }
+}
 </style>

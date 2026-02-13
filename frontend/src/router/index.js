@@ -8,6 +8,8 @@ import PaymentSuccess from "../pages/PaymentSuccess.vue";
 import PaymentFailed from "../pages/PaymentFailed.vue";
 import Order from "../pages/Order.vue";
 import UserPerm from "../pages/UserPerm.vue";
+import ApiDocumentation from "../pages/ApiDocumentation.vue";
+import ProductCatalog from "../pages/ProductCatalog.vue";
 
 const routes = [
     {
@@ -74,6 +76,21 @@ const routes = [
             }
         ]
     },
+    {
+        path: '/api',
+        component: ApiDocumentation
+    },
+    {
+        path: '/catalogo',
+        component: MainLayout,
+        children: [
+            {
+                path: '',
+                component: ProductCatalog
+            }
+        ]
+    },
+
 
 
 

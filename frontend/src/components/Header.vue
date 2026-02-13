@@ -90,7 +90,7 @@
 
       <div class="categories-row d-none d-md-flex align-center justify-center">
         <nav class="nav-links d-flex align-center">
-          <a href="#" class="nav-link">Lançamentos</a>
+          <a href="../pages/ProductCatalog.vue" class="nav-link">Catalogo</a>
           <a href="#" class="nav-link">Masculino</a>
           <a href="#" class="nav-link">Feminino</a>
           <a href="#" class="nav-link">Acessórios</a>
