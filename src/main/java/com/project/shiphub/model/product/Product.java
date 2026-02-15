@@ -36,7 +36,7 @@ public class Product {
     @Column(nullable = false)
     private Boolean ativo = true;
 
-    @Column(nullable = false)
+    @Column
     private Boolean destaque = false;
 
     @Column(columnDefinition = "TEXT")
