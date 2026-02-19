@@ -89,6 +89,16 @@ const routes = [
     {
         path: '/api',
         component: ApiDocumentation
+    },
+    {
+        path: '/ofertas',
+        component: MainLayout,
+        children: [
+            {
+                path: '',
+                component: () => import('../pages/OffersPage.vue')
+            }
+        ]
     }
 
 
