@@ -1,6 +1,5 @@
 package com.project.shiphub.service.auth;
 
-
 import com.project.shiphub.dto.auth.AuthResponse;
 import com.project.shiphub.dto.auth.LoginRequest;
 import com.project.shiphub.dto.auth.RegisterRequest;
@@ -27,12 +26,23 @@ public class ServiceImp implements AuthService {
         User user = loginRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
+        if (user.getOauthProvider() != null && user.getOauthProvider().equals("GOOGLE")) {
+            throw new RuntimeException(
+                    "Esta conta foi criada com Google. Use o botão 'Entrar com Google' para fazer login."
+            );
+        }
+
+        if (user.getPassword() == null) {
+            throw new RuntimeException(
+                    "Esta conta não tem senha definida. Use login social."
+            );
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Senha incorreta");
         }
 
         String token = jwtService.generateToken(user);
-
         addTokenCookie(token, response);
 
         return new AuthResponse(user);
@@ -49,12 +59,12 @@ public class ServiceImp implements AuthService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .oauthProvider("LOCAL")
                 .build();
 
         loginRepository.save(user);
 
         String token = jwtService.generateToken(user);
-
         addTokenCookie(token, response);
 
         return new AuthResponse(user);
@@ -73,12 +83,10 @@ public class ServiceImp implements AuthService {
         String cookieValue = String.format(
                 "token=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Lax",
                 token,
-                60 * 60 * 24  // 24 horas em segundos
+                60 * 60 * 24
         );
 
         response.setHeader("Set-Cookie", cookieValue);
-
-        // Debug log
-        System.out.println("🍪 Set-Cookie header: " + cookieValue.substring(0, Math.min(60, cookieValue.length())) + "...");
+        System.out.println("🍪 Cookie adicionado");
     }
 }
