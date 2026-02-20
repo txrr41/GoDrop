@@ -23,7 +23,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column
     private String password;
 
     @Column(name = "google_id", unique = true)
@@ -34,4 +33,9 @@ public class User {
 
     @Column(name = "oauth_provider")
     private String oauthProvider;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private UserRole role = UserRole.CUSTOMER;
 }

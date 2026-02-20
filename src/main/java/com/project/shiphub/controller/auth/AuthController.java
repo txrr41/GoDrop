@@ -5,6 +5,7 @@ import com.project.shiphub.dto.auth.LoginRequest;
 import com.project.shiphub.dto.auth.RegisterRequest;
 import com.project.shiphub.model.auth.User;
 import com.project.shiphub.service.auth.AuthService;
+import com.project.shiphub.service.auth.ServiceImp;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final ServiceImp serviceImp;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
@@ -39,7 +41,7 @@ public class AuthController {
     @GetMapping("/me")
     public AuthResponse me(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return new AuthResponse(user);
+        return serviceImp.buildAuthResponse(user);
     }
 
     @PostMapping("/logout")
