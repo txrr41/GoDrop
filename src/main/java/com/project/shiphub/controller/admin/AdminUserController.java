@@ -32,9 +32,8 @@ public class AdminUserController {
     public ResponseEntity<List<AdminUserDTO>> listAdminUsers(Authentication authentication) {
         assertOwner(authentication);
 
-        List<User> staffAndOwners = loginRepository.findAll().stream()
-                .filter(u -> u.getRole() != UserRole.CUSTOMER)
-                .collect(Collectors.toList());
+        List<User> staffAndOwners = loginRepository.findAll();
+
 
         List<AdminUserDTO> result = staffAndOwners.stream()
                 .map(u -> {

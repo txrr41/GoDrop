@@ -23,7 +23,6 @@
         </v-btn>
       </div>
 
-
       <div class="stats-grid">
         <div class="stat-glass-card pending">
           <div class="stat-meta">
@@ -60,7 +59,7 @@
     </div>
 
     <div v-if="adminStore.loading" class="premium-loader">
-      <v-progress-circular indeterminate color="primary" size="48" width="3" />
+      <v-progress-circular indeterminate color="primary" size="48" width="3"/>
       <span class="loader-text">Consultando base de dados...</span>
     </div>
 
@@ -112,6 +111,17 @@
 
         <template v-slot:item.actions="{ item }">
           <div class="table-actions">
+            <!-- Botão dados de envio — sempre visível -->
+            <v-btn
+                class="btn-ops info"
+                variant="outlined"
+                @click="openInfoDialog(item)"
+                title="Ver dados para envio"
+            >
+              <v-icon start size="15">mdi-card-account-details-outline</v-icon>
+              Envio
+            </v-btn>
+
             <v-btn
                 v-if="item.status === 'PAYMENT_APPROVED'"
                 class="btn-ops process"
@@ -139,6 +149,159 @@
       </v-data-table>
     </v-card>
 
+    <!-- ===== MODAL: DADOS PARA ENVIO ===== -->
+    <v-dialog v-model="infoDialog" max-width="600" scrollable transition="scale-transition">
+      <v-card v-if="infoOrder" class="info-modal-card" rounded="xl">
+
+        <div class="info-modal-header">
+          <div class="info-modal-header-left">
+            <div class="info-icon-box">
+              <v-icon color="white" size="22">mdi-package-variant-outline</v-icon>
+            </div>
+            <div>
+              <p class="info-modal-pre">Pedido #{{ infoOrder.id }}</p>
+              <h2 class="info-modal-title">Dados para Envio</h2>
+            </div>
+          </div>
+          <v-btn icon variant="text" class="info-close-btn" @click="infoDialog = false">
+            <v-icon color="rgba(255,255,255,0.7)">mdi-close</v-icon>
+          </v-btn>
+        </div>
+
+        <v-card-text class="info-modal-body pa-0">
+
+          <!-- Destinatário -->
+          <div class="info-section">
+            <p class="info-section-label">
+              <v-icon size="13" class="mr-1">mdi-account-outline</v-icon>
+              DESTINATÁRIO
+            </p>
+            <div class="info-two-col">
+              <div class="info-field">
+                <span class="field-key">Nome Completo</span>
+                <div class="field-val-row">
+                  <span class="field-val">{{ infoOrder.buyerName }}</span>
+                  <v-btn icon size="x-small" variant="text" @click="copy(infoOrder.buyerName)">
+                    <v-icon size="13" color="grey-lighten-1">mdi-content-copy</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+              <div class="info-field">
+                <span class="field-key">E-mail</span>
+                <div class="field-val-row">
+                  <span class="field-val">{{ infoOrder.buyerEmail }}</span>
+                  <v-btn icon size="x-small" variant="text" @click="copy(infoOrder.buyerEmail)">
+                    <v-icon size="13" color="grey-lighten-1">mdi-content-copy</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-divider"/>
+
+          <!-- Endereço -->
+          <div class="info-section">
+            <p class="info-section-label">
+              <v-icon size="13" class="mr-1">mdi-map-marker-outline</v-icon>
+              ENDEREÇO DE ENTREGA
+            </p>
+            <div class="address-box-admin">
+              <span class="address-val">{{ infoOrder.shippingAddress }}</span>
+              <v-btn
+                  variant="tonal"
+                  color="primary"
+                  size="small"
+                  class="copy-addr-btn"
+                  @click="copy(infoOrder.shippingAddress)"
+              >
+                <v-icon start size="13">mdi-content-copy</v-icon>
+                Copiar
+              </v-btn>
+            </div>
+          </div>
+
+          <div class="info-divider"/>
+
+          <!-- Itens -->
+          <div class="info-section">
+            <p class="info-section-label">
+              <v-icon size="13" class="mr-1">mdi-package-variant-outline</v-icon>
+              ITENS DO PEDIDO ({{ infoOrder.items?.length ?? 0 }})
+            </p>
+            <div class="info-items-list">
+              <div
+                  v-for="(item, i) in infoOrder.items"
+                  :key="i"
+                  class="info-item-row"
+              >
+                <span class="item-qty-tag">{{ item.quantity }}x</span>
+                <span class="item-nm">{{ item.productName }}</span>
+                <span class="item-pr">{{ formatCurrency(item.totalPrice) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-divider"/>
+
+          <!-- Totais -->
+          <div class="info-section">
+            <p class="info-section-label">
+              <v-icon size="13" class="mr-1">mdi-currency-brl</v-icon>
+              RESUMO
+            </p>
+            <div class="totals-list">
+              <div class="total-row">
+                <span class="total-key">Total do Pedido</span>
+                <span class="total-val highlight-val">{{ formatCurrency(infoOrder.totalAmount) }}</span>
+              </div>
+              <div class="total-row">
+                <span class="total-key">Data do Pedido</span>
+                <span class="total-val">{{ formatDate(infoOrder.createdAt) }}</span>
+              </div>
+              <div class="total-row">
+                <span class="total-key">Status</span>
+                <div :class="['status-dot-pill', infoOrder.status.toLowerCase().replace('_', '')]">
+                  <span class="dot-indicator"></span>
+                  {{ getStatusLabel(infoOrder.status) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rastreio (se houver) -->
+          <template v-if="infoOrder.trackingCode">
+            <div class="info-divider"/>
+            <div class="info-section">
+              <p class="info-section-label">
+                <v-icon size="13" class="mr-1">mdi-barcode-scan</v-icon>
+                CÓDIGO DE RASTREIO
+              </p>
+              <div class="tracking-admin-row">
+                <span class="tracking-admin-code">{{ infoOrder.trackingCode }}</span>
+                <v-btn icon size="small" variant="tonal" color="primary" @click="copy(infoOrder.trackingCode)">
+                  <v-icon size="15">mdi-content-copy</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </template>
+
+        </v-card-text>
+
+        <v-card-actions class="info-modal-footer">
+          <v-btn variant="tonal" color="primary" class="footer-copy-all-btn" @click="copyAll(infoOrder)">
+            <v-icon start size="16">mdi-clipboard-text-outline</v-icon>
+            Copiar Tudo
+          </v-btn>
+          <v-spacer/>
+          <v-btn variant="flat" color="#0F172A" class="footer-close-btn" @click="infoDialog = false">
+            Fechar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- ===== MODAL: DESPACHAR ===== -->
     <v-dialog v-model="shipDialog" max-width="500px" persistent transition="scale-transition">
       <v-card class="shipping-modal-card">
         <div class="modal-gradient-bg"></div>
@@ -151,19 +314,14 @@
             <h3>Logística de Envio</h3>
             <p>Pedido: <span class="highlight">#{{ selectedOrder?.id }}</span></p>
           </div>
-          <v-btn
-              icon="mdi-close"
-              variant="text"
-              size="small"
-              class="close-btn"
-              @click="closeShipDialog"
-          ></v-btn>
+          <v-btn icon="mdi-close" variant="text" size="small" class="close-btn" @click="closeShipDialog"></v-btn>
         </div>
 
         <v-card-text class="pa-8">
           <div class="shipping-info-box">
             <v-icon size="20" color="primary">mdi-information-outline</v-icon>
-            <p>Ao inserir o código, o status do pedido será alterado para <strong>Enviado</strong> e o cliente será notificado.</p>
+            <p>Ao inserir o código, o status do pedido será alterado para <strong>Enviado</strong> e o cliente será
+              notificado.</p>
           </div>
 
           <div class="input-wrapper">
@@ -190,13 +348,7 @@
         <v-divider class="opacity-10"></v-divider>
 
         <v-card-actions class="pa-8">
-          <v-btn
-              variant="text"
-              class="btn-cancel"
-              @click="closeShipDialog"
-          >
-            Cancelar
-          </v-btn>
+          <v-btn variant="text" class="btn-cancel" @click="closeShipDialog">Cancelar</v-btn>
           <v-spacer></v-spacer>
           <v-btn
               class="btn-confirm-shipping"
@@ -214,7 +366,9 @@
 
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" location="bottom right" flat class="premium-snack">
       <div class="snack-content">
-        <v-icon size="20" class="mr-2">{{ snackbar.color === 'error' ? 'mdi-alert-circle-outline' : 'mdi-check-circle-outline' }}</v-icon>
+        <v-icon size="20" class="mr-2">
+          {{ snackbar.color === 'error' ? 'mdi-alert-circle-outline' : 'mdi-check-circle-outline' }}
+        </v-icon>
         {{ snackbar.message }}
       </div>
     </v-snackbar>
@@ -222,35 +376,53 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useAdminOrderStore } from '../stores/adminOrder'
+import {ref, onMounted} from 'vue'
+import {useAdminOrderStore} from '../stores/adminOrder'
 
 const adminStore = useAdminOrderStore()
+
+// Ship dialog
 const shipDialog = ref(false)
 const selectedOrder = ref(null)
 const trackingCode = ref('')
 const shipping = ref(false)
-const snackbar = ref({ show: false, message: '', color: 'success' })
+
+// Info dialog
+const infoDialog = ref(false)
+const infoOrder = ref(null)
+
+const snackbar = ref({show: false, message: '', color: 'success'})
 
 const headers = [
-  { title: 'ORDEM', key: 'id', sortable: true, width: '120px' },
-  { title: 'CLIENTE', key: 'buyerName', sortable: false },
-  { title: 'TOTAL', key: 'totalAmount', sortable: true },
-  { title: 'STATUS', key: 'status', sortable: true },
-  { title: 'DATA', key: 'createdAt', sortable: true },
-  { title: 'AÇÕES', key: 'actions', sortable: false, align: 'end' }
+  {title: 'ORDEM', key: 'id', sortable: true, width: '100px'},
+  {title: 'CLIENTE', key: 'buyerName', sortable: false},
+  {title: 'TOTAL', key: 'totalAmount', sortable: true},
+  {title: 'STATUS', key: 'status', sortable: true},
+  {title: 'DATA', key: 'createdAt', sortable: true},
+  {title: 'AÇÕES', key: 'actions', sortable: false, align: 'end', width: '260px'}
 ]
 
-onMounted(() => { loadOrders() })
+onMounted(() => {
+  loadOrders()
+})
+
 const loadOrders = async () => {
-  try { await adminStore.fetchAllOrders() } catch (e) { showSnackbar('Erro ao carregar pedidos', 'error') }
+  try {
+    await adminStore.fetchAllOrders()
+  } catch {
+    showSnackbar('Erro ao carregar pedidos', 'error')
+  }
 }
+
 const startProcessing = async (order) => {
   try {
     await adminStore.updateOrderStatus(order.id, 'PROCESSING')
     showSnackbar(`Pedido #${order.id} em fase de preparação`)
-  } catch (e) { showSnackbar('Erro ao atualizar status', 'error') }
+  } catch {
+    showSnackbar('Erro ao atualizar status', 'error')
+  }
 }
+
 const openShipDialog = (order) => {
   selectedOrder.value = order
   trackingCode.value = ''
@@ -266,13 +438,69 @@ const confirmShip = async () => {
     await adminStore.shipOrder(selectedOrder.value.id, trackingCode.value)
     showSnackbar(`Pedido #${selectedOrder.value.id} enviado`)
     closeShipDialog()
-  } catch (e) { showSnackbar('Erro ao despachar', 'error') } finally { shipping.value = false }
+  } catch {
+    showSnackbar('Erro ao despachar', 'error')
+  } finally {
+    shipping.value = false
+  }
 }
-const showSnackbar = (message, color = 'success') => { snackbar.value = { show: true, message, color } }
-const formatCurrency = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-const formatDate = (d) => new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+
+const openInfoDialog = (order) => {
+  infoOrder.value = order
+  infoDialog.value = true
+}
+
+const copy = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    showSnackbar('Copiado!')
+  } catch {
+    showSnackbar('Erro ao copiar', 'error')
+  }
+}
+
+const copyAll = async (order) => {
+  const items = (order.items ?? [])
+      .map(i => `  - ${i.quantity}x ${i.productName} (${formatCurrency(i.totalPrice)})`)
+      .join('\n')
+
+  const text =
+      `📦 DADOS DE ENVIO — Pedido #${order.id}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 DESTINATÁRIO
+Nome: ${order.buyerName}
+E-mail: ${order.buyerEmail}
+
+📍 ENDEREÇO
+${order.shippingAddress}
+
+🛍️ ITENS
+${items}
+
+💰 TOTAL: ${formatCurrency(order.totalAmount)}
+📅 DATA: ${formatDate(order.createdAt)}${order.trackingCode ? `\n📬 RASTREIO: ${order.trackingCode}` : ''}`
+
+  await copy(text)
+  showSnackbar('Todos os dados copiados!')
+}
+
+const showSnackbar = (message, color = 'success') => {
+  snackbar.value = {show: true, message, color}
+}
+
+const formatCurrency = (v) => v.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+const formatDate = (d) => new Date(d).toLocaleDateString('pt-BR', {
+  day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'
+})
 const getStatusLabel = (s) => {
-  const l = { 'PENDING': 'Aguardando', 'PAYMENT_APPROVED': 'Aprovado', 'PROCESSING': 'Em Produção', 'SHIPPED': 'Enviado', 'DELIVERED': 'Entregue', 'CANCELLED': 'Cancelado' }
+  const l = {
+    PENDING: 'Aguardando',
+    PAYMENT_APPROVED: 'Aprovado',
+    PROCESSING: 'Em Produção',
+    SHIPPED: 'Enviado',
+    DELIVERED: 'Entregue',
+    CANCELLED: 'Cancelado'
+  }
   return l[s] || s
 }
 </script>
@@ -347,7 +575,7 @@ const getStatusLabel = (s) => {
   height: 44px !important;
 }
 
-/* Stats Grid */
+/* Stats */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -374,16 +602,33 @@ const getStatusLabel = (s) => {
   margin-top: 8px;
 }
 
-.stat-icon { color: #CBD5E1; }
-.stat-meta { display: flex; justify-content: space-between; align-items: center; }
+.stat-icon {
+  color: #CBD5E1;
+}
 
-/* Status Accents */
-.pending { border-bottom: 4px solid #F59E0B; }
-.approved { border-bottom: 4px solid #3B82F6; }
-.processing { border-bottom: 4px solid #8B5CF6; }
-.shipped { border-bottom: 4px solid #10B981; }
+.stat-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-/* Table Full Width */
+.pending {
+  border-bottom: 4px solid #F59E0B;
+}
+
+.approved {
+  border-bottom: 4px solid #3B82F6;
+}
+
+.processing {
+  border-bottom: 4px solid #8B5CF6;
+}
+
+.shipped {
+  border-bottom: 4px solid #10B981;
+}
+
+/* Table */
 .master-table-card {
   background: #FFFFFF !important;
   border-radius: 24px !important;
@@ -427,7 +672,7 @@ const getStatusLabel = (s) => {
   border-bottom: 1px solid #F1F5F9 !important;
 }
 
-/* User Profile Cell */
+/* Profile */
 .profile-stack {
   display: flex;
   align-items: center;
@@ -446,10 +691,18 @@ const getStatusLabel = (s) => {
   color: #475569;
 }
 
-.p-name { font-weight: 700; color: #0F172A; display: block; }
-.p-email { font-size: 12px; color: #94A3B8; }
+.p-name {
+  font-weight: 700;
+  color: #0F172A;
+  display: block;
+}
 
-/* Status Pills */
+.p-email {
+  font-size: 12px;
+  color: #94A3B8;
+}
+
+/* Status */
 .status-dot-pill {
   display: inline-flex;
   align-items: center;
@@ -460,29 +713,371 @@ const getStatusLabel = (s) => {
   font-weight: 700;
 }
 
-.dot-indicator { width: 8px; height: 8px; border-radius: 50%; }
-.status-dot-pill.pending { background: #FFF7ED; color: #9A3412; }
-.status-dot-pill.pending .dot-indicator { background: #F59E0B; }
-.status-dot-pill.paymentapproved { background: #EFF6FF; color: #1E40AF; }
-.status-dot-pill.paymentapproved .dot-indicator { background: #3B82F6; }
-.status-dot-pill.processing { background: #FAF5FF; color: #6B21A8; }
-.status-dot-pill.processing .dot-indicator { background: #8B5CF6; }
-.status-dot-pill.shipped { background: #F0FDF4; color: #166534; }
-.status-dot-pill.shipped .dot-indicator { background: #10B981; }
+.dot-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot-pill.pending {
+  background: #FFF7ED;
+  color: #9A3412;
+}
+
+.status-dot-pill.pending .dot-indicator {
+  background: #F59E0B;
+}
+
+.status-dot-pill.paymentapproved {
+  background: #EFF6FF;
+  color: #1E40AF;
+}
+
+.status-dot-pill.paymentapproved .dot-indicator {
+  background: #3B82F6;
+}
+
+.status-dot-pill.processing {
+  background: #FAF5FF;
+  color: #6B21A8;
+}
+
+.status-dot-pill.processing .dot-indicator {
+  background: #8B5CF6;
+}
+
+.status-dot-pill.shipped {
+  background: #F0FDF4;
+  color: #166534;
+}
+
+.status-dot-pill.shipped .dot-indicator {
+  background: #10B981;
+}
+
+.status-dot-pill.delivered {
+  background: #F0FDF4;
+  color: #166534;
+}
+
+.status-dot-pill.delivered .dot-indicator {
+  background: #10B981;
+}
+
+.status-dot-pill.cancelled {
+  background: #FEF2F2;
+  color: #991B1B;
+}
+
+.status-dot-pill.cancelled .dot-indicator {
+  background: #EF4444;
+}
 
 /* Actions */
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
 .btn-ops {
   border-radius: 10px !important;
   text-transform: none !important;
   font-weight: 700 !important;
-  font-size: 13px !important;
-  height: 38px !important;
+  font-size: 12px !important;
+  height: 36px !important;
 }
 
-.btn-ops.process { background: #0F172A !important; color: white !important; }
-.btn-ops.ship { border: 1px solid #E2E8F0 !important; color: #475569 !important; }
+.btn-ops.process {
+  background: #0F172A !important;
+  color: white !important;
+}
 
-/* --- NOVO MODAL DE ENVIO --- */
+.btn-ops.ship {
+  border: 1px solid #E2E8F0 !important;
+  color: #475569 !important;
+}
+
+.btn-ops.info {
+  border: 1px solid #C7D2FE !important;
+  color: #4338CA !important;
+  background: #EEF2FF !important;
+}
+
+.tracking-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #94A3B8;
+  font-family: monospace;
+}
+
+/* ============================= */
+/* MODAL DADOS DE ENVIO          */
+/* ============================= */
+.info-modal-card {
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+.info-modal-header {
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%);
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.info-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.info-icon-box {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.info-modal-pre {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 2px 0;
+}
+
+.info-modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.info-close-btn {
+  flex-shrink: 0;
+}
+
+.info-modal-body {
+  overflow-y: auto;
+  max-height: 58vh;
+}
+
+.info-section {
+  padding: 18px 28px;
+}
+
+.info-section-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.info-divider {
+  border-top: 1px solid #F1F5F9;
+  margin: 0;
+}
+
+/* Two col */
+.info-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.field-key {
+  font-size: 11px;
+  color: #94A3B8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.field-val-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-val {
+  font-size: 14px;
+  color: #0F172A;
+  font-weight: 600;
+}
+
+/* Address */
+.address-box-admin {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.address-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1E293B;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.copy-addr-btn {
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  flex-shrink: 0;
+}
+
+/* Items */
+.info-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #F8FAFC;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.item-qty-tag {
+  background: #E0E7FF;
+  color: #4338CA;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.item-nm {
+  flex: 1;
+  font-size: 13px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.item-pr {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+/* Totals */
+.totals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px dashed #F1F5F9;
+}
+
+.total-row:last-child {
+  border: none;
+}
+
+.total-key {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.total-val {
+  font-size: 14px;
+  color: #0F172A;
+  font-weight: 600;
+}
+
+.highlight-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #4338CA;
+}
+
+/* Tracking */
+.tracking-admin-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.tracking-admin-code {
+  flex: 1;
+  font-family: monospace;
+  font-size: 17px;
+  font-weight: 800;
+  color: #4338CA;
+  letter-spacing: 0.06em;
+}
+
+/* Footer modal */
+.info-modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #F1F5F9;
+  background: #FAFAFA;
+}
+
+.footer-copy-all-btn {
+  border-radius: 10px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+}
+
+.footer-close-btn {
+  border-radius: 10px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  color: white !important;
+  font-size: 13px !important;
+}
+
+/* ============================= */
+/* MODAL DESPACHAR               */
+/* ============================= */
 .shipping-modal-card {
   border-radius: 28px !important;
   overflow: hidden !important;
@@ -607,11 +1202,43 @@ const getStatusLabel = (s) => {
   color: #94A3B8 !important;
 }
 
-@media (max-width: 1200px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+/* Loader */
+.premium-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 20px;
 }
+
+.loader-text {
+  font-size: 14px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 600px) {
-  .admin-orders-page { padding: 20px; }
-  .stats-grid { grid-template-columns: 1fr; }
+  .admin-orders-page {
+    padding: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .table-actions {
+    justify-content: flex-start;
+  }
 }
 </style>

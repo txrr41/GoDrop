@@ -96,6 +96,7 @@ const principalItems = reactive([
   { title: 'Etiquetas', path: '/etiquetas', icon: 'mdi-tag', active: false },
   { title: 'Pedidos', path: '/admin/pedidos', icon: 'mdi-truck', active: false },
   { title: 'Usuários', path: '/usuarios', icon: 'mdi-account', active: false},
+  { title: 'Cadastar Oferta', path: '/oferta/cadastro', icon: 'mdi-sale', active: false},
 ])
 
 const contaItems = reactive([

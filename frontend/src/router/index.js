@@ -103,7 +103,7 @@ const routes = [
     },
 
     {
-        path: '/ofertas',
+        path: '/oferta/cadastro',
         component: MainLayout,
         meta: {requiresAuth: true, permission: 'marketing'},
         children: [
