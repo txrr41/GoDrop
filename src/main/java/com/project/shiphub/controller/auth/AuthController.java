@@ -39,9 +39,13 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public AuthResponse me(Authentication authentication) {
+    public ResponseEntity<?> me(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
         User user = (User) authentication.getPrincipal();
-        return serviceImp.buildAuthResponse(user);
+        assert user != null;
+        return ResponseEntity.ok(serviceImp.buildAuthResponse(user));
     }
 
     @PostMapping("/logout")

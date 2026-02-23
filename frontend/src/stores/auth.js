@@ -79,8 +79,8 @@ export const useAuthStore = defineStore('auth', {
             if (this.initialized) return
             try {
                 await this.fetchUser()
-            } catch {
-                // não autenticado — ok
+            } catch (error) {
+                this.user = null
             } finally {
                 this.initialized = true
             }
@@ -115,8 +115,16 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async fetchUser() {
-            const { data } = await api.get('/auth/me')
-            this.user = data
+            try {
+                const { data } = await api.get('/auth/me')
+                this.user = data
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    this.user = null
+                    return
+                }
+                throw error
+            }
         },
 
         async logout() {
