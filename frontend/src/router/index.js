@@ -10,10 +10,11 @@ import Order from '../pages/Order.vue'
 import UserPerm from '../pages/UserPerm.vue'
 import ProductCatalog from '../pages/ProductCatalog.vue'
 import ApiDocumentation from '../pages/ApiDocumentation.vue'
+import Dashboard from "../pages/Dashboard.vue";
 
 async function permissionGuard(to, _from, next) {
     // Lazy import do store (evita problemas de inicialização)
-    const {useAuthStore} = await import('../stores/auth.js')
+    const { useAuthStore} = await import('../stores/auth.js')
     const auth = useAuthStore()
 
     if (!auth.initialized) {
@@ -132,6 +133,12 @@ const routes = [
             },
         ],
     },
+    {
+        path: '/metricas',
+        component: MainLayout,
+        meta: {requiresAuth: true, ownerOnly: true},
+        children: [{path: '', component: Dashboard}],
+    }
 ]
 
 const router = createRouter({

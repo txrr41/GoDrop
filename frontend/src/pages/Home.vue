@@ -18,7 +18,7 @@ const router = useRouter()
 
 const handleCategoryClick = (categoryName) => {
   router.push({
-    path: '/produtos',
+    path: '/catalogo',
     query: { categoria: categoryName }
   })
 }

@@ -164,8 +164,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch} from 'vue'
 import { useProductStore } from '../stores/product'
+import { useRoute } from "vue-router";
 
 const productStore = useProductStore()
 
@@ -174,6 +175,16 @@ const activeCategory = ref('Todas')
 const priceRange = ref(5000)
 const sortBy = ref('Novidades')
 const cartCount = ref(0)
+
+const route = useRoute()
+
+watch(() => route.query.categoria, (novaCategoria) => {
+  if (novaCategoria) {
+    activeCategory.value = novaCategoria
+  } else {
+    activeCategory.value = 'Todas'
+  }
+}, { immediate: true })
 
 const feedback = ref({
   show: false,

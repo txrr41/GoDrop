@@ -102,9 +102,9 @@
               </a>
             </template>
             <v-list class="pa-2" rounded="lg">
-              <v-list-item title="Eletrônicos" />
-              <v-list-item title="Casa & Decoração" />
-              <v-list-item title="Esportes" />
+              <v-list-item title="Eletrônicos" @click="goToCategory('Eletrônicos')" />
+              <v-list-item title="Casa & Decoração" @click="goToCategory('Casa')" />
+              <v-list-item title="Esportes" @click="goToCategory('Esportes')" />
             </v-list>
           </v-menu>
         </nav>
@@ -134,21 +134,47 @@ const showAuth = ref(false)
 const startSignUp = ref(false)
 const showCart = ref(false)
 
-function openLogin() { startSignUp.value = false; showAuth.value = true; }
-function openRegister() { startSignUp.value = true; showAuth.value = true; }
-function closeAuth() { showAuth.value = false; }
-function logout() { auth.logout(); cartStore.clearCart(); }
+function goToCategory(name) {
+  router.push({ path: '/catalogo', query: { categoria: name } })
+}
+
+function openLogin() {
+  startSignUp.value = false; showAuth.value = true;
+}
+
+function openRegister() {
+  startSignUp.value = true; showAuth.value = true;
+}
+
+function closeAuth() {
+  showAuth.value = false;
+}
+
+function logout() {
+  auth.logout(); cartStore.clearCart();
+}
 
 function handleUpdateQuantity(productId, change) {
-  try { cartStore.updateQuantity(productId, change); } catch (error) { alert(error.message); }
+
+  try {
+    cartStore.updateQuantity(productId, change);
+  } catch (error) {
+    alert(error.message);
+  }
 }
+
 function handleRemoveItem(productId) {
-  if (confirm('Deseja remover este item do carrinho?')) { cartStore.removeItem(productId); }
+
+  if (confirm('Deseja remover este item do carrinho?')) {
+    cartStore.removeItem(productId);
+  }
 }
+
 function handleCheckout() {
   if (!auth.isLogged) { showCart.value = false; openLogin(); return; }
   showCart.value = false; router.push('/checkout');
 }
+
 cartStore.loadCart()
 </script>
 

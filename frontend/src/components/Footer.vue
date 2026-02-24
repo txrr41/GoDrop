@@ -167,7 +167,7 @@ const scrollToTop = () => {
 
 const filterByCategory = (category) => {
   router.push({
-    path: '/produtos',
+    path: '/catalogo',
     query: { categoria: category }
   })
 }
