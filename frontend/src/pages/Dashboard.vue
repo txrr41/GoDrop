@@ -28,7 +28,7 @@
           <span class="kpi-label">Receita do Mês</span>
           <span class="kpi-delta positive">▲ 23%</span>
         </div>
-        <p class="kpi-value">R$ 48.392</p>
+        <p class="kpi-value">R$ {{ store.monthRevenue }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:74%;background:#059669"></div></div>
         <p class="kpi-sub">Meta: R$ 65.000 · 74%</p>
       </div>
@@ -40,7 +40,7 @@
           <span class="kpi-label">Pedidos Hoje</span>
           <span class="kpi-delta positive">▲ 8%</span>
         </div>
-        <p class="kpi-value">{{store.totalOrders}}</p>
+        <p class="kpi-value">{{ store.lastDayOrders.length }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:51%;background:#6366F1"></div></div>
         <p class="kpi-sub">Meta diária: 250</p>
       </div> 
@@ -76,7 +76,7 @@
           <span class="kpi-label">Novos Clientes</span>
           <span class="kpi-delta positive">▲ 12%</span>
         </div>
-        <p class="kpi-value">318</p>
+        <p class="kpi-value">{{ store.newCustomers }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:63%;background:#059669"></div></div>
         <p class="kpi-sub">Este mês</p>
       </div>
@@ -88,7 +88,7 @@
           <span class="kpi-label">Ticket Médio</span>
           <span class="kpi-delta positive">▲ 4%</span>
         </div>
-        <p class="kpi-value">R$ 381</p>
+        <p class="kpi-value">R$ {{ store.averageTicket }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:61%;background:#F59E0B"></div></div>
         <p class="kpi-sub">vs R$ 366 anterior</p>
       </div>
@@ -210,7 +210,7 @@
             <span>Valor</span>
             <span>Status</span>
           </div>
-          <div class="ot-row" v-for="order in recentOrders" :key="order.id">
+          <div class="ot-row" v-for="order in store.lastDayOrders" :key="order.id">
             <span class="ot-id">#{{ order.id }}</span>
             <div class="ot-client">
               <div class="ot-avatar" :style="{background: order.bg, color: order.tc}">{{ order.initials }}</div>

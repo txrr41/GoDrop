@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,7 +41,7 @@ public class AdminDashboardController {
         // Pedidos por status
         var allOrders = orderRepository.findAll();
 
-        long totalOrders = allOrders.size();
+        int totalOrders = allOrders.size();
         long pendingOrders = allOrders.stream()
                 .filter(o -> o.getStatus().name().equals("PENDING")).count();
         long approvedOrders = allOrders.stream()
@@ -69,6 +70,43 @@ public class AdminDashboardController {
                 })
                 .toList();
 
+        // Novos clientes do mês
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        long newCustomers = loginRepository.findAll().stream()
+                .filter(u -> u.getCreatedAt() != null && u.getCreatedAt().isAfter(startOfMonth))
+                .count();
+
+        //Ticket medio
+        Double averageTicket = totalRevenue.doubleValue() / totalOrders;
+
+        //Receita mensal
+        BigDecimal monthRevenue = allOrders.stream()
+                .filter(o -> o.getCreatedAt().isAfter(startOfMonth))
+                .filter(o -> o.getStatus().name().equals("DELIVERED")
+                        || o.getStatus().name().equals("PAYMENT_APPROVED")
+                        || o.getStatus().name().equals("SHIPPED"))
+                .map(Order::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        //Pedidos das ultimas 24hrs
+        LocalDateTime lastHours = LocalDateTime.now().minusHours(0);
+        List<Order> lastDayOrders = orderRepository.findByCreatedAtAfter(lastHours);
+        List<Map<String, Object>> lastDayOrdersMapped = lastDayOrders.stream()
+                .map(o -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("id", o.getId());
+                    item.put("name", o.getBuyerName());
+                    item.put("product", o.getItems().isEmpty() ? "—" : o.getItems().get(0).getProduct().getNome());
+                    item.put("value", "R$ " + o.getTotalAmount());
+                    item.put("status", o.getStatus().name());
+                    item.put("statusKey", o.getStatus().name().toLowerCase());
+                    item.put("initials", o.getBuyerName().substring(0, 1).toUpperCase());
+                    item.put("bg", "#EEF2FF");
+                    item.put("tc", "#6366F1");
+                    return item;
+                })
+                .toList();
+
         // Produtos e clientes
         long totalProducts = productRepository.count();
         long totalCustomers = loginRepository.count();
@@ -84,6 +122,10 @@ public class AdminDashboardController {
         stats.put("deliveredOrders", deliveredOrders);
         stats.put("lowStockProducts", lowStockProducts);
         stats.put("lowStockCount", lowStockProducts.size());
+        stats.put("newCustomers", newCustomers);
+        stats.put("averageTicket", averageTicket);
+        stats.put("monthRevenue", monthRevenue);
+        stats.put("lastDayOrders", lastDayOrders);
 
         log.info("✅ Stats: {} pedidos, R$ {} receita", totalOrders, totalRevenue);
         return ResponseEntity.ok(stats);

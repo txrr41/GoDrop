@@ -19,6 +19,10 @@ export const useDashboardStore = defineStore('dashboard', {
         deliveredOrders:(state) => state.stats?.deliveredOrders ?? 0,
         lowStockProducts:(state) => state.stats?.lowStockProducts ?? [],
         lowStockCount: (state) => state.stats?.lowStockCount?? 0,
+        newCustomers: (state) => state.stats?.newCustomers ?? 0,
+        averageTicket: (state) => state.stats?.averageTicket ?? 0,
+        monthRevenue: (state) => state.stats?.averageTicket ?? 0,
+        lastDayOrders: (state) => state.stats?.lastDayOrders ?? [],
     },
 
     actions: {
