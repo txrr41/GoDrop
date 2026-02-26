@@ -1,663 +1,609 @@
 <template>
   <div class="dashboard-page">
 
-    <!-- ══════════════════════════════════════════════
-         HEADER
-    ══════════════════════════════════════════════ -->
-    <header class="dash-header">
-      <div class="dash-header__left">
-        <p class="dash-header__greeting">Bom dia, Admin 👋</p>
-        <h1 class="dash-header__title">Dashboard</h1>
+    <!-- ══ PAGE TITLE ══ -->
+    <div class="page-title-row">
+      <div class="page-title-left">
+        <p class="page-breadcrumb">Dashboard / <span>Visão Geral</span></p>
+        <h1 class="page-title">Painel de Operações</h1>
       </div>
-      <div class="dash-header__right">
-        <div class="date-pill">
-          <v-icon size="15" class="mr-1" style="color:#0061FF">mdi-calendar-month-outline</v-icon>
-          24 de Fevereiro, 2026
+      <div class="page-title-right">
+        <div class="date-range-btn">
+          <v-icon size="14">mdi-calendar-range</v-icon>
+          <span>Fev 1 — Fev 24, 2026</span>
+          <v-icon size="14">mdi-chevron-down</v-icon>
         </div>
-        <button class="notif-btn">
-          <v-icon size="20">mdi-bell-outline</v-icon>
-          <span class="notif-dot"></span>
+        <button class="export-btn">
+          <v-icon size="14">mdi-arrow-up-circle-outline</v-icon>
+          Exportar
         </button>
-        <div class="dash-avatar">
-          <v-icon size="18" color="white">mdi-account</v-icon>
-        </div>
       </div>
-    </header>
+    </div>
 
-    <!-- ══════════════════════════════════════════════
-         KPI CARDS — 6 colunas
-    ══════════════════════════════════════════════ -->
-    <section class="kpi-row">
+    <!-- ══ KPI STRIP ══ -->
+    <div class="kpi-strip">
 
-      <div class="kpi-card" style="--accent:#0061FF">
-        <div class="kpi-card__top">
-          <div class="kpi-card__icon" style="background:#EFF6FF">
-            <v-icon size="20" color="#0061FF">mdi-currency-usd</v-icon>
-          </div>
-          <span class="kpi-badge kpi-badge--up">▲ 23%</span>
+      <div class="kpi-tile">
+        <div class="kpi-tile-head">
+          <span class="kpi-label">Receita do Mês</span>
+          <span class="kpi-delta positive">▲ 23%</span>
         </div>
-        <p class="kpi-card__label">Receita do Mês</p>
-        <p class="kpi-card__value">R$ 48.392</p>
-        <div class="kpi-progress"><div class="kpi-progress__fill" style="width:74%;background:#0061FF"></div></div>
-        <p class="kpi-card__sub">Meta: R$ 65.000 · 74% atingida</p>
+        <p class="kpi-value">R$ 48.392</p>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:74%;background:#059669"></div></div>
+        <p class="kpi-sub">Meta: R$ 65.000 · 74%</p>
       </div>
 
-      <div class="kpi-card" style="--accent:#7C3AED">
-        <div class="kpi-card__top">
-          <div class="kpi-card__icon" style="background:#F5F3FF">
-            <v-icon size="20" color="#7C3AED">mdi-package-variant-closed</v-icon>
-          </div>
-          <span class="kpi-badge kpi-badge--up">▲ 8%</span>
+      <div class="kpi-divider"></div>
+
+      <div class="kpi-tile">
+        <div class="kpi-tile-head">
+          <span class="kpi-label">Pedidos Hoje</span>
+          <span class="kpi-delta positive">▲ 8%</span>
         </div>
-        <p class="kpi-card__label">Pedidos Hoje</p>
-        <p class="kpi-card__value">127</p>
-        <div class="kpi-progress"><div class="kpi-progress__fill" style="width:51%;background:#7C3AED"></div></div>
-        <p class="kpi-card__sub">Meta diária: 250 pedidos</p>
+        <p class="kpi-value">{{store.totalOrders}}</p>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:51%;background:#6366F1"></div></div>
+        <p class="kpi-sub">Meta diária: 250</p>
+      </div> 
+
+      <div class="kpi-divider"></div>
+
+      <div class="kpi-tile">
+        <div class="kpi-tile-head">
+          <span class="kpi-label">Produtos Ativos</span>
+          <span class="kpi-delta neutral">→ 0%</span>
+        </div>
+        <p class="kpi-value">{{ store.totalProducts}}</p>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:88%;background:#0EA5E9"></div></div>
+        <p class="kpi-sub">88% do catálogo</p>
       </div>
 
-      <div class="kpi-card" style="--accent:#0891B2">
-        <div class="kpi-card__top">
-          <div class="kpi-card__icon" style="background:#ECFEFF">
-            <v-icon size="20" color="#0891B2">mdi-tag-multiple-outline</v-icon>
-          </div>
-          <span class="kpi-badge kpi-badge--neutral">→ 0%</span>
+      <div class="kpi-divider"></div>
+
+      <div class="kpi-tile">
+        <div class="kpi-tile-head">
+          <span class="kpi-label">Estoque Crítico</span>
+          <span class="kpi-delta negative">▼ 5%</span>
         </div>
-        <p class="kpi-card__label">Produtos Ativos</p>
-        <p class="kpi-card__value">1.284</p>
-        <div class="kpi-progress"><div class="kpi-progress__fill" style="width:88%;background:#0891B2"></div></div>
-        <p class="kpi-card__sub">88% do catálogo disponível</p>
+        <p class="kpi-value danger">{{store.lowStockCount}}</p>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:34%;background:#EF4444"></div></div>
+        <p class="kpi-sub">Abaixo de 10 un.</p>
       </div>
 
-      <div class="kpi-card" style="--accent:#EF4444">
-        <div class="kpi-card__top">
-          <div class="kpi-card__icon" style="background:#FEF2F2">
-            <v-icon size="20" color="#EF4444">mdi-alert-circle-outline</v-icon>
-          </div>
-          <span class="kpi-badge kpi-badge--down">▼ 5%</span>
+      <div class="kpi-divider"></div>
+
+      <div class="kpi-tile">
+        <div class="kpi-tile-head">
+          <span class="kpi-label">Novos Clientes</span>
+          <span class="kpi-delta positive">▲ 12%</span>
         </div>
-        <p class="kpi-card__label">Estoque Crítico</p>
-        <p class="kpi-card__value">34</p>
-        <div class="kpi-progress"><div class="kpi-progress__fill" style="width:34%;background:#EF4444"></div></div>
-        <p class="kpi-card__sub">Produtos abaixo de 10 un.</p>
+        <p class="kpi-value">318</p>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:63%;background:#059669"></div></div>
+        <p class="kpi-sub">Este mês</p>
       </div>
 
-      <div class="kpi-card" style="--accent:#10B981">
-        <div class="kpi-card__top">
-          <div class="kpi-card__icon" style="background:#ECFDF5">
-            <v-icon size="20" color="#10B981">mdi-account-group-outline</v-icon>
-          </div>
-          <span class="kpi-badge kpi-badge--up">▲ 12%</span>
+      <div class="kpi-divider"></div>
+
+      <div class="kpi-tile">
+        <div class="kpi-tile-head">
+          <span class="kpi-label">Ticket Médio</span>
+          <span class="kpi-delta positive">▲ 4%</span>
         </div>
-        <p class="kpi-card__label">Novos Clientes</p>
-        <p class="kpi-card__value">318</p>
-        <div class="kpi-progress"><div class="kpi-progress__fill" style="width:63%;background:#10B981"></div></div>
-        <p class="kpi-card__sub">Este mês</p>
+        <p class="kpi-value">R$ 381</p>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:61%;background:#F59E0B"></div></div>
+        <p class="kpi-sub">vs R$ 366 anterior</p>
       </div>
 
-      <div class="kpi-card" style="--accent:#F59E0B">
-        <div class="kpi-card__top">
-          <div class="kpi-card__icon" style="background:#FFFBEB">
-            <v-icon size="20" color="#F59E0B">mdi-target</v-icon>
-          </div>
-          <span class="kpi-badge kpi-badge--up">▲ 4%</span>
-        </div>
-        <p class="kpi-card__label">Ticket Médio</p>
-        <p class="kpi-card__value">R$ 381</p>
-        <div class="kpi-progress"><div class="kpi-progress__fill" style="width:61%;background:#F59E0B"></div></div>
-        <p class="kpi-card__sub">vs R$ 366 no mês anterior</p>
-      </div>
+    </div>
 
-    </section>
+    <!-- ══ MID ROW ══ -->
+    <div class="mid-row">
 
-    <!-- ══════════════════════════════════════════════
-         LINHA 2: Gráfico + Donut
-    ══════════════════════════════════════════════ -->
-    <section class="mid-row">
-
-      <!-- Gráfico de barras (simulado com CSS) -->
-      <div class="card chart-card">
-        <div class="card__header">
+      <!-- Revenue Chart -->
+      <div class="panel chart-panel">
+        <div class="panel-header">
           <div>
-            <h2 class="card__title">Vendas por Período</h2>
-            <p class="card__sub">Últimos 7 dias</p>
+            <p class="panel-label">Receita Bruta</p>
+            <h2 class="panel-title">R$ 59.400 <span class="panel-period">últimos 7 dias</span></h2>
           </div>
-          <div class="period-tabs">
-            <button class="period-tab period-tab--active">7D</button>
-            <button class="period-tab">30D</button>
-            <button class="period-tab">90D</button>
+          <div class="period-group">
+            <button class="period-pill active">7D</button>
+            <button class="period-pill">30D</button>
+            <button class="period-pill">90D</button>
           </div>
         </div>
 
-        <div class="bar-chart">
-          <div class="bar-chart__y-axis">
-            <span>R$12k</span>
-            <span>R$9k</span>
-            <span>R$6k</span>
-            <span>R$3k</span>
-            <span>R$0</span>
-          </div>
-          <div class="bar-chart__body">
-            <div class="bar-chart__gridlines">
-              <div></div><div></div><div></div><div></div>
+        <div class="chart-area">
+          <div class="chart-body">
+            <div class="chart-grid">
+              <div class="grid-line"><span class="grid-label">R$12k</span></div>
+              <div class="grid-line"><span class="grid-label">R$9k</span></div>
+              <div class="grid-line"><span class="grid-label">R$6k</span></div>
+              <div class="grid-line"><span class="grid-label">R$3k</span></div>
             </div>
-            <div class="bar-chart__bars">
-              <div class="bar-wrap" v-for="(bar, i) in chartData" :key="i">
-                <div class="bar-tooltip">{{ bar.value }}</div>
-                <div
-                    class="bar"
-                    :class="{ 'bar--highlight': bar.highlight }"
-                    :style="{ height: bar.pct + '%' }"
-                ></div>
-                <span class="bar-label">{{ bar.day }}</span>
+            <div class="bars-row">
+              <div class="bar-col" v-for="(bar, i) in chartData" :key="i">
+                <div class="bar-tooltip-text">{{ bar.value }}</div>
+                <div class="bar-fill" :class="{ 'bar-highlight': bar.highlight }" :style="{ height: bar.pct + '%' }"></div>
+                <span class="bar-day">{{ bar.day }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="chart-footer">
-          <div class="chart-footer__legend">
-            <span class="legend-dot" style="background:#0061FF"></span>
-            Receita bruta
+        <div class="chart-footer-row">
+          <div class="chart-legend">
+            <span class="legend-swatch" style="background:#059669"></span>
+            Receita bruta confirmada
           </div>
-          <div class="chart-footer__summary">
-            <span class="chart-total">R$ 59.400</span>
+          <div class="chart-total-info">
+            <span class="chart-total-val">R$ 59.400</span>
             <span class="chart-total-label">Total do período</span>
           </div>
         </div>
       </div>
 
-      <!-- Donut de categorias -->
-      <div class="card donut-card">
-        <div class="card__header">
-          <div>
-            <h2 class="card__title">Vendas por Categoria</h2>
-            <p class="card__sub">Este mês</p>
+      <!-- Right column -->
+      <div class="panel-col-right">
+
+        <div class="panel donut-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-label">Distribuição</p>
+              <h2 class="panel-title">Por Categoria</h2>
+            </div>
           </div>
-        </div>
-
-        <div class="donut-wrap">
-          <svg viewBox="0 0 120 120" class="donut-svg">
-            <circle cx="60" cy="60" r="45" fill="none" stroke="#F1F5F9" stroke-width="16"/>
-            <circle cx="60" cy="60" r="45" fill="none" stroke="#0061FF" stroke-width="16"
-                    stroke-dasharray="107.4 175.8" stroke-dashoffset="0" stroke-linecap="round"/>
-            <circle cx="60" cy="60" r="45" fill="none" stroke="#7C3AED" stroke-width="16"
-                    stroke-dasharray="67.8 215.4" stroke-dashoffset="-109.4" stroke-linecap="round"/>
-            <circle cx="60" cy="60" r="45" fill="none" stroke="#10B981" stroke-width="16"
-                    stroke-dasharray="50.9 232.3" stroke-dashoffset="-179.2" stroke-linecap="round"/>
-            <circle cx="60" cy="60" r="45" fill="none" stroke="#F59E0B" stroke-width="16"
-                    stroke-dasharray="56.5 226.7" stroke-dashoffset="-232.1" stroke-linecap="round"/>
-            <text x="60" y="54" text-anchor="middle" class="donut-center-big">38%</text>
-            <text x="60" y="66" text-anchor="middle" class="donut-center-sm">Eletrônicos</text>
-          </svg>
-
-          <div class="donut-legend">
-            <div class="donut-item" v-for="cat in donutCategories" :key="cat.name">
-              <span class="donut-dot" :style="{ background: cat.color }"></span>
-              <span class="donut-name">{{ cat.name }}</span>
-              <span class="donut-pct">{{ cat.pct }}%</span>
+          <div class="donut-layout">
+            <svg viewBox="0 0 120 120" class="donut-svg">
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#F1F5F9" stroke-width="16"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#059669" stroke-width="16"
+                      stroke-dasharray="115 187" stroke-dashoffset="0" stroke-linecap="butt"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#6366F1" stroke-width="16"
+                      stroke-dasharray="72 230" stroke-dashoffset="-117" stroke-linecap="butt"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#0EA5E9" stroke-width="16"
+                      stroke-dasharray="55 247" stroke-dashoffset="-191" stroke-linecap="butt"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#F59E0B" stroke-width="16"
+                      stroke-dasharray="60 242" stroke-dashoffset="-248" stroke-linecap="butt"/>
+              <text x="60" y="56" text-anchor="middle" class="donut-pct-txt">38%</text>
+              <text x="60" y="67" text-anchor="middle" class="donut-lbl-txt">Eletrôn.</text>
+            </svg>
+            <div class="donut-legend-col">
+              <div class="dl-row" v-for="cat in donutCategories" :key="cat.name">
+                <span class="dl-dot" :style="{background: cat.color}"></span>
+                <span class="dl-name">{{ cat.name }}</span>
+                <span class="dl-pct">{{ cat.pct }}%</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-    </section>
-
-    <!-- ══════════════════════════════════════════════
-         LINHA 3: Pedidos + Top Produtos + Alertas
-    ══════════════════════════════════════════════ -->
-    <section class="bottom-row">
-
-      <!-- Pedidos Recentes -->
-      <div class="card orders-card">
-        <div class="card__header">
-          <div>
-            <h2 class="card__title">Pedidos Recentes</h2>
-            <p class="card__sub">Últimas 24 horas</p>
+        <div class="panel mini-perf-panel">
+          <div class="mini-perf-grid">
+            <div class="perf-item" v-for="stat in miniStats" :key="stat.label">
+              <span class="perf-icon">{{ stat.icon }}</span>
+              <div class="perf-data">
+                <p class="perf-val">{{ stat.value }}</p>
+                <p class="perf-lbl">{{ stat.label }}</p>
+              </div>
+            </div>
           </div>
-          <button class="link-btn">Ver todos <v-icon size="14">mdi-arrow-right</v-icon></button>
         </div>
 
+      </div>
+    </div>
+
+    <!-- ══ BOTTOM ROW ══ -->
+    <div class="bottom-row">
+
+      <div class="panel orders-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">Últimas 24 horas</p>
+            <h2 class="panel-title">Pedidos Recentes</h2>
+          </div>
+          <button class="view-all-btn">Ver todos <v-icon size="13">mdi-arrow-right</v-icon></button>
+        </div>
         <div class="orders-table">
-          <div class="orders-table__head">
-            <span>Pedido</span>
+          <div class="ot-head">
+            <span>ID</span>
             <span>Cliente</span>
             <span>Produto</span>
             <span>Valor</span>
             <span>Status</span>
           </div>
-          <div class="orders-table__row" v-for="order in recentOrders" :key="order.id">
-            <span class="order-id">#{{ order.id }}</span>
-            <div class="order-client">
-              <div class="order-avatar" :style="{ background: order.avatarBg, color: order.avatarColor }">
-                {{ order.initials }}
-              </div>
+          <div class="ot-row" v-for="order in recentOrders" :key="order.id">
+            <span class="ot-id">#{{ order.id }}</span>
+            <div class="ot-client">
+              <div class="ot-avatar" :style="{background: order.bg, color: order.tc}">{{ order.initials }}</div>
               <span>{{ order.name }}</span>
             </div>
-            <span class="order-product">{{ order.product }}</span>
-            <span class="order-value">{{ order.value }}</span>
-            <span :class="['status-pill', 'status-pill--' + order.statusKey]">{{ order.status }}</span>
+            <span class="ot-product">{{ order.product }}</span>
+            <span class="ot-value">{{ order.value }}</span>
+            <div :class="['status-tag', 'status-' + order.statusKey]">{{ order.status }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Top Produtos -->
-      <div class="card top-products-card">
-        <div class="card__header">
+      <div class="panel top-panel">
+        <div class="panel-header">
           <div>
-            <h2 class="card__title">Mais Vendidos</h2>
-            <p class="card__sub">Top 5 este mês</p>
+            <p class="panel-label">Este mês</p>
+            <h2 class="panel-title">Mais Vendidos</h2>
           </div>
-          <button class="link-btn">Catálogo <v-icon size="14">mdi-arrow-right</v-icon></button>
+          <button class="view-all-btn">Catálogo <v-icon size="13">mdi-arrow-right</v-icon></button>
         </div>
-
         <div class="top-list">
           <div class="top-item" v-for="(item, i) in topProducts" :key="i">
-            <div class="top-rank" :class="'rank-' + (i+1)">{{ i + 1 }}</div>
-            <div class="top-thumb" :style="{ background: item.bg }">{{ item.emoji }}</div>
+            <div class="top-rank" :class="'rank-' + (i+1)">{{ i+1 }}</div>
+            <div class="top-thumb" :style="{background: item.bg}">{{ item.emoji }}</div>
             <div class="top-info">
               <p class="top-name">{{ item.name }}</p>
               <p class="top-cat">{{ item.category }}</p>
             </div>
-            <div class="top-bar-wrap">
+            <div class="top-right">
               <p class="top-units">{{ item.units }} un.</p>
-              <div class="top-bar"><div class="top-bar__fill" :style="{ width: item.pct + '%' }"></div></div>
+              <div class="top-bar-track">
+                <div class="top-bar-fill" :style="{width: item.pct + '%'}"></div>
+              </div>
+              <p class="top-revenue">{{ item.revenue }}</p>
             </div>
-            <span class="top-revenue">{{ item.revenue }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Alertas de Estoque -->
-      <div class="card alerts-card">
-        <div class="card__header">
+      <div class="panel alerts-panel">
+        <div class="panel-header">
           <div>
-            <h2 class="card__title">Alertas de Estoque</h2>
-            <p class="card__sub">Reposição urgente</p>
+            <p class="panel-label">Reposição urgente</p>
+            <h2 class="panel-title">Alertas</h2>
           </div>
-          <span class="alert-count">34</span>
+          <div class="alert-count-badge">{{store.lowStockCount}}</div>
         </div>
-
         <div class="alerts-list">
-          <div class="alert-item" :class="'alert-item--' + alert.level" v-for="alert in stockAlerts" :key="alert.name">
-            <v-icon size="14" :color="alert.level === 'critical' ? '#EF4444' : '#F59E0B'">
-              {{ alert.level === 'critical' ? 'mdi-circle' : 'mdi-circle' }}
-            </v-icon>
-            <div class="alert-info">
-              <p class="alert-name">{{ alert.name }}</p>
-              <p class="alert-detail">Estoque: <strong>{{ alert.stock }} un.</strong> · {{ alert.category }}</p>
+          <div class="alert-row alert-critical" v-for="product in store.lowStockProducts" :key="product.id">
+            <div class="alert-left">
+              <span class="alert-dot"></span>
+              <div class="alert-info">
+                <p class="alert-name">{{ product.nome }}</p>
+                <p class="alert-meta">{{ product.estoque }} un · {{ product.categoria }}</p>
+              </div>
             </div>
-            <button class="repor-btn">Repor</button>
+            <button class="repor-pill">Repor</button>
           </div>
         </div>
       </div>
 
-    </section>
-
-    <section class="mini-stats-bar">
-      <div class="mini-stat" v-for="(stat, i) in miniStats" :key="i">
-        <span class="mini-stat__icon">{{ stat.icon }}</span>
-        <div>
-          <p class="mini-stat__value">{{ stat.value }}</p>
-          <p class="mini-stat__label">{{ stat.label }}</p>
-        </div>
-      </div>
-    </section>
+    </div>
 
   </div>
 </template>
 
 <script setup>
+import { useDashboardStore} from "../stores/dashboard.js";
+import { onMounted, ref } from "vue";
 
-const chartData = [
-  { day: 'Seg', value: 'R$ 7.200', pct: 60,  highlight: false },
-  { day: 'Ter', value: 'R$ 9.800', pct: 82,  highlight: false },
-  { day: 'Qua', value: 'R$ 6.100', pct: 51,  highlight: false },
-  { day: 'Qui', value: 'R$ 11.400', pct: 95, highlight: true  },
-  { day: 'Sex', value: 'R$ 8.700', pct: 72,  highlight: false },
-  { day: 'Sáb', value: 'R$ 10.300', pct: 86, highlight: false },
-  { day: 'Dom', value: 'R$ 5.900', pct: 49,  highlight: false },
-]
+const store = useDashboardStore()
 
-// Donut
-const donutCategories = [
-  { name: 'Eletrônicos', color: '#0061FF', pct: 38 },
-  { name: 'Moda',        color: '#7C3AED', pct: 24 },
-  { name: 'Casa',        color: '#10B981', pct: 18 },
-  { name: 'Outros',      color: '#F59E0B', pct: 20 },
-]
+onMounted(() => {
+  store.fetchStats()
+})
 
-// Pedidos recentes
-const recentOrders = [
-  { id: '4821', name: 'Marcos Silva',  initials: 'M', avatarBg: '#DBEAFE', avatarColor: '#1D4ED8', product: 'iPhone 15 Pro',    value: 'R$ 7.299', status: 'Aprovado',   statusKey: 'approved'   },
-  { id: '4820', name: 'Ana Souza',     initials: 'A', avatarBg: '#FCE7F3', avatarColor: '#BE185D', product: 'Tênis Nike Air',  value: 'R$ 849',   status: 'Enviado',    statusKey: 'shipped'    },
-  { id: '4819', name: 'Roberto Lima',  initials: 'R', avatarBg: '#D1FAE5', avatarColor: '#065F46', product: 'Smart TV 55"',   value: 'R$ 3.199', status: 'Em preparo', statusKey: 'processing' },
-  { id: '4818', name: 'Juliana Costa', initials: 'J', avatarBg: '#EDE9FE', avatarColor: '#6D28D9', product: 'Perfume Chanel', value: 'R$ 1.250', status: 'Pendente',   statusKey: 'pending'    },
-  { id: '4817', name: 'Felipe Ramos',  initials: 'F', avatarBg: '#FEF3C7', avatarColor: '#92400E', product: 'Notebook Dell',  value: 'R$ 5.499', status: 'Entregue',   statusKey: 'delivered'  },
-]
+// Dados temporários para o gráfico não quebrar
+const chartData = ref([
+  { day: 'Seg', value: 'R$8.2k', pct: 68, highlight: false },
+  { day: 'Ter', value: 'R$9.1k', pct: 76, highlight: false },
+  { day: 'Qua', value: 'R$7.4k', pct: 62, highlight: false },
+  { day: 'Qui', value: 'R$11k',  pct: 92, highlight: true  },
+  { day: 'Sex', value: 'R$9.8k', pct: 82, highlight: false },
+  { day: 'Sáb', value: 'R$6.1k', pct: 51, highlight: false },
+  { day: 'Dom', value: 'R$7.9k', pct: 66, highlight: false },
+])
 
-// Top Produtos
-const topProducts = [
-  { name: 'iPhone 15 Pro Max',  category: 'Eletrônicos', emoji: '📱', bg: '#DBEAFE', units: 234, pct: 94, revenue: 'R$ 1,7M' },
-  { name: 'Nike Air Max 270',   category: 'Esportes',    emoji: '👟', bg: '#FCE7F3', units: 198, pct: 79, revenue: 'R$ 168k' },
-  { name: 'Samsung Smart TV',   category: 'Eletrônicos', emoji: '📺', bg: '#D1FAE5', units: 143, pct: 57, revenue: 'R$ 457k' },
-  { name: 'Kit Perfumes Chanel',category: 'Beleza',      emoji: '💄', bg: '#EDE9FE', units: 117, pct: 47, revenue: 'R$ 146k' },
-  { name: 'Dell XPS 15',        category: 'Eletrônicos', emoji: '💻', bg: '#FEF3C7', units: 89,  pct: 36, revenue: 'R$ 489k' },
-]
+const donutCategories = ref([
+  { name: 'Eletrônicos', pct: 38, color: '#059669' },
+  { name: 'Moda',        pct: 24, color: '#6366F1' },
+  { name: 'Casa',        pct: 18, color: '#0EA5E9' },
+  { name: 'Outros',      pct: 20, color: '#F59E0B' },
+])
 
-// Alertas de estoque
-const stockAlerts = [
-  { name: 'AirPods Pro 2ª Geração', stock: 2, category: 'Eletrônicos', level: 'critical' },
-  { name: 'Apple Watch Series 9',   stock: 3, category: 'Eletrônicos', level: 'critical' },
-  { name: 'Adidas Ultraboost',      stock: 7, category: 'Esportes',    level: 'warning'  },
-  { name: 'Sony Alpha A7',          stock: 5, category: 'Eletrônicos', level: 'warning'  },
-  { name: 'Dior Sauvage',           stock: 8, category: 'Beleza',      level: 'warning'  },
-]
+const miniStats = ref([
+  { icon: '📦', value: '94%',    label: 'Entrega no prazo' },
+  { icon: '↩️', value: '2.1%',   label: 'Taxa devolução'   },
+  { icon: '⭐', value: '4.8',    label: 'Avaliação média'  },
+  { icon: '⚡', value: '1.2d',   label: 'Tempo preparo'    },
+])
 
-// Mini stats
-const miniStats = [
-  { icon: '⚡', value: '98.7%',  label: 'Uptime da plataforma' },
-  { icon: '🚚', value: '1.8d',   label: 'Tempo médio de envio' },
-  { icon: '⭐', value: '4.87',   label: 'Avaliação dos clientes' },
-  { icon: '↩️', value: '2.3%',  label: 'Taxa de devolução' },
-  { icon: '💳', value: '67%',    label: 'Pagamentos via PIX' },
-  { icon: '🔄', value: '34%',    label: 'Clientes recorrentes' },
-]
+const recentOrders = ref([])
+const topProducts   = ref([])
+
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 .dashboard-page {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: #F0F2F7;
+  font-family: 'DM Sans', sans-serif;
+  background: #F8FAFC;
   min-height: 100vh;
-  padding: 36px 44px;
+  padding: 28px 32px 40px;
   color: #0F172A;
 }
 
-.dash-header {
+/* PAGE TITLE */
+.page-title-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
-.dash-header__greeting {
-  font-size: 14px;
-  color: #64748B;
-  font-weight: 600;
-  margin: 0 0 4px;
+.page-breadcrumb {
+  font-size: 12px;
+  color: #94A3B8;
+  font-family: 'IBM Plex Mono', monospace;
+  margin: 0 0 5px;
 }
+.page-breadcrumb span { color: #64748B; }
 
-.dash-header__title {
-  font-size: 34px;
-  font-weight: 800;
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
   color: #0F172A;
   margin: 0;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
 }
 
-.dash-header__right {
+.page-title-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.date-pill {
+.date-range-btn {
   display: flex;
   align-items: center;
-  background: white;
-  padding: 9px 16px;
-  border-radius: 100px;
+  gap: 7px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.date-range-btn:hover { border-color: #CBD5E1; color: #0F172A; }
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #0F172A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
-
-.notif-btn {
-  position: relative;
-  width: 42px;
-  height: 42px;
-  background: white;
-  border: none;
-  border-radius: 50%;
   cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.export-btn:hover { background: #1E293B; }
+
+/* KPI STRIP */
+.kpi-strip {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  color: #475569;
-}
-
-.notif-dot {
-  position: absolute;
-  top: 9px;
-  right: 9px;
-  width: 9px;
-  height: 9px;
-  background: #EF4444;
-  border-radius: 50%;
-  border: 2px solid white;
-}
-
-.dash-avatar {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #0061FF, #60A5FA);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
+  align-items: stretch;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  overflow: hidden;
   margin-bottom: 20px;
-}
-
-.kpi-card {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  border-top: 3px solid var(--accent);
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.kpi-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+.kpi-tile {
+  flex: 1;
+  padding: 20px 22px;
+  min-width: 0;
+  transition: background 0.15s;
+}
+.kpi-tile:hover { background: #F8FAFC; }
+
+.kpi-divider {
+  width: 1px;
+  background: #F1F5F9;
+  margin: 14px 0;
+  flex-shrink: 0;
 }
 
-.kpi-card__top {
+.kpi-tile-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
-.kpi-card__icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.kpi-badge {
+.kpi-label {
   font-size: 11px;
-  font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 100px;
-}
-.kpi-badge--up      { background: #DCFCE7; color: #15803D; }
-.kpi-badge--down    { background: #FEE2E2; color: #DC2626; }
-.kpi-badge--neutral { background: #F1F5F9; color: #64748B; }
-
-.kpi-card__label {
-  font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: #94A3B8;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 4px;
+  letter-spacing: 0.06em;
 }
 
-.kpi-card__value {
-  font-size: 22px;
-  font-weight: 800;
+.kpi-delta {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+.kpi-delta.positive { background: #ECFDF5; color: #059669; }
+.kpi-delta.negative { background: #FEF2F2; color: #EF4444; }
+.kpi-delta.neutral  { background: #F1F5F9; color: #64748B; }
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: 700;
   color: #0F172A;
   margin: 0 0 10px;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.03em;
+  font-family: 'IBM Plex Mono', monospace;
 }
+.kpi-value.danger { color: #EF4444; }
 
-.kpi-progress {
-  height: 4px;
+.kpi-bar-track {
+  height: 3px;
   background: #F1F5F9;
   border-radius: 10px;
-  margin-bottom: 8px;
   overflow: hidden;
+  margin-bottom: 8px;
 }
-.kpi-progress__fill {
-  height: 100%;
-  border-radius: 10px;
-  transition: width 1s ease;
-}
+.kpi-bar-fill { height: 100%; border-radius: 10px; }
 
-.kpi-card__sub {
+.kpi-sub {
   font-size: 11px;
-  color: #94A3B8;
+  color: #CBD5E1;
   margin: 0;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+/* PANELS */
+.panel {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
 
-.card__header {
+.panel-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
 }
 
-.card__title {
-  font-size: 16px;
-  font-weight: 800;
+.panel-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+}
+
+.panel-title {
+  font-size: 17px;
+  font-weight: 700;
   color: #0F172A;
-  margin: 0 0 3px;
+  margin: 0;
   letter-spacing: -0.02em;
 }
 
-.card__sub {
+.panel-period {
   font-size: 13px;
+  font-weight: 400;
   color: #94A3B8;
-  margin: 0;
 }
 
-.link-btn {
+.view-all-btn {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0061FF;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6366F1;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: opacity 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
 }
-.link-btn:hover { opacity: 0.7; }
+.view-all-btn:hover { opacity: 0.7; }
 
+/* MID ROW */
 .mid-row {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.period-tabs {
-  display: flex;
-  background: #F1F5F9;
-  border-radius: 10px;
-  padding: 3px;
-  gap: 2px;
-}
-.period-tab {
-  padding: 5px 14px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #64748B;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-.period-tab--active {
-  background: white;
-  color: #0061FF;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-
-.bar-chart {
-  display: flex;
-  gap: 12px;
-  height: 190px;
+  grid-template-columns: 1fr 300px;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
-.bar-chart__y-axis {
+.period-group {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  gap: 2px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.period-pill {
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
   font-size: 11px;
-  color: #94A3B8;
   font-weight: 600;
-  padding-bottom: 22px;
-  text-align: right;
-  min-width: 38px;
+  color: #94A3B8;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.15s;
+}
+.period-pill.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-.bar-chart__body {
-  flex: 1;
+.chart-panel { display: flex; flex-direction: column; }
+
+.chart-area { flex: 1; margin-bottom: 16px; }
+
+.chart-body {
   position: relative;
+  height: 180px;
 }
 
-.bar-chart__gridlines {
+.chart-grid {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: calc(100% - 22px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   pointer-events: none;
 }
-.bar-chart__gridlines > div {
-  height: 1px;
-  background: #F1F5F9;
+
+.grid-line {
+  position: relative;
+  border-top: 1px solid #F1F5F9;
 }
 
-.bar-chart__bars {
+.grid-label {
+  position: absolute;
+  left: -44px;
+  top: -8px;
+  font-size: 10px;
+  color: #CBD5E1;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.bars-row {
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
   height: 100%;
-  padding-bottom: 22px;
+  padding-left: 40px;
   position: relative;
   z-index: 1;
 }
 
-.bar-wrap {
+.bar-col {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -667,182 +613,198 @@ const miniStats = [
   justify-content: flex-end;
   position: relative;
 }
-.bar-wrap:hover .bar-tooltip { opacity: 1; transform: translateY(0); }
 
-.bar-tooltip {
+.bar-col:hover .bar-tooltip-text { opacity: 1; transform: translateY(0); }
+
+.bar-tooltip-text {
   position: absolute;
-  top: -34px;
+  top: -32px;
   background: #0F172A;
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
+  color: #F8FAFC;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: 5px;
   white-space: nowrap;
   opacity: 0;
   transform: translateY(4px);
-  transition: all 0.2s;
+  transition: all 0.15s;
   pointer-events: none;
-  font-family: inherit;
-}
-.bar-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%; left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-top-color: #0F172A;
 }
 
-.bar {
+.bar-fill {
   width: 26px;
-  border-radius: 7px 7px 0 0;
-  background: linear-gradient(180deg, #93C5FD 0%, #3B82F6 100%);
-  transition: opacity 0.2s;
+  background: #E2E8F0;
+  border-radius: 5px 5px 0 0;
+  transition: all 0.2s;
 }
-.bar--highlight {
-  background: linear-gradient(180deg, #60A5FA 0%, #0061FF 100%);
-  box-shadow: 0 4px 12px rgba(0,97,255,0.3);
-}
-.bar-wrap:hover .bar { opacity: 0.8; }
+.bar-col:hover .bar-fill { background: #CBD5E1; }
 
-.bar-label {
-  font-size: 11px;
-  color: #94A3B8;
-  font-weight: 600;
+.bar-highlight { background: #059669 !important; }
+.bar-col:hover .bar-highlight { background: #047857 !important; }
+
+.bar-day {
+  font-size: 10px;
+  color: #CBD5E1;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-.chart-footer {
+.chart-footer-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid #F1F5F9;
 }
-.chart-footer__legend {
+
+.chart-legend {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  color: #64748B;
-}
-.legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-}
-.chart-total {
-  display: block;
-  font-size: 20px;
-  font-weight: 800;
-  color: #0F172A;
-  letter-spacing: -0.5px;
-}
-.chart-total-label {
-  font-size: 11px;
+  font-size: 12px;
   color: #94A3B8;
-  display: block;
-  text-align: right;
 }
 
-.donut-wrap {
+.legend-swatch {
+  width: 12px;
+  height: 3px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.chart-total-info { text-align: right; }
+
+.chart-total-val {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0F172A;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: -0.03em;
+}
+
+.chart-total-label { font-size: 11px; color: #CBD5E1; }
+
+/* Right col */
+.panel-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Donut */
+.donut-layout {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
-.donut-svg { width: 160px; height: auto; }
 
-.donut-center-big {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
+.donut-svg { width: 130px; height: 130px; }
+
+.donut-pct-txt {
+  font-size: 17px;
+  font-weight: 700;
   fill: #0F172A;
-}
-.donut-center-sm {
-  font-size: 8px;
-  fill: #94A3B8;
-  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-.donut-legend { width: 100%; }
-.donut-item {
+.donut-lbl-txt { font-size: 8px; fill: #94A3B8; }
+
+.donut-legend-col { width: 100%; }
+
+.dl-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #F8FAFC;
 }
-.donut-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.donut-name {
-  flex: 1;
-  font-size: 13px;
-  color: #475569;
-  font-weight: 500;
-}
-.donut-pct {
-  font-size: 13px;
-  font-weight: 800;
-  color: #0F172A;
+.dl-row:last-child { border-bottom: none; }
+
+.dl-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.dl-name { flex: 1; font-size: 12px; color: #64748B; }
+.dl-pct { font-size: 12px; font-weight: 700; color: #0F172A; font-family: 'IBM Plex Mono', monospace; }
+
+/* Mini perf */
+.mini-perf-panel { padding: 16px 20px; }
+
+.mini-perf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
 }
 
+.perf-item { display: flex; align-items: center; gap: 10px; }
+.perf-icon { font-size: 18px; }
+
+.perf-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 1px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: -0.02em;
+}
+
+.perf-lbl {
+  font-size: 10px;
+  color: #94A3B8;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* BOTTOM ROW */
 .bottom-row {
   display: grid;
-  grid-template-columns: 1fr 360px 260px;
-  gap: 20px;
-  margin-bottom: 20px;
+  grid-template-columns: 1fr 280px 220px;
+  gap: 16px;
 }
 
-.orders-table__head {
+/* Orders */
+.ot-head {
   display: grid;
-  grid-template-columns: 65px 1fr 1fr 90px 110px;
+  grid-template-columns: 60px 1fr 1fr 90px 100px;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background: #F8FAFC;
-  border-radius: 10px;
-  font-size: 11px;
+  border-radius: 8px;
+  font-size: 10px;
   font-weight: 700;
   color: #94A3B8;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.06em;
   margin-bottom: 4px;
 }
 
-.orders-table__row {
+.ot-row {
   display: grid;
-  grid-template-columns: 65px 1fr 1fr 90px 110px;
+  grid-template-columns: 60px 1fr 1fr 90px 100px;
   gap: 8px;
   align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #F8FAFC;
+  padding: 10px;
+  border-radius: 8px;
   transition: background 0.15s;
-  border-radius: 10px;
 }
-.orders-table__row:hover { background: #F8FAFC; }
-.orders-table__row:last-child { border-bottom: none; }
+.ot-row:hover { background: #F8FAFC; }
 
-.order-id {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0061FF;
-}
-.order-client {
+.ot-id { font-size: 12px; font-weight: 700; color: #6366F1; font-family: 'IBM Plex Mono', monospace; }
+
+.ot-client {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #1E293B;
-  font-weight: 600;
+  color: #334155;
+  font-weight: 500;
 }
-.order-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+
+.ot-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -850,196 +812,141 @@ const miniStats = [
   font-weight: 800;
   flex-shrink: 0;
 }
-.order-product { font-size: 13px; color: #475569; }
-.order-value { font-size: 13px; font-weight: 700; color: #0F172A; }
 
-.status-pill {
+.ot-product { font-size: 12px; color: #94A3B8; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ot-value { font-size: 13px; font-weight: 700; color: #0F172A; font-family: 'IBM Plex Mono', monospace; }
+
+.status-tag {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 100px;
+  padding: 3px 9px;
+  border-radius: 5px;
   font-size: 11px;
   font-weight: 700;
+  width: fit-content;
 }
-.status-pill--approved   { background: #DCFCE7; color: #15803D; }
-.status-pill--shipped    { background: #DBEAFE; color: #1D4ED8; }
-.status-pill--processing { background: #EDE9FE; color: #6D28D9; }
-.status-pill--pending    { background: #FEF3C7; color: #92400E; }
-.status-pill--delivered  { background: #D1FAE5; color: #065F46; }
 
-.top-list { display: flex; flex-direction: column; gap: 10px; }
+.status-approved   { background: #ECFDF5; color: #059669; }
+.status-shipped    { background: #EFF6FF; color: #2563EB; }
+.status-processing { background: #F5F3FF; color: #7C3AED; }
+.status-pending    { background: #FFFBEB; color: #D97706; }
+.status-delivered  { background: #ECFDF5; color: #047857; }
+
+/* Top Products */
+.top-list { display: flex; flex-direction: column; gap: 4px; }
 
 .top-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px;
-  border-radius: 12px;
+  padding: 8px 6px;
+  border-radius: 8px;
   transition: background 0.15s;
 }
 .top-item:hover { background: #F8FAFC; }
 
 .top-rank {
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  background: #F1F5F9;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
   font-weight: 800;
-  color: #64748B;
+  font-family: 'IBM Plex Mono', monospace;
+  background: #F1F5F9;
+  color: #94A3B8;
   flex-shrink: 0;
 }
-.rank-1 { background: #FEF3C7; color: #D97706; }
-.rank-2 { background: #F1F5F9; color: #6B7280; }
-.rank-3 { background: #FEF0E7; color: #C2693E; }
+.rank-1 { background: #FFFBEB; color: #D97706; }
+.rank-2 { background: #F8FAFC; color: #64748B; }
 
-.top-thumb {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
+.top-thumb { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
 
 .top-info { flex: 1; min-width: 0; }
-.top-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: #1E293B;
-  margin: 0 0 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.top-cat { font-size: 11px; color: #94A3B8; margin: 0; }
+.top-name { font-size: 12px; font-weight: 600; color: #334155; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top-cat { font-size: 10px; color: #94A3B8; margin: 0; }
 
-.top-bar-wrap { width: 70px; }
-.top-units { font-size: 11px; color: #64748B; font-weight: 600; margin: 0 0 3px; }
-.top-bar {
-  height: 4px;
-  background: #F1F5F9;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.top-bar__fill {
-  height: 100%;
-  background: linear-gradient(90deg, #0061FF, #60A5FA);
-  border-radius: 10px;
-}
+.top-right { text-align: right; min-width: 65px; }
+.top-units { font-size: 10px; color: #94A3B8; margin: 0 0 3px; font-family: 'IBM Plex Mono', monospace; }
+.top-bar-track { height: 3px; background: #F1F5F9; border-radius: 10px; overflow: hidden; margin-bottom: 3px; }
+.top-bar-fill { height: 100%; background: #059669; border-radius: 10px; }
+.top-revenue { font-size: 11px; font-weight: 700; color: #059669; font-family: 'IBM Plex Mono', monospace; }
 
-.top-revenue {
-  font-size: 11px;
-  font-weight: 800;
-  color: #0F172A;
-  white-space: nowrap;
-}
-
-.alert-count {
-  background: #FEE2E2;
-  color: #DC2626;
+/* Alerts */
+.alert-count-badge {
+  background: #FEF2F2;
+  color: #EF4444;
   font-size: 12px;
   font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 100px;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid #FECACA;
 }
 
-.alerts-list { display: flex; flex-direction: column; gap: 8px; }
+.alerts-list { display: flex; flex-direction: column; gap: 6px; }
 
-.alert-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-}
-.alert-item--critical { background: #FFF5F5; border-color: #FECACA; }
-.alert-item--warning  { background: #FFFBEB; border-color: #FDE68A; }
-
-.alert-info { flex: 1; min-width: 0; }
-.alert-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: #1E293B;
-  margin: 0 0 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.alert-detail {
-  font-size: 11px;
-  color: #94A3B8;
-  margin: 0;
-}
-.alert-detail strong { color: #EF4444; }
-
-.repor-btn {
-  font-size: 11px;
-  font-weight: 700;
-  color: #0061FF;
-  background: #EFF6FF;
-  border: none;
-  padding: 4px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-  transition: background 0.2s;
-}
-.repor-btn:hover { background: #DBEAFE; }
-
-.mini-stats-bar {
-  background: white;
-  border-radius: 20px;
-  padding: 18px 32px;
+.alert-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
 }
+.alert-row.alert-critical { background: #FFF5F5; border-color: #FECACA; }
+.alert-row.alert-warning  { background: #FFFBEB; border-color: #FDE68A; }
 
-.mini-stat {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.mini-stat + .mini-stat {
-  padding-left: 24px;
-  border-left: 1px solid #F1F5F9;
-}
-.mini-stat__icon { font-size: 26px; }
-.mini-stat__value {
-  font-size: 18px;
-  font-weight: 800;
+.alert-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+
+.alert-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.alert-critical .alert-dot { background: #EF4444; }
+.alert-warning  .alert-dot { background: #F59E0B; }
+
+.alert-info { min-width: 0; }
+.alert-name { font-size: 12px; font-weight: 600; color: #334155; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.alert-meta { font-size: 10px; color: #94A3B8; margin: 0; font-family: 'IBM Plex Mono', monospace; }
+
+.repor-pill {
+  font-size: 11px;
+  font-weight: 700;
   color: #0F172A;
-  margin: 0;
-  letter-spacing: -0.5px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  flex-shrink: 0;
+  transition: all 0.15s;
 }
-.mini-stat__label {
-  font-size: 12px;
-  color: #94A3B8;
-  margin: 0;
-}
+.repor-pill:hover { background: #E2E8F0; }
 
-@media (max-width: 1400px) {
-  .kpi-row { grid-template-columns: repeat(3, 1fr); }
+/* RESPONSIVE */
+@media (max-width: 1300px) {
+  .kpi-strip { flex-wrap: wrap; }
+  .kpi-tile { min-width: 30%; }
+  .kpi-divider { display: none; }
   .bottom-row { grid-template-columns: 1fr 1fr; }
-  .alerts-card { grid-column: span 2; }
+  .alerts-panel { grid-column: span 2; }
 }
 
 @media (max-width: 1100px) {
-  .dashboard-page { padding: 20px; }
   .mid-row { grid-template-columns: 1fr; }
-  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .panel-col-right { flex-direction: row; gap: 16px; }
+  .donut-panel, .mini-perf-panel { flex: 1; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-page { padding: 16px; }
+  .kpi-tile { min-width: 45%; }
   .bottom-row { grid-template-columns: 1fr; }
-  .alerts-card { grid-column: span 1; }
-  .mini-stats-bar { flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
-  .mini-stat + .mini-stat { border-left: none; padding-left: 0; }
+  .alerts-panel { grid-column: span 1; }
+  .panel-col-right { flex-direction: column; }
+  .page-title-row { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 </style>
