@@ -37,10 +37,10 @@
 
       <div class="kpi-tile">
         <div class="kpi-tile-head">
-          <span class="kpi-label">Pedidos Hoje</span>
+          <span class="kpi-label">Total de Pedidos</span>
           <span class="kpi-delta positive">▲ 8%</span>
         </div>
-        <p class="kpi-value">{{ store.lastDayOrders.length }}</p>
+        <p class="kpi-value">{{ store.totalOrders }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:51%;background:#6366F1"></div></div>
         <p class="kpi-sub">Meta diária: 250</p>
       </div> 
@@ -88,7 +88,7 @@
           <span class="kpi-label">Ticket Médio</span>
           <span class="kpi-delta positive">▲ 4%</span>
         </div>
-        <p class="kpi-value">R$ {{ store.averageTicket }}</p>
+        <p class="kpi-value">R$ {{ store.averageTicket.toFixed(2) }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:61%;background:#F59E0B"></div></div>
         <p class="kpi-sub">vs R$ 366 anterior</p>
       </div>
@@ -210,7 +210,7 @@
             <span>Valor</span>
             <span>Status</span>
           </div>
-          <div class="ot-row" v-for="order in store.lastDayOrders" :key="order.id">
+          <div class="ot-row" v-for="order in store.lastDayOrdersMapped" :key="order.id">
             <span class="ot-id">#{{ order.id }}</span>
             <div class="ot-client">
               <div class="ot-avatar" :style="{background: order.bg, color: order.tc}">{{ order.initials }}</div>
@@ -232,19 +232,19 @@
           <button class="view-all-btn">Catálogo <v-icon size="13">mdi-arrow-right</v-icon></button>
         </div>
         <div class="top-list">
-          <div class="top-item" v-for="(item, i) in topProducts" :key="i">
+          <div class="top-item" v-for="(store, i) in store.bestProducts" :key="i">
             <div class="top-rank" :class="'rank-' + (i+1)">{{ i+1 }}</div>
-            <div class="top-thumb" :style="{background: item.bg}">{{ item.emoji }}</div>
+            <div class="top-thumb" :style="{background: store.bg}">{{ store.emoji }}</div>
             <div class="top-info">
-              <p class="top-name">{{ item.name }}</p>
-              <p class="top-cat">{{ item.category }}</p>
+              <p class="top-name">{{ store.name }}</p>
+              <p class="top-cat">{{ store.category }}</p>
             </div>
             <div class="top-right">
-              <p class="top-units">{{ item.units }} un.</p>
+              <p class="top-units">{{ store.units }} un.</p>
               <div class="top-bar-track">
-                <div class="top-bar-fill" :style="{width: item.pct + '%'}"></div>
+                <div class="top-bar-fill" :style="{width: store.pct + '%'}"></div>
               </div>
-              <p class="top-revenue">{{ item.revenue }}</p>
+              <p class="top-revenue">{{ store.revenue }}</p>
             </div>
           </div>
         </div>

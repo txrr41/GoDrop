@@ -11,6 +11,7 @@ import UserPerm from '../pages/UserPerm.vue'
 import ProductCatalog from '../pages/ProductCatalog.vue'
 import ApiDocumentation from '../pages/ApiDocumentation.vue'
 import Dashboard from "../pages/Dashboard.vue";
+import BeDropper from "../pages/BeDropper.vue";
 
 async function permissionGuard(to, _from, next) {
     // Lazy import do store (evita problemas de inicialização)
@@ -138,6 +139,11 @@ const routes = [
         component: MainLayout,
         meta: {requiresAuth: true, ownerOnly: true},
         children: [{path: '', component: Dashboard}],
+    },
+    {
+        path: '/dropper',
+        meta: {requiresAuth: false, ownerOnly: true},
+        component: BeDropper,
     }
 ]
 
@@ -145,6 +151,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 })
+
 
 router.beforeEach(permissionGuard)
 

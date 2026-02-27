@@ -2,6 +2,7 @@ package com.project.shiphub.controller.admin;
 
 import com.project.shiphub.model.auth.User;
 import com.project.shiphub.model.order.Order;
+import com.project.shiphub.model.order.OrderItem;
 import com.project.shiphub.repository.auth.LoginRepository;
 import com.project.shiphub.repository.order.OrderRepository;
 import com.project.shiphub.repository.product.ProductRepository;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/dashboard")
@@ -76,9 +78,6 @@ public class AdminDashboardController {
                 .filter(u -> u.getCreatedAt() != null && u.getCreatedAt().isAfter(startOfMonth))
                 .count();
 
-        //Ticket medio
-        Double averageTicket = totalRevenue.doubleValue() / totalOrders;
-
         //Receita mensal
         BigDecimal monthRevenue = allOrders.stream()
                 .filter(o -> o.getCreatedAt().isAfter(startOfMonth))
@@ -88,8 +87,12 @@ public class AdminDashboardController {
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        //Ticket medio
+        Double averageTicket = totalOrders > 0 ? monthRevenue.doubleValue() / totalOrders : 0.0;
+
+
         //Pedidos das ultimas 24hrs
-        LocalDateTime lastHours = LocalDateTime.now().minusHours(0);
+        LocalDateTime lastHours = LocalDateTime.now().minusHours(24);
         List<Order> lastDayOrders = orderRepository.findByCreatedAtAfter(lastHours);
         List<Map<String, Object>> lastDayOrdersMapped = lastDayOrders.stream()
                 .map(o -> {
@@ -103,6 +106,32 @@ public class AdminDashboardController {
                     item.put("initials", o.getBuyerName().substring(0, 1).toUpperCase());
                     item.put("bg", "#EEF2FF");
                     item.put("tc", "#6366F1");
+                    return item;
+                })
+                .toList();
+
+        var bestProducts = allOrders.stream()
+                .filter(o -> o.getCreatedAt().isAfter(startOfMonth))
+                .filter(o -> !o.getItems().isEmpty())
+                .filter(o -> o.getStatus().name().equals("DELIVERED")
+                        || o.getStatus().name().equals("PAYMENT_APPROVED")
+                        || o.getStatus().name().equals("SHIPPED"))
+                .flatMap(o -> o.getItems().stream())
+                .collect(Collectors.groupingBy(
+                        OrderItem::getProduct,
+                Collectors.summingInt(OrderItem::getQuantity)
+        ));
+
+        var bestProductsList = bestProducts.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("name", entry.getKey().getNome());
+                    item.put("category", entry.getKey().getCategoria());
+                    item.put("units", entry.getValue());
+                    item.put("bg", "#EEF2FF");
+                    item.put("emoji", "📦");
+                    item.put("pct", 100);
+                    item.put("revenue", "R$ " + entry.getKey().getPreco());
                     return item;
                 })
                 .toList();
@@ -125,7 +154,8 @@ public class AdminDashboardController {
         stats.put("newCustomers", newCustomers);
         stats.put("averageTicket", averageTicket);
         stats.put("monthRevenue", monthRevenue);
-        stats.put("lastDayOrders", lastDayOrders);
+        stats.put("lastDayOrders", lastDayOrdersMapped);
+        stats.put("bestProducts", bestProductsList);
 
         log.info("✅ Stats: {} pedidos, R$ {} receita", totalOrders, totalRevenue);
         return ResponseEntity.ok(stats);

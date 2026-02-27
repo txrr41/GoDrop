@@ -21,8 +21,9 @@ export const useDashboardStore = defineStore('dashboard', {
         lowStockCount: (state) => state.stats?.lowStockCount?? 0,
         newCustomers: (state) => state.stats?.newCustomers ?? 0,
         averageTicket: (state) => state.stats?.averageTicket ?? 0,
-        monthRevenue: (state) => state.stats?.averageTicket ?? 0,
-        lastDayOrders: (state) => state.stats?.lastDayOrders ?? [],
+        monthRevenue: (state) => state.stats?.monthRevenue ?? 0,
+        lastDayOrdersMapped: (state) => state.stats?.lastDayOrders ?? [],
+        bestProducts: (state) => state.stats?.bestProducts ?? [],
     },
 
     actions: {
