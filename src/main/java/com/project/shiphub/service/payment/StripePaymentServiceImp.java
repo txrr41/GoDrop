@@ -78,7 +78,9 @@ public class StripePaymentServiceImp implements StripePaymentService {
             Payment savedPayment = paymentRepository.save(payment);
             log.info("💾 Pagamento salvo no banco: {}", savedPayment.getId());
 
-            return new PaymentResponse(savedPayment, paymentIntent.getClientSecret());
+            PaymentResponse response = new PaymentResponse(savedPayment, paymentIntent.getClientSecret());
+
+            return response;
 
         } catch (StripeException e) {
             log.error("❌ Erro ao criar pagamento no Stripe: {}", e.getMessage(), e);

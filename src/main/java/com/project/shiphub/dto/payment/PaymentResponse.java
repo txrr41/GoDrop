@@ -18,6 +18,15 @@ public class PaymentResponse {
     private String paymentMethod;
     private LocalDateTime createdAt;
     private String clientSecret;
+    
+    // PIX fields
+    private String pixQrCode;
+    private String pixCopyPaste;
+    
+    // Boleto fields
+    private String boletoUrl;
+    private String boletoBarcode;
+    private String boletoDueDate;
 
     public PaymentResponse(Payment payment) {
         this.id = payment.getId();

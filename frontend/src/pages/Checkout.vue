@@ -1,6 +1,5 @@
 <template>
   <div class="checkout-premium">
-    <!-- Navbar de Checkout (Segura) -->
     <nav class="checkout-nav">
       <v-container class="d-flex align-center justify-space-between py-4">
         <div class="brand-secure">
@@ -15,7 +14,6 @@
     </nav>
 
     <v-container class="mt-8 pb-16">
-      <!-- Indicador de Etapas -->
       <div class="steps-indicator mb-12">
         <div v-for="(step, index) in ['Entrega', 'Pagamento', 'Revisão']" :key="index"
              :class="['step-item', { active: currentStep >= index }]">
@@ -26,10 +24,8 @@
       </div>
 
       <v-row>
-        <!-- Coluna Principal (Formulários) -->
         <v-col cols="12" lg="8">
           <v-form ref="formRef">
-            <!-- Seção 1: Entrega -->
             <section class="checkout-section active mb-8">
               <div class="section-header">
                 <v-icon color="primary" class="mr-3">mdi-map-marker-outline</v-icon>
@@ -110,7 +106,6 @@
               </div>
             </section>
 
-            <!-- Seção 2: Dados Pessoais -->
             <section class="checkout-section mb-8">
               <div class="section-header">
                 <v-icon color="primary" class="mr-3">mdi-account-outline</v-icon>
@@ -119,22 +114,27 @@
               <div class="section-body">
                 <v-row>
                   <v-col cols="12" md="6">
-                    <v-text-field v-model="formData.nome" label="Nome Completo" variant="outlined" bg-color="grey-lighten-5" :rules="[rules.required]" />
+                    <v-text-field v-model="formData.nome" label="Nome Completo" variant="outlined"
+                                  bg-color="grey-lighten-5" :rules="[rules.required]"/>
                   </v-col>
                   <v-col cols="12" md="6">
-                    <v-text-field v-model="formData.email" label="E-mail para notificações" variant="outlined" bg-color="grey-lighten-5" :rules="[rules.required, rules.email]" />
+                    <v-text-field v-model="formData.email" label="E-mail para notificações" variant="outlined"
+                                  bg-color="grey-lighten-5" :rules="[rules.required, rules.email]"/>
                   </v-col>
                   <v-col cols="12" md="6">
-                    <v-text-field v-model="formData.cpf" label="CPF" placeholder="000.000.000-00" variant="outlined" bg-color="grey-lighten-5" @input="formatCPF" maxlength="14" :rules="[rules.required]" />
+                    <v-text-field v-model="formData.cpf" label="CPF" placeholder="000.000.000-00" variant="outlined"
+                                  bg-color="grey-lighten-5" @input="formatCPF" maxlength="14"
+                                  :rules="[rules.required]"/>
                   </v-col>
                   <v-col cols="12" md="6">
-                    <v-text-field v-model="formData.telefone" label="Celular/WhatsApp" placeholder="(00) 00000-0000" variant="outlined" bg-color="grey-lighten-5" @input="formatTelefone" maxlength="15" :rules="[rules.required]" />
+                    <v-text-field v-model="formData.telefone" label="Celular/WhatsApp" placeholder="(00) 00000-0000"
+                                  variant="outlined" bg-color="grey-lighten-5" @input="formatTelefone" maxlength="15"
+                                  :rules="[rules.required]"/>
                   </v-col>
                 </v-row>
               </div>
             </section>
 
-            <!-- Seção 3: Pagamento -->
             <section class="checkout-section mb-8">
               <div class="section-header">
                 <v-icon color="primary" class="mr-3">mdi-credit-card-outline</v-icon>
@@ -142,7 +142,6 @@
               </div>
 
               <div class="payment-grid mt-4">
-                <!-- Opção Cartão -->
                 <div
                     class="payment-card-option"
                     :class="{ active: formData.pagamento === 'CREDIT_CARD' }"
@@ -153,7 +152,6 @@
                   <v-icon v-if="formData.pagamento === 'CREDIT_CARD'" class="check-icon">mdi-check-circle</v-icon>
                 </div>
 
-                <!-- Opção PIX -->
                 <div
                     class="payment-card-option"
                     :class="{ active: formData.pagamento === 'PIX' }"
@@ -165,7 +163,6 @@
                   <v-icon v-if="formData.pagamento === 'PIX'" class="check-icon">mdi-check-circle</v-icon>
                 </div>
 
-                <!-- Opção Boleto -->
                 <div
                     class="payment-card-option"
                     :class="{ active: formData.pagamento === 'BOLETO' }"
@@ -178,22 +175,21 @@
               </div>
 
               <div class="payment-details-container mt-6">
-                <!-- Detalhes do Cartão (Stripe) -->
                 <div v-show="formData.pagamento === 'CREDIT_CARD'" class="stripe-container">
                   <p class="text-caption text-grey-darken-1 mb-3">Insira os dados do seu cartão de forma segura:</p>
                   <div id="card-element" class="stripe-card-element"></div>
                   <div id="card-errors" class="stripe-card-errors"></div>
-                  <v-img src="https://vignette.wikia.nocookie.net/p__/images/3/30/Stripe_logo.png/revision/latest?cb=20190521101515&path-prefix=protagonist" width="60" class="mt-4 opacity-50" />
+                  <v-img
+                      src="https://vignette.wikia.nocookie.net/p__/images/3/30/Stripe_logo.png/revision/latest?cb=20190521101515&path-prefix=protagonist"
+                      width="60" class="mt-4 opacity-50"/>
                 </div>
 
-                <!-- Preview PIX -->
                 <div v-if="formData.pagamento === 'PIX'" class="pix-preview text-center py-4">
                   <v-icon size="48" color="primary">mdi-lightning-bolt</v-icon>
                   <p class="mt-2 font-weight-bold">Aprovação imediata</p>
                   <p class="text-caption">O QR Code será gerado após clicar em finalizar.</p>
                 </div>
 
-                <!-- Preview Boleto -->
                 <div v-if="formData.pagamento === 'BOLETO'" class="boleto-preview text-center py-4">
                   <v-icon size="48" color="grey-darken-2">mdi-file-document-outline</v-icon>
                   <p class="mt-2 font-weight-bold">Vencimento em 3 dias</p>
@@ -204,7 +200,6 @@
           </v-form>
         </v-col>
 
-        <!-- Coluna Lateral (Resumo) -->
         <v-col cols="12" lg="4">
           <aside class="order-summary-sticky">
             <v-card class="summary-card-v2" elevation="0">
@@ -215,7 +210,7 @@
               <div class="summary-items-list">
                 <div v-for="item in cartStore.cartItems" :key="item.id" class="mini-product">
                   <div class="mini-thumb">
-                    <img :src="item.imagem || '/placeholder.png'" />
+                    <img :src="item.imagem || '/placeholder.png'"/>
                     <span class="mini-qty">{{ item.quantity }}</span>
                   </div>
                   <div class="mini-details">
@@ -225,7 +220,7 @@
                 </div>
               </div>
 
-              <v-divider class="my-4" />
+              <v-divider class="my-4"/>
 
               <div class="summary-totals-v2">
                 <div class="total-row">
@@ -243,7 +238,9 @@
 
                 <div class="grand-total-box mt-6">
                   <span class="total-label">Total a pagar</span>
-                  <span class="total-value">{{ formatCurrency(formData.pagamento === 'PIX' ? cartStore.total * 0.95 : cartStore.total) }}</span>
+                  <span class="total-value">{{
+                      formatCurrency(formData.pagamento === 'PIX' ? cartStore.total * 0.95 : cartStore.total)
+                    }}</span>
                 </div>
               </div>
 
@@ -276,10 +273,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCartStore } from '../stores/cart'
-import paymentService, { getStripe } from '../services/paymentService'
+import {ref, reactive, onMounted, watch, computed} from 'vue'
+import {useRouter} from 'vue-router'
+import {useCartStore} from '../stores/cart'
+import paymentService, {getStripe} from '../services/paymentService'
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -325,7 +322,7 @@ const formatCEP = (e) => {
 
 const formatCurrency = (v) => {
   const value = Number(v) || 0
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  return value.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
 }
 
 const buscarCEP = async () => {
@@ -359,7 +356,7 @@ const initializeStripe = async () => {
         fontSize: '16px',
         fontFamily: '"Inter", sans-serif',
         color: '#1E293B',
-        '::placeholder': { color: '#94A3B8' }
+        '::placeholder': {color: '#94A3B8'}
       }
     },
     hidePostalCode: true
@@ -382,7 +379,7 @@ const showSnackbar = (m, c) => {
 }
 
 const finalizarCompra = async () => {
-  const { valid } = await formRef.value.validate()
+  const {valid} = await formRef.value.validate()
   if (!valid) return showSnackbar('Preencha os campos obrigatórios', 'error')
 
   loading.value = true
@@ -411,7 +408,8 @@ const finalizarCompra = async () => {
       items: cartItems
     }
 
-    const { clientSecret } = await paymentService.createPaymentIntent(paymentData)
+    const paymentResponse = await paymentService.createPaymentIntent(paymentData)
+    const {clientSecret, stripePaymentId} = paymentResponse
 
     if (formData.pagamento === 'CREDIT_CARD') {
       const result = await paymentService.confirmCardPayment(clientSecret, cardElement, {
@@ -427,20 +425,78 @@ const finalizarCompra = async () => {
 
       if (result.success) {
         cartStore.clearCart()
-        await router.push({ path: '/payment-success', query: { orderId: result.paymentIntent?.metadata?.order_id || 'N/A', amount: cartStore.total, email: formData.email, method: formData.pagamento } })
+        await router.push({
+          path: '/payment-success',
+          query: {
+            orderId: result.paymentIntent?.metadata?.order_id || 'N/A',
+            amount: cartStore.total,
+            email: formData.email,
+            method: formData.pagamento
+          }
+        })
       } else {
-        await router.push({ path: '/payment-failed', query: { message: result.error || 'Erro ao processar pagamento', amount: cartStore.total, errorCode: 'PAY_' + Date.now() } })
+        await router.push({
+          path: '/payment-failed',
+          query: {
+            message: result.error || 'Erro ao processar pagamento',
+            amount: cartStore.total,
+            errorCode: 'PAY_' + Date.now()
+          }
+        })
       }
-    } else {
-      // Simulação PIX/Boleto
-      setTimeout(() => {
-        cartStore.clearCart()
-        router.push({ path: '/payment-success', query: { orderId: 'PED' + Date.now(), amount: cartStore.total, email: formData.email, method: formData.pagamento } })
-            , 2000})
+    } else if (formData.pagamento === 'PIX') {
+      // Processamento PIX - Modo de teste com dados falsos
+      console.log('📱 Processando pagamento PIX (Modo Teste)...')
+
+      // Dados falsos para teste
+      const orderId = 'PED' + Date.now()
+      const pixQrCode = '00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-4266141740005204000053039865406100.005802BR5913GoDropTest6009SaoPaulo62070503***6304A2B3'
+      const pixCopyPaste = '00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-4266141740005204000053039865406100.005802BR5913GoDropTest6009SaoPaulo62070503***6304A2B3'
+
+      cartStore.clearCart()
+      router.push({
+        path: '/payment-success',
+        query: {
+          orderId: orderId,
+          amount: cartStore.total,
+          email: formData.email,
+          method: formData.pagamento,
+          pixQrCode: pixQrCode,
+          pixCopyPaste: pixCopyPaste
+        }
+      })
+    } else if (formData.pagamento === 'BOLETO') {
+  // Processamento Boleto - Modo de teste com dados falsos
+  console.log('📄 Processando pagamento Boleto (Modo Teste)...')
+
+  // Dados falsos para teste
+  const orderId = 'PED' + Date.now()
+  const boletoBarcode = '12345.67890 12345.678901 12345.678906 1 23456789000001'
+  const boletoDueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')
+
+  cartStore.clearCart()
+  router.push({
+    path: '/payment-success',
+    query: {
+      orderId: orderId,
+      amount: cartStore.subtotal,
+      email: formData.email,
+      method: formData.pagamento,
+      boletoBarcode: boletoBarcode,
+      boletoDueDate: boletoDueDate
     }
+  })
+}
   } catch (e) {
     console.error('❌ Erro:', e)
-    await router.push({ path: '/payment-failed', query: { message: 'Erro ao processar pedido. Tente novamente.', amount: cartStore.total, errorCode: 'SYS_' + Date.now() } })
+    await router.push({
+      path: '/payment-failed',
+      query: {
+        message: 'Erro ao processar pedido. Tente novamente.',
+        amount: cartStore.total,
+        errorCode: 'SYS_' + Date.now()
+      }
+    })
   } finally {
     loading.value = false
   }
@@ -541,7 +597,7 @@ watch(() => formData.pagamento, (val) => {
 }
 
 .checkout-section:hover {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
 }
 
 .section-header {
@@ -737,8 +793,16 @@ watch(() => formData.pagamento, (val) => {
 }
 
 @media (max-width: 960px) {
-  .payment-grid { grid-template-columns: 1fr; }
-  .steps-indicator { gap: 10px; }
-  .step-line { display: none; }
+  .payment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps-indicator {
+    gap: 10px;
+  }
+
+  .step-line {
+    display: none;
+  }
 }
 </style>

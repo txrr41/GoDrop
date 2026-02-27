@@ -12,6 +12,7 @@ import ProductCatalog from '../pages/ProductCatalog.vue'
 import ApiDocumentation from '../pages/ApiDocumentation.vue'
 import Dashboard from "../pages/Dashboard.vue";
 import BeDropper from "../pages/BeDropper.vue";
+import UserProfile from "../pages/UserProfile.vue";
 
 async function permissionGuard(to, _from, next) {
     // Lazy import do store (evita problemas de inicialização)
@@ -144,7 +145,12 @@ const routes = [
         path: '/dropper',
         meta: {requiresAuth: false, ownerOnly: true},
         component: BeDropper,
+    },
+    {
+        path: '/perfil',
+        component: UserProfile,
     }
+
 ]
 
 const router = createRouter({
