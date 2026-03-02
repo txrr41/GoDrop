@@ -1,949 +1,829 @@
 <template>
-  <div class="profile-page">
-    <div class="profile-hero" :class="heroClass">
-      <div class="hero-pattern"></div>
-      <div class="hero-content">
-        <div class="avatar-wrapper">
-          <div class="avatar-ring" :style="{ borderColor: levelColor }"></div>
-          <div class="avatar">
-            <span class="avatar-initials">{{ userInitials }}</span>
-          </div>
-          <div v-if="isDropper" class="level-badge-avatar" :style="{ background: levelGradient }">
-            <span class="level-badge-icon">{{ levelIcon }}</span>
+  <div class="profile-root">
+
+    <!-- ════════════════════════════════════════
+         DROPPER VIEW
+    ════════════════════════════════════════ -->
+    <template v-if="isDropper">
+
+      <!-- RANK BANNER — estilo Kirvano, muda por nível -->
+      <div class="rank-banner" :class="`rank-${levelKey}`">
+        <div class="rb-left">
+          <span class="rb-icon">{{ levelIcon }}</span>
+          <div class="rb-info">
+            <span class="rb-eyebrow">Seu nível atual</span>
+            <span class="rb-name">{{ levelLabel }}</span>
           </div>
         </div>
 
-        <div class="hero-info">
-          <div class="hero-name-row">
-            <h1 class="hero-name">{{ user.name }}</h1>
-            <div v-if="isDropper" class="level-pill" :style="{ background: levelGradient }">
-              <span>{{ levelIcon }}</span>
-              <span>{{ levelLabel }}</span>
-            </div>
-            <div v-else class="customer-pill">
-              <span>👤</span>
-              <span>Cliente</span>
-            </div>
+        <div class="rb-center">
+          <span class="rb-big">{{ levelDiscount }}% OFF</span>
+          <span class="rb-center-txt">em todas as suas compras</span>
+        </div>
+
+        <div class="rb-right" v-if="nextLevel">
+          <span class="rb-next-label">Próximo nível</span>
+          <div class="rb-next-row">
+            <span class="rb-next-icon">{{ nextLevelObj?.icon }}</span>
+            <span class="rb-next-name">{{ nextLevel.label }}</span>
           </div>
-          <p class="hero-email">{{ user.email }}</p>
-          <p v-if="isDropper" class="hero-store">
-            <span class="store-icon">🏪</span>
-            {{ dropper.storeName }}
-          </p>
+          <span class="rb-next-sub">Faltam <strong>R$ {{ nextLevel.remaining?.toLocaleString('pt-BR') }}</strong></span>
+        </div>
+        <div class="rb-right" v-else>
+          <span class="rb-next-label">Nível máximo</span>
+          <span class="rb-next-name">🏆 Parabéns!</span>
         </div>
       </div>
-    </div>
 
-    <div class="profile-body">
-
-      <template v-if="isDropper">
-
-        <div class="level-card" :class="'level-card--' + dropper.level.toLowerCase()">
-          <div class="level-card-bg"></div>
-          <div class="level-card-content">
-
-            <div class="level-header">
-              <div class="level-icon-big">{{ levelIcon }}</div>
-              <div>
-                <div class="level-name">{{ levelLabel }}</div>
-                <div class="level-discount">{{ levelDiscount }}% de desconto</div>
-              </div>
-              <div class="level-xp-badge">
-                <span class="xp-value">{{ dropper.xp.toLocaleString() }}</span>
-                <span class="xp-label">XP</span>
-              </div>
-            </div>
-
-            <div v-if="nextLevel" class="progress-section">
-              <div class="progress-labels">
-                <span>{{ levelLabel }}</span>
-                <span class="progress-next">{{ nextLevel.label }} em {{ nextLevel.remaining }}</span>
-              </div>
-              <div class="progress-track">
-                <div
-                    class="progress-fill"
-                    :style="{ width: progressPercent + '%', background: levelGradient }"
-                ></div>
-              </div>
-              <div class="progress-values">
-                <span>R$ {{ dropper.totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-                <span>R$ {{ nextLevel.threshold.toLocaleString('pt-BR') }}</span>
-              </div>
-            </div>
-
-            <div v-else class="max-level">
-              <span class="max-icon">👑</span>
-              <span>Nível máximo atingido!</span>
-            </div>
-
-          </div>
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div class="ph-greet">
+          <p class="ph-date">{{ todayLabel }}</p>
+          <h1 class="ph-title">Olá, {{ firstName }} 👋</h1>
+          <p class="ph-sub">Acompanhe sua jornada e suba de nível vendendo mais.</p>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: #EFF6FF; color: #3B82F6;">💰</div>
-            <div class="stat-info">
-              <span class="stat-label">Total de Vendas</span>
-              <span class="stat-value">R$ {{ dropper.totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }}</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background: #F0FDF4; color: #22C55E;">📦</div>
-            <div class="stat-info">
-              <span class="stat-label">Pedidos Enviados</span>
-              <span class="stat-value">{{ dropper.totalOrders }}</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background: #FFF7ED; color: #F97316;">⚡</div>
-            <div class="stat-info">
-              <span class="stat-label">XP Total</span>
-              <span class="stat-value">{{ dropper.xp.toLocaleString() }} xp</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background: #FDF4FF; color: #A855F7;">🏷️</div>
-            <div class="stat-info">
-              <span class="stat-label">Desconto Atual</span>
-              <span class="stat-value">{{ levelDiscount }}%</span>
-            </div>
+        <!-- 4 quick-stat cards estilo Kirvano -->
+        <div class="ph-stats">
+          <div class="qs" v-for="s in statsData" :key="s.label">
+            <span class="qs-label">{{ s.label }}</span>
+            <span class="qs-val">{{ s.value }}</span>
+            <span class="qs-sub">{{ s.sub }}</span>
           </div>
         </div>
+      </div>
 
-        <div class="section-card">
-          <h3 class="section-title">Jornada de Níveis</h3>
-          <div class="levels-timeline">
+      <!-- BODY -->
+      <div class="body-grid">
+
+        <!-- JORNADA DE CONQUISTAS -->
+        <div class="card journey">
+          <div class="card-header">
+            <div class="ch-left">
+              <span class="card-title">Jornada de conquistas</span>
+              <span class="card-sub">Sua jornada começa com a primeira venda.</span>
+            </div>
+            <a class="saiba-link" href="#">Saiba mais ↗</a>
+          </div>
+
+          <!-- PROGRESS -->
+          <div class="prog-section">
+            <div class="prog-meta">
+              <span class="prog-cur">{{ levelLabel }}</span>
+              <span class="prog-pct-lbl">{{ progressPercent }}%</span>
+              <span class="prog-nxt" v-if="nextLevel">→ {{ nextLevel.label }}</span>
+              <span class="prog-nxt" v-else>Máximo ✓</span>
+            </div>
+            <div class="prog-track">
+              <div class="prog-fill" :class="`fill-${levelKey}`" :style="{ width: progressPercent + '%' }"></div>
+            </div>
+          </div>
+
+          <!-- LEVELS -->
+          <div class="levels-list">
             <div
-                v-for="lvl in levels"
+                v-for="(lvl, i) in levels"
                 :key="lvl.key"
-                class="timeline-item"
+                class="lv-row"
                 :class="{
-                'timeline-item--active': dropper.level === lvl.key,
-                'timeline-item--done': isLevelDone(lvl.key),
-                'timeline-item--locked': !isLevelDone(lvl.key) && dropper.level !== lvl.key
+                'lv-done':    isLevelDone(lvl.key),
+                'lv-current': dropper?.level === lvl.key,
+                'lv-locked':  !isLevelDone(lvl.key) && dropper?.level !== lvl.key
               }"
             >
-              <div class="timeline-dot" :style="isLevelDone(lvl.key) || dropper.level === lvl.key ? { background: lvl.gradient } : {}">
-                <span>{{ isLevelDone(lvl.key) ? '✓' : lvl.icon }}</span>
+              <!-- vertical connector -->
+              <div class="lv-line" v-if="i < levels.length - 1"
+                   :class="isLevelDone(lvl.key) ? `lv-line-${lvl.key.toLowerCase()}` : ''"
+              ></div>
+
+              <div class="lv-node" :class="(isLevelDone(lvl.key) || dropper?.level === lvl.key) ? `lv-node-${lvl.key.toLowerCase()}` : ''">
+                <span v-if="isLevelDone(lvl.key)" class="lv-check">✓</span>
+                <span v-else class="lv-emoji">{{ lvl.icon }}</span>
               </div>
-              <div class="timeline-line" v-if="lvl.key !== 'DIAMOND'"></div>
-              <div class="timeline-info">
-                <div class="timeline-name" :style="dropper.level === lvl.key ? { color: lvl.color } : {}">
-                  {{ lvl.label }}
+
+              <div class="lv-body">
+                <div class="lv-name-row">
+                  <span class="lv-name">{{ lvl.label }}</span>
+                  <span v-if="dropper?.level === lvl.key" class="tag tag-cur" :class="`tag-${lvl.key.toLowerCase()}`">Você está aqui</span>
+                  <span v-if="isLevelDone(lvl.key)" class="tag tag-done">Concluído</span>
+                  <span v-if="!isLevelDone(lvl.key) && dropper?.level !== lvl.key" class="tag tag-locked">🔒 Bloqueado</span>
                 </div>
-                <div class="timeline-threshold">
-                  {{ lvl.threshold === 0 ? 'Inicial' : 'R$ ' + lvl.threshold.toLocaleString('pt-BR') }}
-                </div>
-                <div class="timeline-discount" :style="{ color: lvl.color }">{{ lvl.discount }}% off</div>
+                <span class="lv-threshold">A partir de {{ lvl.threshold }} em vendas</span>
+              </div>
+
+              <div class="lv-pct" :class="(isLevelDone(lvl.key) || dropper?.level === lvl.key) ? `pct-${lvl.key.toLowerCase()}` : 'pct-locked'">
+                {{ lvl.discount }}<span class="pct-sym">%</span>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="section-card">
-          <h3 class="section-title">Dados da Loja</h3>
-          <div class="info-list">
-            <div class="info-row">
-              <span class="info-key">Nome da Loja</span>
-              <span class="info-val">{{ dropper.storeName }}</span>
+          <!-- CTA motivacional -->
+          <div class="mot-banner" :class="`mot-${levelKey}`" v-if="nextLevel">
+            <div class="mot-left">
+              <span class="mot-icon">{{ nextLevelObj?.icon }}</span>
+              <div>
+                <p class="mot-title">Faltam R$ {{ nextLevel.remaining?.toLocaleString('pt-BR') }} para o nível {{ nextLevel.label }}</p>
+                <p class="mot-sub">Seu desconto vai de {{ levelDiscount }}% para {{ nextLevelObj?.discount }}% — +{{ nextLevelObj?.discount - levelDiscount }}% em todas as compras</p>
+              </div>
             </div>
-            <div class="info-row">
-              <span class="info-key">CNPJ</span>
-              <span class="info-val info-mono">{{ dropper.cnpj }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">WhatsApp</span>
-              <span class="info-val">{{ dropper.whatsapp }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Status</span>
-              <span class="status-badge status-active">● Ativo</span>
+            <span class="mot-arrow">→</span>
+          </div>
+          <div class="mot-banner mot-max" v-else>
+            <span class="mot-icon">💎</span>
+            <div>
+              <p class="mot-title">Nível máximo atingido!</p>
+              <p class="mot-sub">Você tem {{ levelDiscount }}% de desconto permanente em tudo.</p>
             </div>
           </div>
         </div>
 
-      </template>
+        <!-- COLUNA DIREITA -->
+        <div class="right-col">
 
-      <template v-else>
-
-        <div class="dropper-cta">
-          <div class="cta-left">
-            <div class="cta-icons">
-              <span>🥉</span><span>🥈</span><span>🏅</span><span>💎</span>
+          <!-- DADOS DA LOJA -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Dados da loja</span>
             </div>
-            <h3 class="cta-title">Torne-se um Dropper</h3>
-            <p class="cta-desc">Venda nossos produtos com até <strong>30% de desconto</strong> e evolua por níveis.</p>
-          </div>
-          <button class="cta-btn" @click="$router.push('/dropper')">
-            Quero ser Dropper →
-          </button>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: #EFF6FF; color: #3B82F6;">🛒</div>
-            <div class="stat-info">
-              <span class="stat-label">Total de Pedidos</span>
-              <span class="stat-value">{{ user.totalOrders ?? 0 }}</span>
+            <div class="field-list">
+              <div class="field-row">
+                <span class="fk">CNPJ</span>
+                <span class="fv">{{ dropper?.cnpj || '—' }}</span>
+              </div>
+              <div class="field-row">
+                <span class="fk">Nome da loja</span>
+                <span class="fv">{{ dropper?.storeName || '—' }}</span>
+              </div>
+              <div class="field-row">
+                <span class="fk">WhatsApp</span>
+                <span class="fv">{{ dropper?.whatsapp || '—' }}</span>
+              </div>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background: #F0FDF4; color: #22C55E;">📍</div>
-            <div class="stat-info">
-              <span class="stat-label">Pedidos Entregues</span>
-              <span class="stat-value">{{ user.deliveredOrders ?? 0 }}</span>
+
+          <!-- DADOS PESSOAIS -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Dados pessoais</span>
+              <button class="edit-btn" @click="editMode = !editMode">
+                {{ editMode ? 'Cancelar' : 'Editar' }}
+              </button>
+            </div>
+
+            <div v-if="!editMode" class="field-list">
+              <div class="field-row">
+                <span class="fk">Nome</span>
+                <span class="fv">{{ user?.name }}</span>
+              </div>
+              <div class="field-row">
+                <span class="fk">E-mail</span>
+                <span class="fv">{{ user?.email }}</span>
+              </div>
+              <div class="field-row">
+                <span class="fk">Membro desde</span>
+                <span class="fv">{{ formatDate(user?.createdAt) }}</span>
+              </div>
+            </div>
+
+            <div v-else class="edit-body">
+              <div class="edit-grp">
+                <label>Nome</label>
+                <input v-model="editName" type="text" />
+              </div>
+              <div class="edit-grp">
+                <label>E-mail</label>
+                <input v-model="editEmail" type="email" />
+              </div>
+              <button class="save-btn" @click="saveProfile">Salvar alterações</button>
             </div>
           </div>
+
         </div>
+      </div>
+    </template>
 
-      </template>
-
-      <div class="section-card">
-        <div class="section-card-header">
-          <h3 class="section-title">Dados Pessoais</h3>
-          <button class="edit-btn" @click="editMode = !editMode">
-            {{ editMode ? 'Cancelar' : '✏️ Editar' }}
-          </button>
-        </div>
-
-        <div v-if="!editMode" class="info-list">
-          <div class="info-row">
-            <span class="info-key">Nome</span>
-            <span class="info-val">{{ user.name }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">E-mail</span>
-            <span class="info-val">{{ user.email }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">Membro desde</span>
-            <span class="info-val">{{ formatDate(user.createdAt) }}</span>
-          </div>
-        </div>
-
-        <div v-else class="edit-form">
-          <div class="form-field">
-            <label>Nome</label>
-            <input v-model="editName" type="text" class="field-input" />
-          </div>
-          <div class="form-field">
-            <label>E-mail</label>
-            <input v-model="editEmail" type="email" class="field-input" />
-          </div>
-          <div class="edit-actions">
-            <button class="btn-save" @click="saveProfile">Salvar</button>
-            <button class="btn-cancel" @click="editMode = false">Cancelar</button>
-          </div>
+    <!-- ════════════════════════════════════════
+         CUSTOMER VIEW
+    ════════════════════════════════════════ -->
+    <template v-else>
+      <div class="page-header">
+        <div class="ph-greet">
+          <p class="ph-date">{{ todayLabel }}</p>
+          <h1 class="ph-title">Olá, {{ firstName }} 👋</h1>
+          <p class="ph-sub">Gerencie seu perfil e acompanhe seus pedidos.</p>
         </div>
       </div>
 
-    </div>
+      <div class="customer-grid">
+
+        <!-- CTA DROPPER -->
+        <div class="card dropper-cta">
+          <div class="card-header">
+            <div class="ch-left">
+              <span class="card-title">Jornada de conquistas</span>
+              <span class="card-sub">Sua jornada começa com a primeira venda.</span>
+            </div>
+            <span class="tag-programa">Programa de Parceiros</span>
+          </div>
+
+          <div class="cta-body">
+            <p class="cta-desc">Torne-se um <strong>Dropper</strong> e ganhe descontos progressivos em todas as compras. Quanto mais você vende, mais economiza.</p>
+
+            <div class="cta-levels">
+              <div v-for="lvl in levels" :key="lvl.key" class="cta-lv" :class="`cta-lv-${lvl.key.toLowerCase()}`">
+                <div class="cta-lv-dot" :class="`dot-${lvl.key.toLowerCase()}`">{{ lvl.icon }}</div>
+                <span class="cta-lv-name">{{ lvl.label }}</span>
+                <span class="cta-lv-thr">{{ lvl.threshold }}</span>
+                <span class="cta-lv-pct" :class="`cpct-${lvl.key.toLowerCase()}`">{{ lvl.discount }}%</span>
+              </div>
+            </div>
+
+            <a href="/seja-dropper" class="cta-action">Quero ser Dropper →</a>
+          </div>
+        </div>
+
+        <div class="customer-side">
+
+          <!-- PEDIDOS -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">Meus pedidos</span></div>
+            <div class="cstats">
+              <div class="cstat">
+                <span class="cstat-n">{{ dropper?.totalOrders ?? 0 }}</span>
+                <span class="cstat-l">Realizados</span>
+              </div>
+              <div class="cstat-sep"></div>
+              <div class="cstat">
+                <span class="cstat-n">{{ dropper?.deliveredOrders ?? 0 }}</span>
+                <span class="cstat-l">Entregues</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERFIL -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Dados pessoais</span>
+              <button class="edit-btn" @click="editMode = !editMode">{{ editMode ? 'Cancelar' : 'Editar' }}</button>
+            </div>
+            <div v-if="!editMode" class="field-list">
+              <div class="field-row"><span class="fk">Nome</span><span class="fv">{{ user?.name }}</span></div>
+              <div class="field-row"><span class="fk">E-mail</span><span class="fv">{{ user?.email }}</span></div>
+            </div>
+            <div v-else class="edit-body">
+              <div class="edit-grp"><label>Nome</label><input v-model="editName" type="text" /></div>
+              <div class="edit-grp"><label>E-mail</label><input v-model="editEmail" type="email" /></div>
+              <button class="save-btn" @click="saveProfile">Salvar</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </template>
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore }    from '../stores/auth'
+import { useDropperStore } from '../stores/dropper'
 
-const auth = useAuthStore()
+const auth         = useAuthStore()
+const dropperStore = useDropperStore()
 
+const user      = computed(() => auth.user)
+const dropper   = computed(() => dropperStore.profile)
+const isDropper = computed(() => ['DROPPER', 'OWNER'].includes(auth.user?.role))
 
-const user = computed(() => auth.user)
+const editMode = ref(false)
+const editName  = ref(user.value?.name  || '')
+const editEmail = ref(user.value?.email || '')
 
-const isDropper = computed(() =>
-    user.value?.role === 'DROPPER' || user.value?.role === 'OWNER'
-)
-
-const dropper = ref({
-  level: 'GOLD',
-  xp: 4350,
-  totalSales: 23800.00,
-  totalOrders: 47,
-  storeName: 'Minha Loja Top',
-  cnpj: '12.345.678/0001-99',
-  whatsapp: '(41) 99999-8888',
-  status: 'ACTIVE'
-})
-
+/* ── Levels config ── */
 const levels = [
-  { key: 'BRONZE',   label: 'Bronze',   icon: '🥉', discount: 5,  threshold: 0,      color: '#92400e', gradient: 'linear-gradient(135deg, #fde68a, #f59e0b)' },
-  { key: 'SILVER',   label: 'Prata',    icon: '🥈', discount: 10, threshold: 5000,   color: '#374151', gradient: 'linear-gradient(135deg, #e2e8f0, #94a3b8)' },
-  { key: 'GOLD',     label: 'Ouro',     icon: '🏅', discount: 15, threshold: 20000,  color: '#854d0e', gradient: 'linear-gradient(135deg, #fef08a, #f59e0b)' },
-  { key: 'PLATINUM', label: 'Platina',  icon: '🎖️', discount: 22, threshold: 60000,  color: '#075985', gradient: 'linear-gradient(135deg, #bae6fd, #0ea5e9)' },
-  { key: 'DIAMOND',  label: 'Diamante', icon: '💎', discount: 30, threshold: 150000, color: '#6b21a8', gradient: 'linear-gradient(135deg, #e9d5ff, #a855f7)' },
+  { key: 'BRONZE',   label: 'Bronze',   icon: '🥉', discount: 5,  threshold: 'R$ 0'        },
+  { key: 'SILVER',   label: 'Prata',    icon: '🥈', discount: 10, threshold: 'R$ 5.000'    },
+  { key: 'GOLD',     label: 'Ouro',     icon: '🏅', discount: 15, threshold: 'R$ 20.000'   },
+  { key: 'PLATINUM', label: 'Platina',  icon: '🎖️', discount: 22, threshold: 'R$ 60.000'   },
+  { key: 'DIAMOND',  label: 'Diamante', icon: '💎', discount: 30, threshold: 'R$ 150.000'  },
 ]
 
-const currentLevel = computed(() =>
-    levels.find(l => l.key === dropper.value.level) ?? levels[0]
-)
-
-
+const currentLevelIndex = computed(() => levels.findIndex(l => l.key === dropper.value?.level))
+const currentLevel  = computed(() => levels[Math.max(0, currentLevelIndex.value)])
+const levelKey      = computed(() => currentLevel.value.key.toLowerCase())
 const levelIcon     = computed(() => currentLevel.value.icon)
 const levelLabel    = computed(() => currentLevel.value.label)
 const levelDiscount = computed(() => currentLevel.value.discount)
-const levelColor    = computed(() => currentLevel.value.color)
-const levelGradient = computed(() => currentLevel.value.gradient)
 
-const heroClass = computed(() => {
-  if (!isDropper.value) return ''
-  return 'hero-' + dropper.value.level.toLowerCase()
-})
-
-const userInitials = computed(() => {
-  const name = user.value?.name ?? ''
-  return name
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(n => n[0].toUpperCase())
-      .join('')
-})
+const nextLevelObj = computed(() => levels[currentLevelIndex.value + 1] ?? null)
 
 const nextLevel = computed(() => {
-  const idx = levels.findIndex(l => l.key === dropper.value.level)
-  if (idx === -1 || idx === levels.length - 1) return null // já é Diamond
-
-  const next = levels[idx + 1]
-  const current = levels[idx]
-  const remaining = 'R$ ' + (next.threshold - dropper.value.totalSales)
-      .toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-
-  return { label: next.label, threshold: next.threshold, remaining }
+  const idx = currentLevelIndex.value
+  if (idx < 0 || idx === levels.length - 1) return null
+  const nxt = levels[idx + 1]
+  const nxtVal = parseFloat(nxt.threshold.replace(/\D/g, '')) || 0
+  const sales  = parseFloat(dropper.value?.totalSales || 0)
+  return { label: nxt.label, remaining: Math.max(0, nxtVal - sales) }
 })
 
 const progressPercent = computed(() => {
-  const idx = levels.findIndex(l => l.key === dropper.value.level)
-  if (idx === -1 || idx === levels.length - 1) return 100
-
-  const current = levels[idx]
-  const next = levels[idx + 1]
-  const range = next.threshold - current.threshold
-  const progress = dropper.value.totalSales - current.threshold
-  return Math.min(100, Math.max(0, (progress / range) * 100))
+  const idx = currentLevelIndex.value
+  if (idx === levels.length - 1) return 100
+  if (idx < 0) return 0
+  const cur = parseFloat(levels[idx].threshold.replace(/\D/g, '')) || 0
+  const nxt = parseFloat(levels[idx + 1].threshold.replace(/\D/g, '')) || 1
+  const sal = parseFloat(dropper.value?.totalSales || 0)
+  return Math.min(100, Math.round(((sal - cur) / (nxt - cur)) * 100))
 })
 
-function isLevelDone(key) {
-  const myIdx  = levels.findIndex(l => l.key === dropper.value.level)
-  const thisIdx = levels.findIndex(l => l.key === key)
-  return thisIdx < myIdx
-}
+const isLevelDone = key => levels.findIndex(l => l.key === key) < currentLevelIndex.value
 
-const editMode  = ref(false)
-const editName  = ref(user.value?.name ?? '')
-const editEmail = ref(user.value?.email ?? '')
+const firstName = computed(() => user.value?.name?.split(' ')[0] || '')
 
-function saveProfile() {
-  // TODO: chamar PUT /api/user/profile
-  console.log('Salvar:', editName.value, editEmail.value)
-  editMode.value = false
-}
+const todayLabel = computed(() =>
+    'Hoje é ' + new Date().toLocaleDateString('pt-BR', { weekday: undefined, day: 'numeric', month: 'long', year: 'numeric' })
+)
 
-function formatDate(date) {
-  if (!date) return '—'
-  return new Date(date).toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'long', year: 'numeric'
-  })
-}
+const statsData = computed(() => [
+  { label: 'Saldo disponível',  value: `R$ ${Number(dropper.value?.balance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,        sub: `Pendente: R$ 0,00` },
+  { label: 'Vendas aprovadas',  value: dropper.value?.totalOrders ?? 0,                                                                             sub: `Ticket médio: R$ 0,00` },
+  { label: 'Jornada de nível',  value: `${progressPercent.value}%`,                                                                                 sub: nextLevel.value ? `Próximo: ${nextLevel.value.label}` : 'Nível máximo 🏆' },
+  { label: 'Desconto atual',    value: `${levelDiscount.value}%`,                                                                                   sub: `Nível ${levelLabel.value}` },
+])
+
+const formatDate = d => d ? new Date(d).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) : '—'
+
+const saveProfile = async () => { editMode.value = false }
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
+/* ══════════════════════════════════════
+   TOKENS — mesma paleta do Kirvano
+══════════════════════════════════════ */
+.profile-root {
+  --bg:      #F7F8FA;
+  --white:   #FFFFFF;
+  --border:  #E5E7EB;
+  --text:    #111827;
+  --text2:   #374151;
+  --muted:   #6B7280;
+  --radius:  8px;
+  --fs-base: 13px;
 
-:root {
-  --blue-50: #EFF6FF;
-  --blue-100: #DBEAFE;
-  --blue-500: #3B82F6;
-  --blue-600: #2563EB;
-  --blue-700: #1D4ED8;
-  --gray-50: #F9FAFB;
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;
-  --gray-700: #374151;
-  --gray-900: #111827;
-}
+  /* level colors */
+  --bronze-c:  #B45309; --bronze-bg:  #FFFBEB; --bronze-bd:  #FDE68A; --bronze-bar:  #F59E0B;
+  --silver-c:  #374151; --silver-bg:  #F9FAFB; --silver-bd:  #D1D5DB; --silver-bar:  #9CA3AF;
+  --gold-c:    #92400E; --gold-bg:    #FFFBEB; --gold-bd:    #FDE68A; --gold-bar:    #FBBF24;
+  --platinum-c:#0E7490; --platinum-bg:#ECFEFF; --platinum-bd:#A5F3FC; --platinum-bar:#06B6D4;
+  --diamond-c: #6D28D9; --diamond-bg: #F5F3FF; --diamond-bd: #DDD6FE; --diamond-bar: #8B5CF6;
 
-.profile-page {
-  font-family: 'DM Sans', sans-serif;
-  background: #F8FAFC;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
   min-height: 100vh;
-  color: var(--gray-900);
+  padding-bottom: 80px;
 }
 
-.profile-hero {
-  position: relative;
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
-  padding: 48px 32px 64px;
-  overflow: hidden;
-}
-
-.profile-hero.hero-bronze  { background: linear-gradient(135deg, #451a03 0%, #92400e 60%, #b45309 100%); }
-.profile-hero.hero-silver  { background: linear-gradient(135deg, #1f2937 0%, #4b5563 60%, #6b7280 100%); }
-.profile-hero.hero-gold    { background: linear-gradient(135deg, #451a03 0%, #b45309 60%, #f59e0b 100%); }
-.profile-hero.hero-platinum{ background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0891b2 100%); }
-.profile-hero.hero-diamond { background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #7c3aed 100%); }
-
-.hero-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 50%),
-  radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 40%);
-}
-
-.hero-content {
-  position: relative;
-  max-width: 800px;
-  margin: 0 auto;
+/* ══════════════════════════════════════
+   RANK BANNER
+══════════════════════════════════════ */
+.rank-banner {
   display: flex;
   align-items: center;
-  gap: 28px;
+  padding: 0 40px;
+  height: 72px;
+  border-bottom: 1px solid var(--border);
+  gap: 32px;
 }
 
-.avatar-wrapper {
-  position: relative;
+/* per-level skin */
+.rank-bronze   { background: var(--bronze-bg);   border-top: 3px solid var(--bronze-bar);   }
+.rank-silver   { background: var(--silver-bg);   border-top: 3px solid var(--silver-bar);   }
+.rank-gold     { background: var(--gold-bg);     border-top: 3px solid var(--gold-bar);     }
+.rank-platinum { background: var(--platinum-bg); border-top: 3px solid var(--platinum-bar); }
+.rank-diamond  { background: var(--diamond-bg);  border-top: 3px solid var(--diamond-bar);  }
+
+.rb-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 180px;
+}
+.rb-icon { font-size: 26px; line-height: 1; }
+.rb-info { display: flex; flex-direction: column; gap: 1px; }
+.rb-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.rb-name    { font-size: 16px; font-weight: 700; color: var(--text); }
+
+.rb-center {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+}
+.rb-big {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.rb-center-txt { font-size: 13px; color: var(--muted); }
+
+.rb-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 200px;
+}
+.rb-next-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.rb-next-row   { display: flex; align-items: center; gap: 6px; }
+.rb-next-icon  { font-size: 16px; }
+.rb-next-name  { font-size: 14px; font-weight: 700; }
+.rb-next-sub   { font-size: 12px; color: var(--muted); }
+
+/* ══════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 40px;
+  gap: 24px;
+}
+
+.ph-date  { font-size: 12px; color: var(--muted); margin: 0 0 4px; }
+.ph-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; }
+.ph-sub   { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* 4-card stats strip idêntico ao Kirvano */
+.ph-stats {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
   flex-shrink: 0;
 }
 
-.avatar-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.4);
-}
-
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(8px);
-  border: 2px solid rgba(255,255,255,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-initials {
-  font-family: 'Syne', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
-}
-
-.level-badge-avatar {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.hero-info {
-  flex: 1;
-}
-
-.hero-name-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-
-.hero-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  color: white;
-  margin: 0;
-}
-
-/* Pills */
-.level-pill, .customer-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 99px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.03em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-}
-
-.customer-pill {
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(8px);
-}
-
-.hero-email {
-  color: rgba(255,255,255,0.7);
-  font-size: 14px;
-  margin: 0 0 4px;
-}
-
-.hero-store {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: rgba(255,255,255,0.9);
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0;
-}
-
-.profile-body {
-  max-width: 800px;
-  margin: -24px auto 0;
-  padding: 0 24px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.level-card {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-}
-
-.level-card-bg {
-  position: absolute;
-  inset: 0;
-  opacity: 0.07;
-}
-
-.level-card--bronze  { background: linear-gradient(135deg, #fef3c7, #fde68a); }
-.level-card--bronze .level-card-bg { background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b45309' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
-
-.level-card--silver  { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
-.level-card--gold    { background: linear-gradient(135deg, #fef9c3, #fef08a); }
-.level-card--platinum{ background: linear-gradient(135deg, #e0f2fe, #bae6fd); }
-.level-card--diamond { background: linear-gradient(135deg, #f3e8ff, #e9d5ff); }
-
-.level-card-content {
-  position: relative;
-  padding: 28px;
-}
-
-.level-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.level-icon-big {
-  font-size: 48px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
-}
-
-.level-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--gray-900);
-}
-
-.level-discount {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--gray-500);
-  margin-top: 2px;
-}
-
-.level-xp-badge {
-  margin-left: auto;
-  text-align: right;
-}
-
-.xp-value {
-  display: block;
-  font-family: 'Syne', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--gray-900);
-  line-height: 1;
-}
-
-.xp-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gray-400);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.progress-section { margin-top: 4px; }
-
-.progress-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-500);
-  margin-bottom: 8px;
-}
-
-.progress-next { color: var(--gray-700); }
-
-.progress-track {
-  height: 8px;
-  background: rgba(0,0,0,0.08);
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.progress-values {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--gray-400);
-  margin-top: 6px;
-}
-
-.max-level {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--gray-700);
-}
-
-.max-icon { font-size: 20px; }
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-@media (min-width: 600px) {
-  .stats-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-.stat-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  border: 1px solid var(--gray-100);
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.stat-info {
+.qs {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding: 14px 22px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  min-width: 150px;
+  transition: background .12s;
+}
+.qs:last-child { border-right: none; }
+.qs:hover { background: var(--bg); }
+
+.qs-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+.qs-val   { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.qs-sub   { font-size: 11px; color: var(--muted); }
+
+/* ══════════════════════════════════════
+   BODY
+══════════════════════════════════════ */
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  padding: 24px 40px;
+  max-width: 1200px;
 }
 
-.stat-label {
-  font-size: 11px;
-  color: var(--gray-400);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* ══════════════════════════════════════
+   CARD
+══════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
-.stat-value {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--gray-900);
-}
-
-.section-card {
-  background: white;
-  border-radius: 20px;
-  padding: 28px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  border: 1px solid var(--gray-100);
-}
-
-.section-card-header {
+.card-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--gray-900);
-  margin: 0 0 20px;
-}
-
-.section-card-header .section-title { margin: 0; }
-
-.edit-btn {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--blue-600);
-  background: var(--blue-50);
-  border: none;
-  padding: 6px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.edit-btn:hover { background: var(--blue-100); }
-
-.levels-timeline {
-  display: flex;
   justify-content: space-between;
-  position: relative;
-  padding: 0 8px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
 }
 
-.timeline-item {
+.ch-left { display: flex; flex-direction: column; gap: 2px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-sub   { font-size: 12px; color: var(--muted); }
+
+.saiba-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563EB;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.saiba-link:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════
+   PROGRESS
+══════════════════════════════════════ */
+.prog-section {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prog-meta {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  position: relative;
-  flex: 1;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
 }
 
-.timeline-dot {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--gray-100);
+.prog-cur      { font-weight: 600; color: var(--text); }
+.prog-pct-lbl  { color: var(--muted); }
+.prog-nxt      { margin-left: auto; color: var(--muted); }
+
+.prog-track {
+  height: 5px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.prog-fill { height: 100%; border-radius: 100px; transition: width .8s cubic-bezier(.16,1,.3,1); }
+.fill-bronze   { background: var(--bronze-bar);   }
+.fill-silver   { background: var(--silver-bar);   }
+.fill-gold     { background: var(--gold-bar);     }
+.fill-platinum { background: var(--platinum-bar); }
+.fill-diamond  { background: var(--diamond-bar);  }
+
+/* ══════════════════════════════════════
+   LEVELS LIST
+══════════════════════════════════════ */
+.levels-list { padding: 4px 0; }
+
+.lv-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px;
+  transition: background .1s;
+}
+.lv-row:hover { background: var(--bg); }
+
+/* connector line between nodes */
+.lv-line {
+  position: absolute;
+  left: 31px; bottom: -8px;
+  width: 2px; height: 16px;
+  background: var(--border);
+  border-radius: 1px;
+  z-index: 1;
+}
+.lv-line-bronze   { background: var(--bronze-bar);   }
+.lv-line-silver   { background: var(--silver-bar);   }
+.lv-line-gold     { background: var(--gold-bar);     }
+.lv-line-platinum { background: var(--platinum-bar); }
+.lv-line-diamond  { background: var(--diamond-bar);  }
+
+/* node circle */
+.lv-node {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: transform 0.2s;
+  font-size: 13px;
+  flex-shrink: 0;
+  z-index: 2;
+  transition: all .18s;
 }
+.lv-node-bronze   { background: var(--bronze-bar);   border-color: transparent; }
+.lv-node-silver   { background: var(--silver-bar);   border-color: transparent; }
+.lv-node-gold     { background: var(--gold-bar);     border-color: transparent; }
+.lv-node-platinum { background: var(--platinum-bar); border-color: transparent; }
+.lv-node-diamond  { background: var(--diamond-bar);  border-color: transparent; }
 
-.timeline-item--active .timeline-dot {
-  transform: scale(1.15);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
+.lv-check { font-size: 11px; font-weight: 800; color: #fff; }
+.lv-locked { opacity: .35; }
 
-.timeline-item--locked .timeline-dot {
-  opacity: 0.35;
-  filter: grayscale(0.7);
-}
+.lv-body { flex: 1; }
+.lv-name-row { display: flex; align-items: center; gap: 7px; margin-bottom: 1px; }
+.lv-name     { font-size: 13px; font-weight: 600; color: var(--text); }
+.lv-threshold{ font-size: 11px; color: var(--muted); }
 
-.timeline-line {
-  position: absolute;
-  top: 22px;
-  left: 50%;
-  width: 100%;
-  height: 2px;
-  background: var(--gray-200);
-  z-index: 0;
-}
-
-.timeline-item--done .timeline-line,
-.timeline-item--active .timeline-line {
-  background: linear-gradient(90deg, #3b82f6, var(--gray-200));
-}
-
-.timeline-info {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.timeline-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--gray-700);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.timeline-threshold {
+/* tags */
+.tag {
   font-size: 10px;
-  color: var(--gray-400);
-  margin-top: 2px;
-}
-
-.timeline-discount {
-  font-size: 12px;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-.info-list { display: flex; flex-direction: column; }
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--gray-100);
-}
-.info-row:last-child { border-bottom: none; }
-
-.info-key {
-  font-size: 13px;
-  color: var(--gray-400);
-  font-weight: 500;
-}
-
-.info-val {
-  font-size: 14px;
   font-weight: 600;
-  color: var(--gray-900);
+  padding: 1px 7px;
+  border-radius: 100px;
+  border: 1px solid transparent;
 }
+.tag-done   { background: #F0FDF4; color: #16A34A; border-color: #BBF7D0; }
+.tag-locked { background: var(--bg); color: var(--muted); border-color: var(--border); }
 
-.info-mono {
-  font-family: monospace;
-  font-size: 13px;
-  letter-spacing: 0.05em;
-  background: var(--gray-50);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
+.tag-cur { color: #fff; border-color: transparent; }
+.tag-bronze   { background: var(--bronze-bar);   }
+.tag-silver   { background: var(--silver-bar);   }
+.tag-gold     { background: var(--gold-bar);     }
+.tag-platinum { background: var(--platinum-bar); }
+.tag-diamond  { background: var(--diamond-bar);  }
 
-.status-badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 99px;
-}
+/* percent */
+.lv-pct { font-size: 20px; font-weight: 800; letter-spacing: -.4px; min-width: 48px; text-align: right; transition: color .18s; }
+.pct-sym { font-size: 13px; }
+.pct-locked   { color: var(--border); }
+.pct-bronze   { color: var(--bronze-c);   }
+.pct-silver   { color: var(--silver-c);   }
+.pct-gold     { color: var(--gold-c);     }
+.pct-platinum { color: var(--platinum-c); }
+.pct-diamond  { color: var(--diamond-c);  }
 
-.status-active {
-  background: #DCFCE7;
-  color: #15803D;
-}
-
-.edit-form { display: flex; flex-direction: column; gap: 16px; }
-
-.form-field { display: flex; flex-direction: column; gap: 6px; }
-
-.form-field label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.field-input {
-  padding: 10px 14px;
-  border: 1.5px solid var(--gray-200);
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  color: var(--gray-900);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.field-input:focus { border-color: var(--blue-500); }
-
-.edit-actions { display: flex; gap: 10px; }
-
-.btn-save {
-  flex: 1;
-  padding: 10px;
-  background: var(--blue-600);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.btn-save:hover { background: var(--blue-700); }
-
-.btn-cancel {
-  padding: 10px 20px;
-  background: var(--gray-100);
-  color: var(--gray-700);
-  border: none;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.dropper-cta {
-  background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
-  border: 1.5px solid var(--blue-100);
-  border-radius: 20px;
-  padding: 28px;
+/* ══════════════════════════════════════
+   MOTIVATION BANNER
+══════════════════════════════════════ */
+.mot-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin: 12px 20px 16px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.mot-left { display: flex; align-items: flex-start; gap: 12px; }
+.mot-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.mot-title{ font-size: 13px; font-weight: 600; margin: 0 0 2px; color: var(--text); }
+.mot-sub  { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.5; }
+.mot-arrow{ font-size: 18px; color: var(--muted); flex-shrink: 0; }
+
+.mot-bronze   { background: var(--bronze-bg);   border-color: var(--bronze-bd);   }
+.mot-silver   { background: var(--silver-bg);   border-color: var(--silver-bd);   }
+.mot-gold     { background: var(--gold-bg);     border-color: var(--gold-bd);     }
+.mot-platinum { background: var(--platinum-bg); border-color: var(--platinum-bd); }
+.mot-diamond  { background: var(--diamond-bg);  border-color: var(--diamond-bd);  }
+.mot-max      { background: #F0FDF4; border-color: #BBF7D0; }
+
+/* ══════════════════════════════════════
+   RIGHT COL
+══════════════════════════════════════ */
+.right-col { display: flex; flex-direction: column; gap: 16px; }
+
+.field-list { }
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.field-row:last-child { border-bottom: none; }
+.fk { font-size: 12px; color: var(--muted); font-weight: 500; }
+.fv { font-size: 13px; font-weight: 500; color: var(--text2); text-align: right; max-width: 60%; word-break: break-all; }
+
+.edit-btn {
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  background: none; border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 10px; cursor: pointer;
+  font-family: inherit; transition: all .12s;
+}
+.edit-btn:hover { background: var(--bg); color: var(--text); }
+
+.edit-body {
+  padding: 14px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.edit-grp { display: flex; flex-direction: column; gap: 4px; }
+.edit-grp label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.edit-grp input {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 11px;
+  font-size: 13px; font-family: inherit; color: var(--text);
+  outline: none; transition: border-color .15s;
+}
+.edit-grp input:focus { border-color: #9CA3AF; }
+
+.save-btn {
+  background: var(--text); color: #fff; border: none;
+  border-radius: 6px; padding: 9px 16px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  cursor: pointer; align-self: flex-start; transition: opacity .15s;
+}
+.save-btn:hover { opacity: .82; }
+
+/* ══════════════════════════════════════
+   CUSTOMER VIEW
+══════════════════════════════════════ */
+.customer-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
   gap: 20px;
-  flex-wrap: wrap;
+  padding: 24px 40px;
+  max-width: 1100px;
+  align-items: start;
 }
 
-.cta-icons {
-  font-size: 22px;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+.dropper-cta { display: flex; flex-direction: column; }
+
+.tag-programa {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: #7C3AED;
+  background: #F5F3FF; border: 1px solid #DDD6FE;
+  padding: 3px 10px; border-radius: 100px;
 }
 
-.cta-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--gray-900);
-  margin: 0 0 6px;
+.cta-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.cta-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin: 0; }
+
+.cta-levels { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 6px; overflow: hidden; }
+
+.cta-lv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--white);
+  border-left: 3px solid transparent;
+  transition: background .1s;
+}
+.cta-lv:hover { background: var(--bg); }
+
+.cta-lv-bronze   { border-left-color: var(--bronze-bar);   }
+.cta-lv-silver   { border-left-color: var(--silver-bar);   }
+.cta-lv-gold     { border-left-color: var(--gold-bar);     }
+.cta-lv-platinum { border-left-color: var(--platinum-bar); }
+.cta-lv-diamond  { border-left-color: var(--diamond-bar);  }
+
+.cta-lv-dot {
+  width: 26px; height: 26px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.dot-bronze   { background: var(--bronze-bg);   }
+.dot-silver   { background: var(--silver-bg);   }
+.dot-gold     { background: var(--gold-bg);     }
+.dot-platinum { background: var(--platinum-bg); }
+.dot-diamond  { background: var(--diamond-bg);  }
+
+.cta-lv-name { font-size: 13px; font-weight: 600; flex: 1; }
+.cta-lv-thr  { font-size: 11px; color: var(--muted); margin-right: 8px; }
+.cta-lv-pct  { font-size: 15px; font-weight: 800; }
+.cpct-bronze   { color: var(--bronze-c);   }
+.cpct-silver   { color: var(--silver-c);   }
+.cpct-gold     { color: var(--gold-c);     }
+.cpct-platinum { color: var(--platinum-c); }
+.cpct-diamond  { color: var(--diamond-c);  }
+
+.cta-action {
+  display: block; background: var(--text); color: #fff;
+  border-radius: 7px; padding: 11px 18px;
+  font-size: 13px; font-weight: 600; text-align: center;
+  text-decoration: none; transition: opacity .15s; font-family: inherit;
+}
+.cta-action:hover { opacity: .82; }
+
+.customer-side { display: flex; flex-direction: column; gap: 14px; }
+
+.cstats { display: flex; align-items: center; padding: 20px; }
+.cstat  { flex: 1; text-align: center; }
+.cstat-n {
+  display: block; font-size: 30px; font-weight: 800;
+  letter-spacing: -.5px; color: var(--text);
+}
+.cstat-l {
+  display: block; font-size: 11px; color: var(--muted);
+  margin-top: 2px; text-transform: uppercase; letter-spacing: .07em;
+}
+.cstat-sep { width: 1px; height: 40px; background: var(--border); flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .body-grid, .customer-grid { grid-template-columns: 1fr; padding: 20px 24px; }
+  .rank-banner { padding: 0 24px; flex-wrap: wrap; height: auto; padding: 12px 24px; gap: 16px; }
+  .rb-center   { order: -1; width: 100%; justify-content: flex-start; }
+  .rb-right    { display: none; }
+  .page-header { padding: 20px 24px; flex-direction: column; align-items: flex-start; }
+  .ph-stats    { display: none; }
 }
 
-.cta-desc {
-  font-size: 13px;
-  color: var(--gray-500);
-  margin: 0;
-}
-
-.cta-btn {
-  white-space: nowrap;
-  padding: 12px 24px;
-  background: var(--blue-600);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
-}
-.cta-btn:hover {
-  background: var(--blue-700);
-  transform: translateY(-1px);
+@media (max-width: 640px) {
+  .rank-banner { padding: 12px 16px; }
+  .body-grid, .customer-grid { padding: 12px 16px; }
+  .page-header { padding: 20px 16px; }
 }
 </style>

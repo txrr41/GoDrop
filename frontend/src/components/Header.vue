@@ -71,7 +71,7 @@
             <template #activator="{ props }">
               <DropperBadge
                   :isDropper="auth.user?.role === 'DROPPER' || auth.user?.role === 'OWNER'"
-                  :level="auth.user?.role === 'OWNER' ? 'DIAMOND' : dropperProfile?.level"
+                  :level="dropperProfile?.level"
                   class="mr-2"
               />
               <v-btn v-bind="props" variant="text" class="user-profile-btn text-none ml-2" rounded="xl">
@@ -83,7 +83,7 @@
               </v-btn>
             </template>
             <v-list class="custom-menu-list mt-2 pa-2" elevation="10" rounded="xl" min-width="200">
-              <v-list-item to="/profile" prepend-icon="mdi-account-outline" title="Meu perfil" />
+              <v-list-item to="/perfil" prepend-icon="mdi-account-outline" title="Meu perfil" />
               <v-list-item to="/settings" prepend-icon="mdi-cog-outline" title="Configurações" />
               <v-list-item to="/orders" prepend-icon="mdi-package-variant-closed" title="Meus Pedidos" />
               <v-divider class="my-2 opacity-10" />

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed } from 'vue'
+
 import api from '../api/api'
+import {useDropperStore} from "./dropper.js";
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -74,11 +75,16 @@ export const useAuthStore = defineStore('auth', {
         },
     },
 
+
     actions: {
         async init() {
             if (this.initialized) return
             try {
                 await this.fetchUser()
+                if (this.user?.role === 'DROPPER' || this.user?.role === 'OWNER' ) {
+                    const dropperStore = useDropperStore()
+                    await dropperStore.fetchProfile()
+                }
             } catch (error) {
                 this.user = null
             } finally {

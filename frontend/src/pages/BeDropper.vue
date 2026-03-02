@@ -206,15 +206,15 @@
                   <div class="input-wrapper">
                     <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                     <input
-                        v-model="cnpj"
+                        :value="cnpj"
                         type="text"
                         placeholder="00.000.000/0001-00"
                         class="form-input"
                         maxlength="18"
                         @input="formatCNPJ"
                     />
-                    <div v-if="cnpjStatus === 'valid'" class="input-badge valid">✓ Válido</div>
-                    <div v-if="cnpjStatus === 'invalid'" class="input-badge invalid">✗ Inválido</div>
+                    <div v-if="cnpjStatus === 'valid'" class="input-badge valid">Válido</div>
+                    <div v-if="cnpjStatus === 'invalid'" class="input-badge invalid">Inválido</div>
                   </div>
                   <p v-if="cnpjError" class="input-error">{{ cnpjError }}</p>
                 </div>
@@ -313,6 +313,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import LogoDrop from '../assets/LogoDrop.png'
+import api from "../api/api.js";
 
 const auth = useAuthStore()
 
@@ -393,11 +394,13 @@ const scrollToTiers = () => tiersSection.value?.scrollIntoView({ behavior: 'smoo
 const goToLogin = () => window.location.href = '/home'
 
 const formatCNPJ = (e) => {
-  let v = e.target.value.replace(/\D/g, '')
-  v = v.replace(/(\d{2})(\d)/, '$1.$2')
-  v = v.replace(/(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-  v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
-  v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5')
+  let v = e.target.value.replace(/\D/g, '').slice(0, 14)
+
+  if (v.length > 12) v = `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8,12)}-${v.slice(12)}`
+  else if (v.length > 8) v = `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8)}`
+  else if (v.length > 5) v = `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5)}`
+  else if (v.length > 2) v = `${v.slice(0,2)}.${v.slice(2)}`
+
   cnpj.value = v
   if (v.length === 18) validateCNPJ(v)
   else cnpjStatus.value = null
@@ -439,7 +442,11 @@ const handleSubmit = async () => {
   if (cnpjStatus.value !== 'valid') { cnpjError.value = 'Verifique o CNPJ informado'; return }
   loading.value = true
   try {
-    await new Promise(r => setTimeout(r, 1500)) // simulação
+    await api.post('/api/dropper/register', {
+      cnpj: cnpj.value,
+      storeName: storeName.value,
+      whatsapp: whatsapp.value
+    })
     submitted.value = true
   } catch (err) {
     cnpjError.value = 'Erro ao enviar. Tente novamente.'
