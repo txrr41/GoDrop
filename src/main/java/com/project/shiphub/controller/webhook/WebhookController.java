@@ -1,6 +1,7 @@
 package com.project.shiphub.controller.webhook;
 
 import com.project.shiphub.repository.order.OrderRepository;
+import com.project.shiphub.service.auth.DropperService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 public class WebhookController {
 
     private final OrderRepository orderRepository;
+    private final DropperService dropperService;
     private final EmailService emailService;
 
     @Value("${stripe.webhook.secret}")
@@ -102,7 +104,7 @@ public class WebhookController {
                         System.out.println("   " + key + " = " + value)
                 );
             } else {
-                System.out.println("   ⚠️ NENHUM METADATA!");
+                System.out.println("⚠️ NENHUM METADATA!");
             }
 
             String orderIdStr = paymentIntent.getMetadata().get("order_id");
@@ -156,6 +158,13 @@ public class WebhookController {
                 System.out.println("✅ Email enviado!");
             } catch (Exception e) {
                 System.out.println("⚠️ Erro ao enviar email: " + e.getMessage());
+            }
+
+            try {
+                dropperService.updateSalesAndLevel(order.getUser().getId(), order.getTotalAmount());
+                System.out.println("Sales e level do dropper atualizados!");
+            } catch (Exception e) {
+                System.out.println("Usuário não é dropper ou erro ao atualizar: " + e.getMessage());
             }
 
         } catch (Exception e) {

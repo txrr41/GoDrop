@@ -1,308 +1,298 @@
 <template>
   <div class="dropper-page">
-
+    <!-- HERO SECTION -->
     <section class="hero">
-      <div class="hero-noise"></div>
+      <div class="hero-grid-bg"></div>
       <div class="hero-glow"></div>
 
       <nav class="hero-nav">
         <img :src="LogoDrop" alt="Go Drop" class="nav-logo" />
         <a href="/home" class="nav-back">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Voltar à loja
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Voltar para a loja
         </a>
       </nav>
 
       <div class="hero-content">
         <div class="hero-eyebrow">
-          <span class="eyebrow-dot"></span>
-          Programa de Parceiros
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            Go Drop Partners
+          </div>
         </div>
 
         <h1 class="hero-title">
-          Venda sem<br />
-          <span class="title-gradient">estocar nada.</span><br />
-          Lucre de verdade.
+          Escale suas vendas<br />
+          <span class="title-gradient">sem investir em estoque.</span>
         </h1>
 
         <p class="hero-desc">
-          Cadastre seu CNPJ, escolha os produtos, divulgue — e cada venda sua
-          vira desconto real na próxima compra. Quanto mais você vende, mais você economiza.
+          O programa definitivo para empreendedores. Cadastre seu CNPJ, conecte-se ao nosso centro de distribuição e transforme seu volume de vendas em até <strong>30% de desconto real</strong>.
         </p>
 
         <div class="hero-actions">
           <button class="btn-primary" @click="scrollToForm">
-            Quero ser Dropper
+            Iniciar meu cadastro
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
-          <button class="btn-ghost" @click="scrollToTiers">
-            Ver os níveis
+          <button class="btn-secondary" @click="scrollToTiers">
+            Conhecer os Níveis
           </button>
         </div>
 
         <div class="hero-trust">
           <div class="trust-item">
-            <span class="trust-num">+2.400</span>
-            <span class="trust-lbl">droppers ativos</span>
+            <span class="trust-num">2.4k+</span>
+            <span class="trust-lbl">Empresas parceiras</span>
           </div>
           <div class="trust-sep"></div>
           <div class="trust-item">
-            <span class="trust-num">Até 30%</span>
-            <span class="trust-lbl">de desconto</span>
+            <span class="trust-num">R$ 0</span>
+            <span class="trust-lbl">Custo de adesão</span>
           </div>
           <div class="trust-sep"></div>
           <div class="trust-item">
-            <span class="trust-num">0 estoque</span>
-            <span class="trust-lbl">necessário</span>
+            <span class="trust-num">Automático</span>
+            <span class="trust-lbl">Cálculo de nível</span>
           </div>
         </div>
       </div>
 
       <div class="hero-visual">
-        <div class="floating-card card-a">
-          <div class="fc-icon">🚀</div>
-          <div class="fc-data">
-            <span class="fc-val">R$ 18.400</span>
-            <span class="fc-lbl">vendas este mês</span>
+        <div class="visual-wrapper">
+          <div class="glass-panel main-dashboard">
+            <div class="dash-header">
+              <div class="dash-title">Performance Mensal</div>
+              <div class="dash-badge">Nível Ouro</div>
+            </div>
+            <div class="dash-body">
+              <div class="dash-stat">
+                <span class="stat-lbl">Volume de Vendas</span>
+                <span class="stat-val">R$ 42.500,00</span>
+                <span class="stat-growth">+14.2% vs mês anterior</span>
+              </div>
+              <div class="dash-chart">
+                <div class="chart-bar" v-for="(h, i) in [40, 65, 45, 80, 55, 90, 100]" :key="i" :style="{height: h + '%', animationDelay: (i * 0.1) + 's'}"></div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="floating-card card-b">
-          <div class="fc-icon">💎</div>
-          <div class="fc-data">
-            <span class="fc-val">Nível Diamond</span>
-            <span class="fc-lbl">30% de desconto</span>
+
+          <div class="glass-panel floating-stat fs-1">
+            <div class="fs-icon blue-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="fs-info">
+              <span class="fs-val">100% Sincronizado</span>
+              <span class="fs-lbl">Estoque em tempo real</span>
+            </div>
           </div>
-        </div>
-        <div class="floating-card card-c">
-          <div class="fc-icon">📦</div>
-          <div class="fc-data">
-            <span class="fc-val">127 pedidos</span>
-            <span class="fc-lbl">entregues</span>
+
+          <div class="glass-panel floating-stat fs-2">
+            <div class="fs-icon green-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="fs-info">
+              <span class="fs-val">Margem de Lucro</span>
+              <span class="fs-lbl">Aumentou 15%</span>
+            </div>
           </div>
-        </div>
-        <div class="dashboard-mock">
-          <div class="mock-bar" v-for="(h, i) in [55, 70, 45, 90, 65, 80, 100]" :key="i" :style="{height: h + '%', animationDelay: (i * 0.1) + 's'}"></div>
         </div>
       </div>
     </section>
 
+    <!-- COMO FUNCIONA -->
     <section class="how">
-      <div class="section-header">
-        <p class="section-eyebrow">Como funciona</p>
-        <h2 class="section-title">Simples assim</h2>
-      </div>
-      <div class="how-steps">
-        <div class="step" v-for="(s, i) in steps" :key="i">
-          <div class="step-num">0{{ i + 1 }}</div>
-          <div class="step-icon">{{ s.icon }}</div>
-          <h3 class="step-title">{{ s.title }}</h3>
-          <p class="step-desc">{{ s.desc }}</p>
-          <div v-if="i < steps.length - 1" class="step-connector"></div>
+      <div class="section-container">
+        <div class="section-header">
+          <p class="section-eyebrow">Aceleração de negócios</p>
+          <h2 class="section-title">Operação otimizada em 4 passos</h2>
+        </div>
+        <div class="how-steps">
+          <div class="step-line"></div>
+          <div class="step" v-for="(s, i) in steps" :key="i">
+            <div class="step-marker">
+              <div class="step-num">0{{ i + 1 }}</div>
+            </div>
+            <h3 class="step-title">{{ s.title }}</h3>
+            <p class="step-desc">{{ s.desc }}</p>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- NÍVEIS -->
     <section class="tiers" id="tiers" ref="tiersSection">
-      <div class="section-header">
-        <p class="section-eyebrow">Programa de níveis</p>
-        <h2 class="section-title">Quanto mais você vende,<br/>mais você ganha</h2>
-      </div>
-
-      <div class="tiers-grid">
-        <div class="tier-card" v-for="tier in tiers" :key="tier.name" :class="['tier-' + tier.key, { 'tier-featured': tier.featured }]">
-          <div class="tier-badge">
-            <span class="tier-emoji">{{ tier.emoji }}</span>
-            <div v-if="tier.featured" class="tier-popular-tag">Mais popular</div>
-          </div>
-          <h3 class="tier-name">{{ tier.name }}</h3>
-          <div class="tier-discount">
-            <span class="discount-num">{{ tier.discount }}</span>
-            <span class="discount-pct">%</span>
-            <span class="discount-lbl">desconto</span>
-          </div>
-          <div class="tier-threshold">
-            A partir de <strong>{{ tier.threshold }}</strong> em vendas
-          </div>
-          <ul class="tier-perks">
-            <li v-for="perk in tier.perks" :key="perk">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-              {{ perk }}
-            </li>
-          </ul>
+      <div class="section-container">
+        <div class="section-header">
+          <p class="section-eyebrow">Estrutura de benefícios</p>
+          <h2 class="section-title">Crescimento escalonável</h2>
+          <p class="section-subtitle">Um modelo meritocrático: seu volume de vendas dita sua margem de lucro.</p>
         </div>
-      </div>
 
-      <div class="tier-note">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        Os descontos são aplicados automaticamente nas suas compras. O nível é calculado todo dia 1° do mês com base nas vendas do mês anterior.
-      </div>
-    </section>
+        <div class="tiers-grid">
+          <div class="tier-card" v-for="tier in tiers" :key="tier.name" :class="['tier-' + tier.key, { 'tier-featured': tier.featured }]">
+            <div v-if="tier.featured" class="featured-banner">Plano Recomendado</div>
 
-    <section class="benefits">
-      <div class="section-header">
-        <p class="section-eyebrow">Por que vale a pena</p>
-        <h2 class="section-title">Tudo o que você precisa<br/>para crescer</h2>
-      </div>
-      <div class="benefits-grid">
-        <div class="benefit-card" v-for="b in benefits" :key="b.title">
-          <div class="benefit-icon">{{ b.icon }}</div>
-          <h3 class="benefit-title">{{ b.title }}</h3>
-          <p class="benefit-desc">{{ b.desc }}</p>
+            <div class="tier-header">
+              <div class="tier-icon-wrapper" :style="{ color: tier.color, background: tier.bg }">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <h3 class="tier-name" :style="{ color: tier.color }">{{ tier.name }}</h3>
+            </div>
+
+            <div class="tier-discount">
+              <span class="discount-num">{{ tier.discount }}</span>
+              <span class="discount-pct">%</span>
+            </div>
+            <div class="tier-lbl">desconto em todas as compras</div>
+
+            <div class="tier-threshold">
+              Meta: <strong>{{ tier.threshold }}</strong>/mês
+            </div>
+
+            <div class="tier-divider"></div>
+
+            <ul class="tier-perks">
+              <li v-for="perk in tier.perks" :key="perk">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                <span>{{ perk }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- FORMULÁRIO -->
     <section class="form-section" id="form" ref="formSection">
-      <div class="form-wrapper">
-        <div class="form-left">
-          <p class="section-eyebrow">Comece agora</p>
-          <h2 class="form-title">Vire um Dropper<br/>em minutos</h2>
-          <p class="form-subtitle">
-            Preencha o formulário ao lado com seu CNPJ. Vamos validar automaticamente
-            e ativar os benefícios assim que tudo estiver certo.
-          </p>
+      <div class="section-container">
+        <div class="form-wrapper">
+          <div class="form-left">
+            <h2 class="form-title">Inicie sua jornada<br/>como Parceiro</h2>
+            <p class="form-subtitle">
+              O processo de homologação é instantâneo. Insira os dados da sua empresa abaixo e libere o acesso ao nosso ecossistema de logística e vendas imediatamente.
+            </p>
 
-          <div class="form-requirements">
-            <p class="req-title">Requisitos</p>
-            <div class="req-item" v-for="r in requirements" :key="r">
-              <div class="req-dot"></div>
-              {{ r }}
+            <div class="benefits-compact">
+              <div class="bc-item" v-for="b in benefitsCompact" :key="b.title">
+                <div class="bc-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                  <h4>{{ b.title }}</h4>
+                  <p>{{ b.desc }}</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="form-right">
-          <div v-if="!submitted" class="signup-form">
-            <div v-if="!auth.isLogged" class="form-not-logged">
-              <div class="not-logged-icon">🔒</div>
-              <h3>Faça login primeiro</h3>
-              <p>Você precisa ter uma conta Go Drop para se tornar um Dropper.</p>
-              <button class="btn-primary" @click="goToLogin">
-                Entrar ou Criar Conta
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-            </div>
+          <div class="form-right">
+            <div class="premium-form-card">
+              <div v-if="!submitted" class="signup-form">
 
-            <div v-else>
-              <div class="form-user-info">
-                <div class="fui-avatar">{{ auth.user?.name?.charAt(0) }}</div>
-                <div>
-                  <p class="fui-name">{{ auth.user?.name }}</p>
-                  <p class="fui-email">{{ auth.user?.email }}</p>
+                <div v-if="!auth.isLogged" class="form-not-logged">
+                  <div class="lock-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <h3>Autenticação Necessária</h3>
+                  <p>Acesse sua conta corporativa Go Drop para vincular seu CNPJ ao programa de parceiros.</p>
+                  <button class="btn-primary full-width" @click="goToLogin">
+                    Fazer Login na Plataforma
+                  </button>
+                </div>
+
+                <div v-else>
+                  <div class="active-user-badge">
+                    <div class="aub-avatar">{{ auth.user?.name?.charAt(0) || 'G' }}</div>
+                    <div class="aub-info">
+                      <span class="aub-name">{{ auth.user?.name || 'Usuário Autenticado' }}</span>
+                      <span class="aub-email">{{ auth.user?.email || 'email@empresa.com' }}</span>
+                    </div>
+                  </div>
+
+                  <div v-if="auth.user?.role === 'DROPPER'" class="already-dropper">
+                    <div class="success-ring">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <h3>Conta Homologada</h3>
+                    <p>Seu CNPJ já está vinculado ao programa de Parceiros. Boas vendas!</p>
+                  </div>
+
+                  <div v-else class="form-fields">
+                    <div class="input-group">
+                      <label class="input-label">CNPJ da Empresa</label>
+                      <div class="input-wrapper" :class="{ 'is-valid': cnpjStatus === 'valid', 'is-invalid': cnpjStatus === 'invalid' }">
+                        <input
+                            :value="cnpj"
+                            type="text"
+                            placeholder="00.000.000/0001-00"
+                            class="form-input"
+                            maxlength="18"
+                            @input="formatCNPJ"
+                        />
+                        <div class="input-status-icon">
+                          <svg v-if="cnpjStatus === 'valid'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                          <svg v-if="cnpjStatus === 'invalid'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </div>
+                      </div>
+                      <p v-if="cnpjError" class="input-error">{{ cnpjError }}</p>
+                    </div>
+
+                    <div class="input-group">
+                      <label class="input-label">Nome Fantasia / Marca</label>
+                      <input v-model="storeName" type="text" placeholder="Ex: Acme Corp Digital" class="form-input" />
+                    </div>
+
+                    <div class="input-group">
+                      <label class="input-label">WhatsApp Comercial</label>
+                      <input v-model="whatsapp" type="text" placeholder="(00) 00000-0000" class="form-input" @input="formatPhone" maxlength="15" />
+                    </div>
+
+                    <label class="checkbox-label">
+                      <input type="checkbox" v-model="acceptedTerms" class="checkbox-input" />
+                      <span class="checkbox-box">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      <span class="checkbox-text">Declaro que li e concordo com os <a href="#">Termos e Condições Comerciais</a>.</span>
+                    </label>
+
+                    <button
+                        class="btn-primary btn-submit full-width"
+                        :disabled="loading || !acceptedTerms || cnpj.length < 18"
+                        @click="handleSubmit"
+                    >
+                      <span v-if="loading" class="spinner"></span>
+                      <span v-else>Validar e Ativar Conta</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div v-if="auth.user?.role === 'DROPPER'" class="already-dropper">
-                <span class="ad-icon">🎉</span>
-                <div>
-                  <p class="ad-title">Você já é um Dropper!</p>
-                  <p class="ad-sub">Seus benefícios já estão ativos na sua conta.</p>
+              <div v-else class="form-success">
+                <div class="success-shield">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                 </div>
-              </div>
+                <h3 class="success-title">Empresa Homologada</h3>
+                <p class="success-desc">Bem-vindo ao Go Drop Partners. Sua infraestrutura de e-commerce acaba de subir de nível.</p>
 
-              <div v-else>
-                <div class="input-group">
-                  <label class="input-label">CNPJ da sua empresa</label>
-                  <div class="input-wrapper">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                    <input
-                        :value="cnpj"
-                        type="text"
-                        placeholder="00.000.000/0001-00"
-                        class="form-input"
-                        maxlength="18"
-                        @input="formatCNPJ"
-                    />
-                    <div v-if="cnpjStatus === 'valid'" class="input-badge valid">Válido</div>
-                    <div v-if="cnpjStatus === 'invalid'" class="input-badge invalid">Inválido</div>
+                <div class="success-card">
+                  <div class="sc-row">
+                    <span class="sc-lbl">CNPJ Registrado</span>
+                    <span class="sc-val">{{ cnpj }}</span>
                   </div>
-                  <p v-if="cnpjError" class="input-error">{{ cnpjError }}</p>
-                </div>
-
-                <div class="input-group">
-                  <label class="input-label">Nome da sua loja / marca</label>
-                  <div class="input-wrapper">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                    <input v-model="storeName" type="text" placeholder="Ex: Minha Loja Digital" class="form-input" />
+                  <div class="sc-row">
+                    <span class="sc-lbl">Nível Inicial</span>
+                    <span class="sc-val bronze-text">Bronze (5% OFF)</span>
                   </div>
                 </div>
 
-                <div class="input-group">
-                  <label class="input-label">Seu WhatsApp</label>
-                  <div class="input-wrapper">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.5 12.88a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.39 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.1 6.1l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <input v-model="whatsapp" type="text" placeholder="(00) 00000-0000" class="form-input" @input="formatPhone" maxlength="15" />
-                  </div>
-                </div>
-
-                <label class="checkbox-label">
-                  <input type="checkbox" v-model="acceptedTerms" class="checkbox-input" />
-                  <span class="checkbox-custom"></span>
-                  <span class="checkbox-text">Li e aceito os <a href="#" class="link">Termos do Programa Dropper</a></span>
-                </label>
-
-                <button
-                    class="btn-primary btn-submit"
-                    :disabled="loading || !acceptedTerms || cnpj.length < 18"
-                    @click="handleSubmit"
-                >
-                  <span v-if="loading" class="loading-spinner"></span>
-                  <span v-else>Quero ser Dropper</span>
-                  <svg v-if="!loading" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <button class="btn-primary full-width" @click="goToLogin">
+                  Acessar Dashboard
                 </button>
               </div>
             </div>
           </div>
-
-          <div v-else class="form-success">
-            <div class="success-icon">🎉</div>
-            <h3 class="success-title">Solicitação enviada!</h3>
-            <p class="success-desc">Seu CNPJ está sendo validado. Em breve você receberá a confirmação por e-mail e seus benefícios serão ativados.</p>
-            <div class="success-details">
-              <div class="sd-row">
-                <span>CNPJ</span>
-                <strong>{{ cnpj }}</strong>
-              </div>
-              <div class="sd-row">
-                <span>Nível inicial</span>
-                <strong>🥉 Bronze — 5%</strong>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
-
-    <section class="faq">
-      <div class="section-header">
-        <p class="section-eyebrow">Dúvidas frequentes</p>
-        <h2 class="section-title">Ficou alguma dúvida?</h2>
-      </div>
-      <div class="faq-list">
-        <div
-            class="faq-item"
-            v-for="(faq, i) in faqs"
-            :key="i"
-            :class="{ open: openFaq === i }"
-            @click="openFaq = openFaq === i ? null : i"
-        >
-          <div class="faq-question">
-            {{ faq.q }}
-            <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-          <div class="faq-answer">{{ faq.a }}</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="cta-final">
-      <div class="cta-content">
-        <h2 class="cta-title">Pronto para começar?</h2>
-        <p class="cta-desc">Junte-se a mais de 2.400 droppers e comece a vender hoje mesmo.</p>
-        <button class="btn-primary btn-large" @click="scrollToForm">
-          Quero ser Dropper agora
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
       </div>
     </section>
 
@@ -311,9 +301,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
-import LogoDrop from '../assets/LogoDrop.png'
-import api from "../api/api.js";
+import { useAuthStore } from '../stores/auth' // Mantenha seus imports reais
+import LogoDrop from '../assets/LogoDrop.png' // Mantenha seus imports reais
+import api from "../api/api.js"; // Mantenha seus imports reais
 
 const auth = useAuthStore()
 
@@ -325,68 +315,49 @@ const cnpjStatus = ref(null)
 const cnpjError = ref('')
 const loading = ref(false)
 const submitted = ref(false)
-const openFaq = ref(null)
 
 const tiersSection = ref(null)
 const formSection = ref(null)
 
 const steps = [
-  { icon: '📋', title: 'Crie sua conta', desc: 'Se ainda não tem, registre-se gratuitamente na Go Drop. Leva menos de 2 minutos.' },
-  { icon: '🏢', title: 'Informe seu CNPJ', desc: 'Acesse a página Seja Dropper e insira o CNPJ da sua empresa. Validamos automaticamente.' },
-  { icon: '🛍️', title: 'Escolha produtos', desc: 'Acesse nosso catálogo exclusivo para droppers com preços especiais e selecione o que vai divulgar.' },
-  { icon: '💰', title: 'Venda e suba de nível', desc: 'Cada venda acumula pontos. Quanto mais você vende, maior o seu nível e maior o desconto.' },
+  { title: 'Criação da Conta', desc: 'Registro na plataforma Go Drop com foco em dados corporativos.' },
+  { title: 'Homologação de CNPJ', desc: 'Validação fiscal automática e imediata pela nossa API.' },
+  { title: 'Seleção de Portfólio', desc: 'Acesso ao catálogo de produtos com preço de custo para revenda.' },
+  { title: 'Operação e Escala', desc: 'Venda para seus clientes; nós cuidamos da separação, embalagem e envio.' },
 ]
 
 const tiers = [
   {
-    key: 'bronze', name: 'Bronze', emoji: '🥉', discount: 5, threshold: 'R$ 0',
+    key: 'bronze', name: 'Bronze', color: '#B08D57', bg: 'rgba(176, 141, 87, 0.1)', discount: 5, threshold: 'R$ 0',
     featured: false,
-    perks: ['5% de desconto em compras', 'Acesso ao catálogo dropper', 'Suporte por e-mail']
+    perks: ['Desconto base ativo', 'Acesso ao catálogo atacadista', 'Suporte ticket standard']
   },
   {
-    key: 'silver', name: 'Silver', emoji: '🥈', discount: 10, threshold: 'R$ 5.000 em vendas',
+    key: 'silver', name: 'Silver', color: '#9CA3AF', bg: 'rgba(156, 163, 175, 0.1)', discount: 10, threshold: 'R$ 5.000',
     featured: false,
-    perks: ['10% de desconto em compras', 'Badge verificado no perfil', 'Suporte prioritário', 'Relatórios de vendas']
+    perks: ['Selo de parceiro verificado', 'Suporte prioritário (SLA 12h)', 'Dashboard analítico avançado']
   },
   {
-    key: 'gold', name: 'Gold', emoji: '🥇', discount: 15, threshold: 'R$ 20.000 em vendas',
+    key: 'gold', name: 'Gold', color: '#FBBF24', bg: 'rgba(251, 191, 36, 0.1)', discount: 15, threshold: 'R$ 20.000',
     featured: true,
-    perks: ['15% de desconto em compras', 'Acesso antecipado a lançamentos', 'Canal exclusivo no WhatsApp', 'Comissão extra em produtos parceiros']
+    perks: ['Acesso early-bird a estoques', 'Canal direto no WhatsApp', 'Comissionamento em cross-sell']
   },
   {
-    key: 'platinum', name: 'Platinum', emoji: '🔷', discount: 22, threshold: 'R$ 60.000 em vendas',
+    key: 'platinum', name: 'Platinum', color: '#60A5FA', bg: 'rgba(96, 165, 250, 0.1)', discount: 22, threshold: 'R$ 60.000',
     featured: false,
-    perks: ['22% de desconto em compras', 'Gerente de contas dedicado', 'Personalização de marca', 'Acesso à API de estoque']
+    perks: ['Account Manager dedicado', 'White-label nas embalagens', 'Integração via API REST']
   },
   {
-    key: 'diamond', name: 'Diamond', emoji: '💎', discount: 30, threshold: 'R$ 150.000 em vendas',
+    key: 'diamond', name: 'Diamond', color: '#A78BFA', bg: 'rgba(167, 139, 250, 0.1)', discount: 30, threshold: 'R$ 150.000',
     featured: false,
-    perks: ['30% de desconto em compras', 'Condições negociadas caso a caso', 'Treinamentos e eventos exclusivos', 'Co-marketing disponível']
+    perks: ['Condições B2B customizadas', 'Participação no conselho parceiro', 'Fundo de Co-marketing']
   },
 ]
 
-const benefits = [
-  { icon: '📦', title: 'Zero estoque', desc: 'Você divulga, a Go Drop separa e envia diretamente para o seu cliente final.' },
-  { icon: '🔄', title: 'Sincronização de estoque', desc: 'Estoque atualizado em tempo real. Sem risco de vender produto fora de estoque.' },
-  { icon: '📊', title: 'Dashboard completo', desc: 'Acompanhe suas vendas, comissões e progresso de nível em um painel exclusivo.' },
-  { icon: '🚀', title: 'Rastreio automático', desc: 'Seus clientes recebem atualizações de entrega automaticamente, sem precisar te perguntar.' },
-  { icon: '💳', title: 'Descontos reais', desc: 'Quanto mais você vende, mais barato fica para você comprar. Desconto real, na prática.' },
-  { icon: '🤝', title: 'Suporte dedicado', desc: 'A partir do nível Silver você tem suporte prioritário para resolver tudo rápido.' },
-]
-
-const requirements = [
-  'CNPJ ativo e em situação regular',
-  'Conta Go Drop cadastrada',
-  'E-mail verificado',
-]
-
-const faqs = [
-  { q: 'Precisa ter estoque?', a: 'Não! Você vende como se fosse sua loja, mas quem armazena e envia é a Go Drop. Você só precisa divulgar.' },
-  { q: 'Como funciona o desconto?', a: 'A cada compra de produto para revenda, o sistema aplica automaticamente o desconto do seu nível atual.' },
-  { q: 'Quando o nível muda?', a: 'O nível é recalculado todo dia 1° do mês com base nas suas vendas do mês anterior.' },
-  { q: 'Posso me cadastrar sendo MEI?', a: 'Sim! Aceitamos MEI e demais tipos de CNPJ, desde que estejam ativos na Receita Federal.' },
-  { q: 'O cadastro é gratuito?', a: 'Totalmente gratuito. Sem mensalidade, sem taxa de adesão. Você só paga pelos produtos que comprar.' },
-  { q: 'Como rastrear minhas vendas?', a: 'Após ativar o cadastro, você terá acesso a um dashboard exclusivo com todos os seus dados em tempo real.' },
+const benefitsCompact = [
+  { title: 'Zero investimento em infra', desc: 'Armazenamento, picking e packing por nossa conta.' },
+  { title: 'Rastreabilidade B2B', desc: 'Logística transparente para você e seu cliente final.' },
+  { title: 'Integração tecnológica', desc: 'Sincronização de estoque contra quebras de venda.' },
 ]
 
 const scrollToForm = () => formSection.value?.scrollIntoView({ behavior: 'smooth' })
@@ -418,20 +389,12 @@ const validateCNPJ = (value) => {
   const nums = value.replace(/\D/g, '')
   if (nums.length !== 14) { cnpjStatus.value = 'invalid'; return }
   if (/^(\d)\1+$/.test(nums)) { cnpjStatus.value = 'invalid'; cnpjError.value = 'CNPJ inválido'; return }
-  // Basic digit validation
-  let sum = 0
-  let pos = 5
-  for (let i = 0; i < 12; i++) {
-    sum += parseInt(nums[i]) * pos--
-    if (pos < 2) pos = 9
-  }
+  let sum = 0, pos = 5
+  for (let i = 0; i < 12; i++) { sum += parseInt(nums[i]) * pos--; if (pos < 2) pos = 9 }
   let r = sum % 11 < 2 ? 0 : 11 - (sum % 11)
   if (r !== parseInt(nums[12])) { cnpjStatus.value = 'invalid'; cnpjError.value = 'CNPJ inválido'; return }
   sum = 0; pos = 6
-  for (let i = 0; i < 13; i++) {
-    sum += parseInt(nums[i]) * pos--
-    if (pos < 2) pos = 9
-  }
+  for (let i = 0; i < 13; i++) { sum += parseInt(nums[i]) * pos--; if (pos < 2) pos = 9 }
   r = sum % 11 < 2 ? 0 : 11 - (sum % 11)
   if (r !== parseInt(nums[13])) { cnpjStatus.value = 'invalid'; cnpjError.value = 'CNPJ inválido'; return }
   cnpjStatus.value = 'valid'
@@ -449,7 +412,7 @@ const handleSubmit = async () => {
     })
     submitted.value = true
   } catch (err) {
-    cnpjError.value = 'Erro ao enviar. Tente novamente.'
+    cnpjError.value = 'Erro de comunicação com o servidor.'
   } finally {
     loading.value = false
   }
@@ -457,64 +420,82 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 .dropper-page {
-  --c-bg: #09090B;
-  --c-surface: #111113;
-  --c-border: #1E1E22;
+  --c-bg: #050505;
+  --c-surface: #121212;
+  --c-surface-hover: #1A1A1A;
+  --c-border: rgba(255, 255, 255, 0.1);
+  --c-border-strong: rgba(255, 255, 255, 0.2);
   --c-text: #FAFAFA;
   --c-muted: #A1A1AA;
-  --c-accent: #22D3EE;
-  --c-accent2: #818CF8;
-  --c-gold: #F59E0B;
-  --c-green: #10B981;
-  font-family: 'Manrope', sans-serif;
+  --c-primary: #3B82F6;
+  --c-primary-hover: #2563EB;
+  --c-primary-light: #60A5FA;
+  --c-success: #10B981;
+  --c-error: #EF4444;
+
+  font-family: 'Inter', sans-serif;
   background: var(--c-bg);
   color: var(--c-text);
   min-height: 100vh;
   overflow-x: hidden;
+  line-height: 1.5;
 }
 
+h1, h2, h3, h4, .font-display {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* --- HERO SECTION --- */
 .hero {
   position: relative;
   min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas: "nav nav" "content visual";
-  padding: 0 60px 80px;
-  gap: 0 40px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
   overflow: hidden;
 }
 
-.hero-noise {
+.hero-grid-bg {
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  opacity: 0.4;
+  background-image:
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
   pointer-events: none;
 }
 
 .hero-glow {
   position: absolute;
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 70%);
-  top: -200px;
-  right: -100px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+  top: -100px;
+  right: 10%;
   pointer-events: none;
+  filter: blur(40px);
 }
 
 .hero-nav {
-  grid-area: nav;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 32px 0;
+  padding: 24px 48px;
+  position: relative;
+  z-index: 10;
 }
 
-.nav-logo { height: 36px; filter: brightness(0) invert(1); }
+.nav-logo { height: 32px; filter: brightness(0) invert(1); }
 
 .nav-back {
   display: flex;
@@ -523,706 +504,355 @@ const handleSubmit = async () => {
   color: var(--c-muted);
   text-decoration: none;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   transition: color 0.2s;
 }
 .nav-back:hover { color: var(--c-text); }
 
 .hero-content {
-  grid-area: content;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: 20px;
+  padding: 40px 48px;
+  max-width: 650px;
+  position: relative;
+  z-index: 10;
 }
 
 .hero-eyebrow {
+  margin-bottom: 24px;
+}
+
+.eyebrow-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--c-accent);
-  margin-bottom: 28px;
+  padding: 6px 14px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-primary-light);
 }
 
 .eyebrow-dot {
   width: 6px; height: 6px;
-  background: var(--c-accent);
+  background: var(--c-primary-light);
   border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.8); }
+  box-shadow: 0 0 8px var(--c-primary-light);
 }
 
 .hero-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(42px, 5vw, 72px);
+  font-size: clamp(36px, 5vw, 64px);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
   letter-spacing: -0.03em;
-  margin: 0 0 28px;
+  margin: 0 0 24px;
 }
 
 .title-gradient {
-  background: linear-gradient(120deg, var(--c-accent) 0%, var(--c-accent2) 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #A1A1AA 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero-desc {
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: 18px;
   color: var(--c-muted);
-  max-width: 480px;
   margin-bottom: 40px;
+  max-width: 540px;
 }
+.hero-desc strong { color: var(--c-text); font-weight: 600; }
 
 .hero-actions {
   display: flex;
-  gap: 14px;
-  margin-bottom: 56px;
+  gap: 16px;
+  margin-bottom: 60px;
 }
 
 .btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  background: var(--c-accent);
-  color: #09090B;
+  background: var(--c-primary);
+  color: #FFFFFF;
   border: none;
-  border-radius: 12px;
-  padding: 16px 28px;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'Manrope', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-.btn-primary:hover { background: #67E8F9; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(34,211,238,0.25); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  color: var(--c-text);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
-  padding: 16px 28px;
+  border-radius: 8px;
+  padding: 14px 28px;
   font-size: 15px;
   font-weight: 600;
-  font-family: 'Manrope', sans-serif;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
 }
-.btn-ghost:hover { border-color: var(--c-muted); }
+.btn-primary:hover:not(:disabled) {
+  background: var(--c-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary.full-width { width: 100%; }
 
-.hero-trust {
-  display: flex;
+.btn-secondary {
+  display: inline-flex;
   align-items: center;
-  gap: 32px;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: var(--c-border-strong); }
 
-.trust-item { display: flex; flex-direction: column; gap: 2px; }
-.trust-num { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--c-text); }
-.trust-lbl { font-size: 12px; color: var(--c-muted); font-weight: 500; }
-.trust-sep { width: 1px; height: 40px; background: var(--c-border); }
+.hero-trust { display: flex; align-items: center; gap: 32px; }
+.trust-item { display: flex; flex-direction: column; gap: 4px; }
+.trust-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 700; color: var(--c-text); }
+.trust-lbl { font-size: 13px; color: var(--c-muted); }
+.trust-sep { width: 1px; height: 32px; background: var(--c-border); }
 
 .hero-visual {
-  grid-area: visual;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.floating-card {
   position: absolute;
-  background: rgba(17, 17, 19, 0.9);
-  border: 1px solid var(--c-border);
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  width: 500px;
+  z-index: 5;
+  display: none;
+}
+@media (min-width: 1100px) { .hero-visual { display: block; } }
+
+.visual-wrapper { position: relative; width: 100%; height: 500px; }
+
+.glass-panel {
+  background: rgba(18, 18, 18, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
-  padding: 16px 20px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+}
+
+.main-dashboard {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  padding: 24px;
+}
+
+.dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.dash-title { font-size: 14px; font-weight: 500; color: var(--c-muted); }
+.dash-badge { font-size: 12px; font-weight: 600; color: #FBBF24; background: rgba(251, 191, 36, 0.1); padding: 4px 10px; border-radius: 6px; }
+
+.dash-body { display: flex; flex-direction: column; gap: 24px; }
+.dash-stat { display: flex; flex-direction: column; gap: 4px; }
+.stat-lbl { font-size: 13px; color: var(--c-muted); }
+.stat-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 32px; font-weight: 700; }
+.stat-growth { font-size: 13px; color: var(--c-success); font-weight: 500; }
+
+.dash-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; gap: 8px; margin-top: 10px; }
+.chart-bar {
+  flex: 1;
+  background: var(--c-primary);
+  border-radius: 4px 4px 0 0;
+  opacity: 0.8;
+  transform-origin: bottom;
+  animation: growBar 1s ease-out forwards;
+}
+@keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+.floating-stat {
+  position: absolute;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-}
-
-.card-a { top: 15%; left: -20px; animation: floatA 4s ease-in-out infinite; }
-.card-b { top: 50%; right: -10px; transform: translateY(-50%); animation: floatB 5s ease-in-out infinite; }
-.card-c { bottom: 15%; left: 10%; animation: floatC 3.5s ease-in-out infinite; }
-
-@keyframes floatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-@keyframes floatB { 0%,100%{transform:translateY(-50%)} 50%{transform:translateY(calc(-50% - 10px))} }
-@keyframes floatC { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-
-.fc-icon { font-size: 28px; }
-.fc-val { display: block; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--c-text); }
-.fc-lbl { display: block; font-size: 11px; color: var(--c-muted); font-weight: 500; }
-
-.dashboard-mock {
-  width: 280px; height: 180px;
-  background: rgba(17,17,19,0.8);
-  border: 1px solid var(--c-border);
-  border-radius: 20px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  padding: 24px 20px 20px;
-  gap: 8px;
-}
-
-.mock-bar {
-  flex: 1;
-  background: linear-gradient(to top, var(--c-accent), var(--c-accent2));
-  border-radius: 6px 6px 0 0;
-  opacity: 0.7;
-  animation: growBar 1s ease-out forwards;
-  transform-origin: bottom;
-  transform: scaleY(0);
-}
-
-@keyframes growBar {
-  to { transform: scaleY(1); }
-}
-
-section { padding: 100px 60px; }
-
-.section-header {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.section-eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--c-accent);
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(32px, 4vw, 52px);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  margin: 0;
-}
-
-.how { background: var(--c-surface); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); }
-
-.how-steps {
-  display: flex;
-  gap: 0;
-  position: relative;
-}
-
-.step {
-  flex: 1;
-  text-align: center;
-  padding: 0 32px;
-  position: relative;
-}
-
-.step-num {
-  font-family: 'Syne', sans-serif;
-  font-size: 56px;
-  font-weight: 800;
-  color: var(--c-border);
-  line-height: 1;
-  margin-bottom: 20px;
-}
-
-.step-icon {
-  font-size: 36px;
-  margin-bottom: 16px;
-}
-
-.step-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.step-desc {
-  font-size: 14px;
-  color: var(--c-muted);
-  line-height: 1.6;
-}
-
-.step-connector {
-  position: absolute;
-  top: 36px;
-  right: -12px;
-  width: 24px;
-  height: 2px;
-  background: var(--c-border);
-}
-
-.tiers { background: var(--c-bg); }
-
-.tiers-grid {
-  display: flex;
   gap: 16px;
-  align-items: stretch;
+  border-radius: 12px;
 }
+.fs-1 { top: 10%; right: -20px; animation: floatY 6s ease-in-out infinite; }
+.fs-2 { bottom: 15%; left: -40px; animation: floatY 5s ease-in-out infinite reverse; }
+
+@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+.fs-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
+.fs-icon.blue-bg { background: linear-gradient(135deg, var(--c-primary-light), var(--c-primary)); }
+.fs-icon.green-bg { background: linear-gradient(135deg, #34D399, #10B981); }
+.fs-info { display: flex; flex-direction: column; }
+.fs-val { font-weight: 600; font-size: 14px; }
+.fs-lbl { font-size: 12px; color: var(--c-muted); }
+
+
+/* --- SECTIONS GLOBALS --- */
+section { padding: 120px 0; border-top: 1px solid var(--c-border); }
+.section-header { text-align: center; margin-bottom: 72px; }
+.section-eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-primary-light); margin-bottom: 16px; }
+.section-title { font-size: clamp(32px, 4vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+.section-subtitle { font-size: 18px; color: var(--c-muted); max-width: 600px; margin: 0 auto; }
+
+/* --- COMO FUNCIONA --- */
+.how { background: #0A0A0A; }
+.how-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; position: relative; }
+.step-line { position: absolute; top: 24px; left: 50px; right: 50px; height: 1px; background: var(--c-border); z-index: 1; }
+@media (max-width: 900px) { .how-steps { grid-template-columns: 1fr; gap: 48px; } .step-line { display: none; } }
+
+.step { position: relative; z-index: 2; display: flex; flex-direction: column; }
+.step-marker { background: #0A0A0A; padding-right: 16px; display: inline-block; margin-bottom: 24px; align-self: flex-start; }
+.step-num {
+  width: 48px; height: 48px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--c-text);
+}
+.step-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.step-desc { font-size: 14px; color: var(--c-muted); line-height: 1.6; }
+
+/* --- NÍVEIS --- */
+.tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: end; }
 
 .tier-card {
-  flex: 1;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
-  border-radius: 20px;
-  padding: 28px 24px;
-  transition: all 0.2s;
-  position: relative;
-}
-.tier-card:hover { border-color: #333; transform: translateY(-4px); }
-.tier-featured { border-color: var(--c-gold) !important; background: rgba(245,158,11,0.04); transform: scale(1.03); }
-.tier-featured:hover { transform: scale(1.03) translateY(-4px); }
-
-.tier-badge {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.tier-emoji { font-size: 32px; }
-
-.tier-popular-tag {
-  font-size: 10px;
-  font-weight: 700;
-  background: var(--c-gold);
-  color: #09090B;
-  padding: 4px 10px;
-  border-radius: 100px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.tier-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-
-.tier-discount {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-.discount-num { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--c-accent); }
-.discount-pct { font-size: 24px; font-weight: 700; color: var(--c-accent); }
-.discount-lbl { font-size: 14px; color: var(--c-muted); margin-left: 4px; }
-.tier-featured .discount-num, .tier-featured .discount-pct { color: var(--c-gold); }
-
-.tier-threshold {
-  font-size: 12px;
-  color: var(--c-muted);
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--c-border);
-}
-.tier-threshold strong { color: var(--c-text); }
-
-.tier-perks {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tier-perks li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--c-muted);
-}
-
-.tier-perks svg { color: var(--c-green); flex-shrink: 0; margin-top: 2px; }
-
-.tier-note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 32px;
-  padding: 16px 20px;
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
-  font-size: 13px;
-  color: var(--c-muted);
-}
-.tier-note svg { color: var(--c-accent); flex-shrink: 0; }
-
-benefits { background: var(--c-surface); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); }
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.benefit-card {
-  background: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 20px;
-  padding: 32px;
-  transition: all 0.2s;
-}
-.benefit-card:hover { border-color: #333; transform: translateY(-4px); }
-
-.benefit-icon { font-size: 36px; margin-bottom: 20px; }
-.benefit-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-.benefit-desc { font-size: 14px; color: var(--c-muted); line-height: 1.6; }
-
-.form-section { background: var(--c-bg); }
-
-.form-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: start;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.form-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(32px, 3vw, 48px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin-bottom: 20px;
-}
-
-.form-subtitle {
-  font-size: 15px;
-  color: var(--c-muted);
-  line-height: 1.7;
-  margin-bottom: 40px;
-}
-
-.req-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--c-muted);
-  margin-bottom: 16px;
-}
-
-.req-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  color: var(--c-text);
-  margin-bottom: 10px;
-}
-
-.req-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--c-green);
-  flex-shrink: 0;
-}
-
-.signup-form {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 24px;
-  padding: 40px;
-}
-
-.form-not-logged {
-  text-align: center;
-  padding: 20px 0;
-}
-.not-logged-icon { font-size: 48px; margin-bottom: 20px; }
-.form-not-logged h3 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-.form-not-logged p { color: var(--c-muted); font-size: 14px; margin-bottom: 28px; }
-
-.form-user-info {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  background: rgba(34,211,238,0.05);
-  border: 1px solid rgba(34,211,238,0.2);
-  border-radius: 12px;
-  margin-bottom: 28px;
-}
-
-.fui-avatar {
-  width: 44px; height: 44px;
-  background: var(--c-accent);
-  color: #09090B;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.fui-name { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
-.fui-email { font-size: 13px; color: var(--c-muted); }
-
-.already-dropper {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 20px;
-  background: rgba(16,185,129,0.08);
-  border: 1px solid rgba(16,185,129,0.3);
   border-radius: 16px;
-}
-.ad-icon { font-size: 32px; }
-.ad-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; color: var(--c-green); }
-.ad-sub { font-size: 13px; color: var(--c-muted); }
-
-.input-group { margin-bottom: 20px; }
-.input-label { display: block; font-size: 13px; font-weight: 600; color: var(--c-muted); margin-bottom: 8px; letter-spacing: 0.04em; }
-
-.input-wrapper {
+  padding: 32px 24px;
+  transition: all 0.3s ease;
   position: relative;
-  display: flex;
-  align-items: center;
+  display: flex; flex-direction: column;
+}
+.tier-card:hover { transform: translateY(-8px); border-color: var(--c-border-strong); background: var(--c-surface-hover); }
+
+.tier-featured {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(to bottom, rgba(251, 191, 36, 0.03), var(--c-surface));
+  transform: translateY(-16px);
+}
+.tier-featured:hover { transform: translateY(-24px); border-color: rgba(251, 191, 36, 0.6); }
+
+.featured-banner {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: #FBBF24; color: #000; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 4px 12px; border-radius: 100px; white-space: nowrap;
 }
 
-.input-icon {
-  position: absolute;
-  left: 14px;
-  color: #555;
-  pointer-events: none;
+.tier-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.tier-icon-wrapper { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.tier-name { font-size: 20px; font-weight: 700; margin: 0; }
+
+.tier-discount { display: flex; align-items: baseline; gap: 2px; }
+.discount-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 40px; font-weight: 800; color: var(--c-text); }
+.discount-pct { font-size: 20px; font-weight: 700; color: var(--c-muted); }
+.tier-lbl { font-size: 13px; color: var(--c-muted); margin-bottom: 24px; }
+
+.tier-threshold { font-size: 13px; color: var(--c-muted); }
+.tier-threshold strong { color: var(--c-text); font-weight: 600; }
+
+.tier-divider { height: 1px; background: var(--c-border); margin: 24px 0; }
+
+.tier-perks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.tier-perks li { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; color: var(--c-muted); line-height: 1.4; }
+.tier-perks svg { color: var(--c-text); flex-shrink: 0; margin-top: 2px; opacity: 0.7; }
+
+/* --- FORMULÁRIO --- */
+.form-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+@media (max-width: 900px) { .form-wrapper { grid-template-columns: 1fr; gap: 48px; } }
+
+.form-title { font-size: clamp(32px, 4vw, 44px); font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
+.form-subtitle { font-size: 16px; color: var(--c-muted); margin-bottom: 40px; }
+
+.benefits-compact { display: flex; flex-direction: column; gap: 24px; }
+.bc-item { display: flex; gap: 16px; }
+.bc-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--c-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.bc-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.bc-item p { font-size: 14px; color: var(--c-muted); }
+
+.premium-form-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
 }
 
+.form-not-logged { text-align: center; }
+.lock-icon { width: 64px; height: 64px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--c-border); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: var(--c-muted); }
+.form-not-logged h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+.form-not-logged p { font-size: 14px; color: var(--c-muted); margin-bottom: 32px; }
+
+.active-user-badge { display: flex; align-items: center; gap: 16px; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--c-border); border-radius: 12px; margin-bottom: 32px; }
+.aub-avatar { width: 40px; height: 40px; border-radius: 8px; background: var(--c-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+.aub-info { display: flex; flex-direction: column; }
+.aub-name { font-weight: 600; font-size: 14px; }
+.aub-email { font-size: 13px; color: var(--c-muted); }
+
+.already-dropper { text-align: center; padding: 20px 0; }
+.success-ring { width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+.already-dropper h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.already-dropper p { font-size: 14px; color: var(--c-muted); }
+
+.form-fields { display: flex; flex-direction: column; gap: 20px; }
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+.input-label { font-size: 13px; font-weight: 500; color: var(--c-muted); }
+
+.input-wrapper { position: relative; display: flex; align-items: center; }
 .form-input {
   width: 100%;
-  height: 52px;
-  padding: 0 16px 0 46px;
-  background: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 8px;
+  padding: 12px 16px;
   color: var(--c-text);
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
-  font-family: 'Manrope', sans-serif;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.form-input:focus { border-color: var(--c-accent); }
-.form-input::placeholder { color: #444; }
-
-.input-badge {
-  position: absolute;
-  right: 12px;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-.input-badge.valid { background: rgba(16,185,129,0.15); color: var(--c-green); }
-.input-badge.invalid { background: rgba(239,68,68,0.15); color: #F87171; }
-
-.input-error { font-size: 12px; color: #F87171; margin-top: 6px; }
-
-.checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-  margin-bottom: 24px;
-}
-
-.checkbox-input { display: none; }
-
-.checkbox-custom {
-  width: 20px; height: 20px;
-  border: 2px solid var(--c-border);
-  border-radius: 6px;
-  flex-shrink: 0;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px;
 }
+.form-input:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.form-input::placeholder { color: #52525B; }
 
-.checkbox-input:checked + .checkbox-custom {
-  background: var(--c-accent);
-  border-color: var(--c-accent);
-}
-.checkbox-input:checked + .checkbox-custom::after {
-  content: '✓';
-  font-size: 12px;
-  color: #09090B;
-  font-weight: 800;
-}
+.input-status-icon { position: absolute; right: 16px; display: flex; }
+.is-valid .form-input { border-color: var(--c-success); }
+.is-invalid .form-input { border-color: var(--c-error); }
+.input-error { font-size: 12px; color: var(--c-error); margin-top: 4px; }
 
+.checkbox-label { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin: 8px 0 16px; }
+.checkbox-input { display: none; }
+.checkbox-box {
+  width: 20px; height: 20px; border-radius: 6px; border: 1px solid var(--c-border-strong);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(0,0,0,0.2);
+  transition: all 0.2s;
+}
+.checkbox-box svg { opacity: 0; transform: scale(0.5); transition: all 0.2s; }
+.checkbox-input:checked + .checkbox-box { background: var(--c-primary); border-color: var(--c-primary); }
+.checkbox-input:checked + .checkbox-box svg { opacity: 1; transform: scale(1); color: white; }
 .checkbox-text { font-size: 13px; color: var(--c-muted); line-height: 1.5; }
-.link { color: var(--c-accent); text-decoration: none; }
+.checkbox-text a { color: var(--c-text); text-decoration: underline; }
 
-.btn-submit { width: 100%; justify-content: center; height: 56px; font-size: 16px; }
-
-.loading-spinner {
-  width: 18px; height: 18px;
-  border: 2px solid rgba(9,9,11,0.3);
-  border-top-color: #09090B;
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Success state */
-.form-success {
-  background: var(--c-surface);
-  border: 1px solid rgba(16,185,129,0.3);
-  border-radius: 24px;
-  padding: 48px 40px;
-  text-align: center;
-}
-
-.success-icon { font-size: 64px; margin-bottom: 24px; }
-.success-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 12px; }
-.success-desc { font-size: 15px; color: var(--c-muted); line-height: 1.6; margin-bottom: 32px; }
-
-.success-details {
-  background: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 16px;
-  padding: 20px 24px;
-}
-
-.sd-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  font-size: 14px;
-}
-.sd-row:not(:last-child) { border-bottom: 1px solid var(--c-border); }
-.sd-row span { color: var(--c-muted); }
-.sd-row strong { color: var(--c-text); }
-
-.faq { background: var(--c-surface); border-top: 1px solid var(--c-border); }
-
-.faq-list {
-  max-width: 800px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.faq-item {
-  background: var(--c-bg);
-  border: 1px solid var(--c-border);
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-.faq-item:hover, .faq-item.open { border-color: #333; }
-.faq-item.open { border-color: rgba(34,211,238,0.3); }
-
-.faq-question {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.faq-arrow {
-  flex-shrink: 0;
-  transition: transform 0.3s;
-  color: var(--c-muted);
-}
-.faq-item.open .faq-arrow { transform: rotate(180deg); color: var(--c-accent); }
-
-.faq-answer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.3s;
-  font-size: 14px;
-  color: var(--c-muted);
-  line-height: 1.7;
-  padding: 0 24px;
-}
-.faq-item.open .faq-answer {
-  max-height: 200px;
-  padding: 0 24px 20px;
-}
-
-.cta-final {
-  background: linear-gradient(135deg, rgba(34,211,238,0.08) 0%, rgba(129,140,248,0.08) 100%);
-  border-top: 1px solid var(--c-border);
-  text-align: center;
-  padding: 100px 60px;
-}
-
-.cta-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(36px, 4vw, 56px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 20px;
-}
-
-.cta-desc {
-  font-size: 17px;
-  color: var(--c-muted);
-  margin-bottom: 40px;
-}
-
-.btn-large {
-  height: 64px;
-  padding: 0 48px;
-  font-size: 17px;
-  border-radius: 16px;
-}
-
-@media (max-width: 1100px) {
-  .hero { grid-template-columns: 1fr; grid-template-areas: "nav" "content"; padding: 0 40px 60px; }
-  .hero-visual { display: none; }
-  .tiers-grid { flex-wrap: wrap; }
-  .tier-card { min-width: calc(50% - 8px); }
-  .tier-featured { transform: none; }
-  .benefits-grid { grid-template-columns: repeat(2, 1fr); }
-  .form-wrapper { grid-template-columns: 1fr; gap: 40px; }
-}
-
-@media (max-width: 768px) {
-  section { padding: 60px 24px; }
-  .hero { padding: 0 24px 60px; }
-  .hero-actions { flex-direction: column; }
-  .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
-  .how-steps { flex-direction: column; gap: 32px; }
-  .step-connector { display: none; }
-  .tier-card { min-width: 100%; }
-  .benefits-grid { grid-template-columns: 1fr; }
-  .hero-trust { flex-wrap: wrap; gap: 20px; }
-}
+/* FORM SUCCESS STATE */
+.form-success { text-align: center; }
+.success-shield { width: 72px; height: 72px; border-radius: 20px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--c-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+.success-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+.success-desc { font-size: 14px; color: var(--c-muted); margin-bottom: 32px; }
+.success-card { background: rgba(0,0,0,0.3); border: 1px solid var(--c-border); border-radius: 12px; padding: 20px; margin-bottom: 32px; display: flex; flex-direction: column; gap: 16px; }
+.sc-row { display: flex; justify-content: space-between; align-items: center; }
+.sc-lbl { font-size: 13px; color: var(--c-muted); }
+.sc-val { font-size: 14px; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;}
+.bronze-text { color: #B08D57; }
 </style>

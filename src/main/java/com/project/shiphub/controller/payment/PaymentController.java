@@ -4,6 +4,7 @@ import com.project.shiphub.dto.payment.CreatePaymentRequest;
 import com.project.shiphub.dto.payment.PaymentResponse;
 import com.project.shiphub.model.auth.User;
 import com.project.shiphub.model.order.Order;
+import com.project.shiphub.service.auth.DropperService;
 import com.project.shiphub.service.order.OrderService;
 import com.project.shiphub.service.payment.StripePaymentService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -23,6 +25,7 @@ public class PaymentController {
 
     private final StripePaymentService stripePaymentService;
     private final OrderService orderService;
+    private final DropperService dropperService;
 
     @PostMapping("/create")
     public ResponseEntity<PaymentResponse> createPayment(
@@ -33,6 +36,21 @@ public class PaymentController {
 
         try {
             User user = (User) authentication.getPrincipal();
+
+            int discount = dropperService.getDiscount(user.getId());
+            long originalAmount = request.getAmountInCents();
+                if (discount > 0) {
+                   BigDecimal amount = new BigDecimal(request.getAmountInCents());
+                   BigDecimal discountPercent = new BigDecimal(discount);
+
+                   BigDecimal discountRank = amount
+                           .multiply(discountPercent)
+                           .divide(new BigDecimal(100), 0, RoundingMode.HALF_UP);
+                    BigDecimal finalAmount = amount.subtract(discountRank);
+
+                    request.setAmountInCents(finalAmount.longValue());
+                    log.info("Desconto dropper de {}% aplicado. De {} Para {}", discount,  originalAmount, finalAmount);
+                }
 
             BigDecimal total = BigDecimal.valueOf(request.getAmountInCents()).divide(new BigDecimal(100));
 

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -101,5 +102,31 @@ public class DropperServiceImp implements DropperService {
                     case DIAMOND  -> 30;
                 })
                 .orElse(0);
+    }
+
+    @Override
+    public DropperProfileDTO updateSalesAndLevel(Long userId, BigDecimal amount) {
+      DropperProfile profile = dropperProfileRepository.findByUserId(userId)
+              .orElseThrow(() -> new RuntimeException("Perfil dropper não encontrado"));
+      BigDecimal totalSales = profile.getTotalSales();
+      profile.setTotalSales(totalSales.add(amount));
+
+      BigDecimal newTotalSales = profile.getTotalSales();
+
+      if (newTotalSales.compareTo(new BigDecimal("150000")) >= 0) {
+          profile.setLevel(DropperLevel.DIAMOND);
+      } else if (newTotalSales.compareTo(new BigDecimal("60000")) >= 0 ) {
+          profile.setLevel(DropperLevel.PLATINUM);
+      } else if (newTotalSales.compareTo(new BigDecimal("20000")) >= 0 ) {
+          profile.setLevel(DropperLevel.GOLD);
+      }else if (newTotalSales.compareTo(new BigDecimal("5000")) >= 0 ) {
+          profile.setLevel(DropperLevel.SILVER);
+      }else {
+          profile.setLevel(DropperLevel.BRONZE);
+      }
+        dropperProfileRepository.save(profile);
+
+      return new DropperProfileDTO(profile);
+
     }
 }
