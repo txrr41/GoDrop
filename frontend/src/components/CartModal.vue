@@ -69,7 +69,13 @@
                   </button>
                 </div>
                 <div class="p-pricing">
-                  <span class="total-p">{{ formatCurrency(item.preco * item.quantity) }}</span>
+                  <!-- Se tem desconto dropper, mostra preço original riscado -->
+                  <span v-if="cartStore.hasDropperDiscount" class="original-price">
+                    {{ formatCurrency(item.preco * item.quantity) }}
+                  </span>
+                  <span class="total-p" :class="{ 'discounted': cartStore.hasDropperDiscount }">
+                    {{ formatCurrency(itemFinalPrice(item)) }}
+                  </span>
                 </div>
               </div>
 
@@ -87,6 +93,20 @@
       </main>
 
       <footer v-if="items.length > 0" class="cart-footer">
+
+        <!-- Badge de nível dropper -->
+        <div v-if="cartStore.hasDropperDiscount" class="dropper-badge">
+          <div class="dropper-badge-inner">
+            <v-icon size="16" color="#7C3AED">mdi-crown</v-icon>
+            <span class="dropper-level-text">
+              Nível {{ cartStore.dropperLevel }}
+            </span>
+            <span class="dropper-discount-text">
+              {{ cartStore.dropperDiscount }}% de desconto aplicado
+            </span>
+          </div>
+        </div>
+
         <div class="shipping-section">
           <div class="section-label">
             <v-icon size="16" class="mr-1">mdi-truck-outline</v-icon>
@@ -113,7 +133,9 @@
 
         <div class="free-shipping-progress">
           <div class="progress-info">
-            <span v-if="subtotal < 199">Faltam <strong>{{ formatCurrency(199 - subtotal) }}</strong> para frete grátis</span>
+            <span v-if="cartStore.subtotalWithDropperDiscount < 199">
+              Faltam <strong>{{ formatCurrency(199 - cartStore.subtotalWithDropperDiscount) }}</strong> para frete grátis
+            </span>
             <span v-else class="success-text">Você ganhou frete grátis!</span>
           </div>
           <div class="progress-track">
@@ -126,10 +148,20 @@
             <span>Subtotal</span>
             <span>{{ formatCurrency(subtotal) }}</span>
           </div>
+
+          <!-- Linha de desconto dropper -->
+          <div v-if="cartStore.hasDropperDiscount" class="summary-line discount-line">
+            <span class="discount-label">
+              <v-icon size="14" color="#7C3AED" class="mr-1">mdi-crown</v-icon>
+              Desconto {{ cartStore.dropperLevel }} ({{ cartStore.dropperDiscount }}%)
+            </span>
+            <span class="discount-value">- {{ formatCurrency(cartStore.dropperDiscountAmount) }}</span>
+          </div>
+
           <div class="summary-line">
             <span>Frete</span>
-            <span :class="{'free-text': subtotal >= 199}">
-              {{ subtotal >= 199 ? 'Grátis' : (shippingCalculated ? formatCurrency(shippingCost) : '--') }}
+            <span :class="{'free-text': cartStore.subtotalWithDropperDiscount >= 199}">
+              {{ cartStore.subtotalWithDropperDiscount >= 199 ? 'Grátis' : (shippingCalculated ? formatCurrency(shippingCost) : '--') }}
             </span>
           </div>
           <v-divider class="my-3" />
@@ -163,12 +195,15 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useCartStore } from '../stores/cart'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   items: { type: Array, default: () => [] }
 })
-defineEmits(['update:modelValue', 'updateQuantity', 'removeItem', 'checkout']);
+defineEmits(['update:modelValue', 'updateQuantity', 'removeItem', 'checkout'])
+
+const cartStore = useCartStore()
 
 const zipCode = ref('')
 const shippingCost = ref(0)
@@ -181,13 +216,20 @@ const subtotal = computed(() => {
 })
 
 const freeShippingProgress = computed(() => {
-  return Math.min((subtotal.value / 199) * 100, 100)
+  return Math.min((cartStore.subtotalWithDropperDiscount / 199) * 100, 100)
 })
 
 const total = computed(() => {
-  const shipping = subtotal.value >= 199 ? 0 : shippingCost.value
-  return subtotal.value + shipping
+  const shipping = cartStore.subtotalWithDropperDiscount >= 199 ? 0 : shippingCost.value
+  return cartStore.subtotalWithDropperDiscount - (cartStore.couponDiscount || 0) + shipping
 })
+
+// Preço de cada item já com desconto dropper aplicado
+const itemFinalPrice = (item) => {
+  const base = item.preco * item.quantity
+  if (!cartStore.hasDropperDiscount) return base
+  return base * (1 - cartStore.dropperDiscount / 100)
+}
 
 const formatCurrency = (value) => {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -353,16 +395,64 @@ const calculateShipping = () => {
   color: #1E293B;
 }
 
+.p-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.original-price {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94A3B8;
+  text-decoration: line-through;
+}
+
 .total-p {
   font-weight: 800;
   color: #0F172A;
   font-size: 16px;
 }
 
+.total-p.discounted {
+  color: #7C3AED;
+}
+
 .remove-p-btn {
   position: absolute;
   top: 0;
   right: -8px;
+}
+
+/* DROPPER BADGE */
+.dropper-badge {
+  margin-bottom: 16px;
+}
+
+.dropper-badge-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #F5F3FF, #EDE9FE);
+  border: 1.5px solid #DDD6FE;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.dropper-level-text {
+  font-size: 12px;
+  font-weight: 800;
+  color: #7C3AED;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dropper-discount-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6D28D9;
+  margin-left: auto;
 }
 
 /* FOOTER SECTION */
@@ -457,10 +547,31 @@ const calculateShipping = () => {
 .summary-line {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 14px;
   font-weight: 600;
   color: #64748B;
   margin-bottom: 8px;
+}
+
+.discount-line {
+  background: #F5F3FF;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
+
+.discount-label {
+  display: flex;
+  align-items: center;
+  color: #7C3AED;
+  font-size: 13px;
+}
+
+.discount-value {
+  color: #7C3AED;
+  font-weight: 800;
+  font-size: 14px;
 }
 
 .free-text {

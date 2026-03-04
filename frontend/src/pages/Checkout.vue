@@ -223,24 +223,42 @@
               <v-divider class="my-4"/>
 
               <div class="summary-totals-v2">
+                <!-- Subtotal bruto -->
                 <div class="total-row">
                   <span>Subtotal</span>
                   <span>{{ formatCurrency(cartStore.subtotal) }}</span>
                 </div>
+
+                <!-- Desconto dropper -->
+                <div v-if="cartStore.hasDropperDiscount" class="total-row dropper-discount-row">
+                  <span class="dropper-row-label">
+                    <v-icon size="14" color="#7C3AED" class="mr-1">mdi-crown</v-icon>
+                    Desconto {{ cartStore.dropperLevel }} ({{ cartStore.dropperDiscount }}%)
+                  </span>
+                  <span class="dropper-row-value">- {{ formatCurrency(cartStore.dropperDiscountAmount) }}</span>
+                </div>
+
+                <!-- Entrega -->
                 <div class="total-row">
                   <span>Entrega Estimada</span>
                   <span class="text-success font-weight-bold">Grátis</span>
                 </div>
+
+                <!-- Desconto PIX -->
                 <div v-if="formData.pagamento === 'PIX'" class="total-row discount">
                   <span>Desconto PIX (5%)</span>
-                  <span>- {{ formatCurrency(cartStore.subtotal * 0.05) }}</span>
+                  <span>- {{ formatCurrency(baseTotal * 0.05) }}</span>
                 </div>
 
-                <div class="grand-total-box mt-6">
+                <!-- Badge nível dropper -->
+                <div v-if="cartStore.hasDropperDiscount" class="dropper-level-badge mt-3 mb-2">
+                  <v-icon size="16" color="#7C3AED">mdi-crown</v-icon>
+                  <span>Benefício nível {{ cartStore.dropperLevel }} aplicado</span>
+                </div>
+
+                <div class="grand-total-box mt-4">
                   <span class="total-label">Total a pagar</span>
-                  <span class="total-value">{{
-                      formatCurrency(formData.pagamento === 'PIX' ? cartStore.total * 0.95 : cartStore.total)
-                    }}</span>
+                  <span class="total-value">{{ formatCurrency(finalTotal) }}</span>
                 </div>
               </div>
 
@@ -301,6 +319,19 @@ const rules = {
   required: v => !!v || 'Campo obrigatório',
   email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'E-mail inválido'
 }
+
+// Total base já com desconto dropper (sem PIX)
+const baseTotal = computed(() => cartStore.total)
+
+// Total final considerando PIX também
+const finalTotal = computed(() => {
+  return formData.pagamento === 'PIX'
+      ? baseTotal.value * 0.95
+      : baseTotal.value
+})
+
+// Valor em centavos para enviar ao backend
+const amountInCents = computed(() => Math.round(finalTotal.value * 100))
 
 const formatTelefone = (e) => {
   const val = String(e.target.value || '')
@@ -367,9 +398,16 @@ const initializeStripe = async () => {
   }, 500)
 }
 
-onMounted(() => {
-  if (cartStore.totalItems === 0) router.push('/produtos')
-  else initializeStripe()
+onMounted(async () => {
+  if (cartStore.totalItems === 0) {
+    router.push('/produtos')
+    return
+  }
+  // Busca desconto dropper ao entrar no checkout (caso não tenha sido buscado antes)
+  if (!cartStore.hasDropperDiscount && !cartStore.loadingDiscount) {
+    await cartStore.fetchDropperDiscount()
+  }
+  initializeStripe()
 })
 
 const showSnackbar = (m, c) => {
@@ -392,7 +430,9 @@ const finalizarCompra = async () => {
 
     const paymentData = {
       paymentMethod: formData.pagamento,
-      amountInCents: Math.round(cartStore.total * 100),
+      // Envia o valor JÁ COM desconto dropper aplicado no front
+      // O backend também vai aplicar, mas o front mostra o valor correto
+      amountInCents: amountInCents.value,
       customerEmail: formData.email,
       buyerName: formData.nome,
       buyerEmail: formData.email,
@@ -429,7 +469,7 @@ const finalizarCompra = async () => {
           path: '/payment-success',
           query: {
             orderId: result.paymentIntent?.metadata?.order_id || 'N/A',
-            amount: cartStore.total,
+            amount: finalTotal.value,
             email: formData.email,
             method: formData.pagamento
           }
@@ -439,61 +479,53 @@ const finalizarCompra = async () => {
           path: '/payment-failed',
           query: {
             message: result.error || 'Erro ao processar pagamento',
-            amount: cartStore.total,
+            amount: finalTotal.value,
             errorCode: 'PAY_' + Date.now()
           }
         })
       }
     } else if (formData.pagamento === 'PIX') {
-      // Processamento PIX - Modo de teste com dados falsos
-      console.log('📱 Processando pagamento PIX (Modo Teste)...')
-
-      // Dados falsos para teste
       const orderId = 'PED' + Date.now()
       const pixQrCode = '00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-4266141740005204000053039865406100.005802BR5913GoDropTest6009SaoPaulo62070503***6304A2B3'
-      const pixCopyPaste = '00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-4266141740005204000053039865406100.005802BR5913GoDropTest6009SaoPaulo62070503***6304A2B3'
+      const pixCopyPaste = pixQrCode
 
       cartStore.clearCart()
       router.push({
         path: '/payment-success',
         query: {
-          orderId: orderId,
-          amount: cartStore.total,
+          orderId,
+          amount: finalTotal.value,
           email: formData.email,
           method: formData.pagamento,
-          pixQrCode: pixQrCode,
-          pixCopyPaste: pixCopyPaste
+          pixQrCode,
+          pixCopyPaste
         }
       })
     } else if (formData.pagamento === 'BOLETO') {
-  // Processamento Boleto - Modo de teste com dados falsos
-  console.log('📄 Processando pagamento Boleto (Modo Teste)...')
+      const orderId = 'PED' + Date.now()
+      const boletoBarcode = '12345.67890 12345.678901 12345.678906 1 23456789000001'
+      const boletoDueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')
 
-  // Dados falsos para teste
-  const orderId = 'PED' + Date.now()
-  const boletoBarcode = '12345.67890 12345.678901 12345.678906 1 23456789000001'
-  const boletoDueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')
-
-  cartStore.clearCart()
-  router.push({
-    path: '/payment-success',
-    query: {
-      orderId: orderId,
-      amount: cartStore.subtotal,
-      email: formData.email,
-      method: formData.pagamento,
-      boletoBarcode: boletoBarcode,
-      boletoDueDate: boletoDueDate
+      cartStore.clearCart()
+      router.push({
+        path: '/payment-success',
+        query: {
+          orderId,
+          amount: finalTotal.value,
+          email: formData.email,
+          method: formData.pagamento,
+          boletoBarcode,
+          boletoDueDate
+        }
+      })
     }
-  })
-}
   } catch (e) {
     console.error('❌ Erro:', e)
     await router.push({
       path: '/payment-failed',
       query: {
         message: 'Erro ao processar pedido. Tente novamente.',
-        amount: cartStore.total,
+        amount: finalTotal.value,
         errorCode: 'SYS_' + Date.now()
       }
     })
@@ -517,7 +549,6 @@ watch(() => formData.pagamento, (val) => {
   color: #1E293B;
 }
 
-/* NAVBAR */
 .checkout-nav {
   background: white;
   border-bottom: 1px solid #F1F5F9;
@@ -536,7 +567,6 @@ watch(() => formData.pagamento, (val) => {
   letter-spacing: -0.5px;
 }
 
-/* STEPPER */
 .steps-indicator {
   display: flex;
   justify-content: center;
@@ -553,9 +583,7 @@ watch(() => formData.pagamento, (val) => {
   transition: all 0.3s;
 }
 
-.step-item.active {
-  opacity: 1;
-}
+.step-item.active { opacity: 1; }
 
 .step-number {
   width: 32px;
@@ -587,7 +615,6 @@ watch(() => formData.pagamento, (val) => {
   margin-left: 20px;
 }
 
-/* SEÇÕES */
 .checkout-section {
   background: white;
   border: 1px solid #F1F5F9;
@@ -612,7 +639,6 @@ watch(() => formData.pagamento, (val) => {
   color: #0F172A;
 }
 
-/* PAYMENT OPTIONS */
 .payment-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -670,7 +696,6 @@ watch(() => formData.pagamento, (val) => {
   border-radius: 12px;
 }
 
-/* SUMMARY SIDEBAR */
 .order-summary-sticky {
   position: sticky;
   top: 32px;
@@ -742,14 +767,47 @@ watch(() => formData.pagamento, (val) => {
 .summary-totals-v2 .total-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
   font-size: 14px;
   font-weight: 600;
   color: #64748B;
 }
 
-.total-row.discount span {
-  color: #059669;
+.total-row.discount span { color: #059669; }
+
+/* Dropper discount row no checkout */
+.dropper-discount-row {
+  background: #F5F3FF;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.dropper-row-label {
+  display: flex;
+  align-items: center;
+  color: #7C3AED;
+  font-size: 13px;
+}
+
+.dropper-row-value {
+  color: #7C3AED;
+  font-weight: 800;
+}
+
+/* Badge nível dropper no checkout */
+.dropper-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #F5F3FF, #EDE9FE);
+  border: 1px solid #DDD6FE;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7C3AED;
 }
 
 .grand-total-box {
@@ -793,16 +851,8 @@ watch(() => formData.pagamento, (val) => {
 }
 
 @media (max-width: 960px) {
-  .payment-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .steps-indicator {
-    gap: 10px;
-  }
-
-  .step-line {
-    display: none;
-  }
+  .payment-grid { grid-template-columns: 1fr; }
+  .steps-indicator { gap: 10px; }
+  .step-line { display: none; }
 }
 </style>
