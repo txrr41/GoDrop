@@ -13,6 +13,7 @@ import ApiDocumentation from '../pages/ApiDocumentation.vue'
 import Dashboard from "../pages/Dashboard.vue";
 import BeDropper from "../pages/BeDropper.vue";
 import UserProfile from "../pages/UserProfile.vue";
+import AcceptDroppers from "../pages/AcceptDroppers.vue";
 
 async function permissionGuard(to, _from, next) {
     // Lazy import do store (evita problemas de inicialização)
@@ -149,7 +150,12 @@ const routes = [
     {
         path: '/perfil',
         component: UserProfile,
-    }
+    },
+    {
+        path: '/pedidos/droppers',
+        component: MainLayout,
+        children: [{path: '', component: AcceptDroppers}],
+    },
 
 ]
 

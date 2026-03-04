@@ -303,9 +303,11 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth' // Mantenha seus imports reais
 import LogoDrop from '../assets/LogoDrop.png' // Mantenha seus imports reais
-import api from "../api/api.js"; // Mantenha seus imports reais
+import api from "../api/api.js";
+import {useDropperStore} from "../stores/dropper.js";// Mantenha seus imports reais
 
 const auth = useAuthStore()
+const dropperStore = useDropperStore()
 
 const cnpj = ref('')
 const storeName = ref('')
@@ -410,9 +412,15 @@ const handleSubmit = async () => {
       storeName: storeName.value,
       whatsapp: whatsapp.value
     })
+
+    // ✅ Busca o usuário atualizado (agora com role: DROPPER)
+    await auth.fetchUser()
+    // ✅ Carrega o perfil dropper (level BRONZE, cnpj, etc)
+    await dropperStore.fetchProfile()
+
     submitted.value = true
   } catch (err) {
-    cnpjError.value = 'Erro de comunicação com o servidor.'
+    cnpjError.value = err.response?.data?.message || 'Erro ao processar cadastro.'
   } finally {
     loading.value = false
   }

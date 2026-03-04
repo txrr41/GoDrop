@@ -1,351 +1,243 @@
 <template>
-  <div class="offers-page">
-    <header class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <div class="title-icon-wrapper">
-            <v-icon color="deep-purple-accent-3" size="32">mdi-tag-heart</v-icon>
-          </div>
-          <div class="title-text-group">
-            <h1>Gerenciar Ofertas</h1>
-            <p>Configure ofertas agendadas e descontos automáticos</p>
-          </div>
-        </div>
-        <v-btn
-            color="deep-purple-accent-3"
-            elevation="0"
-            class="action-btn"
-            @click="openOfferModal()"
-        >
-          <v-icon start>mdi-plus</v-icon>
-          Nova Oferta
-        </v-btn>
+  <div class="page-root">
+
+    <header class="page-topbar">
+      <div class="tb-left">
+        <p class="tb-breadcrumb">Admin <span class="sep">/</span> <span class="current">Ofertas</span></p>
+        <h1 class="tb-title">Gerenciar Ofertas</h1>
       </div>
+      <button class="tb-btn-primary" @click="openOfferModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Nova Oferta
+      </button>
     </header>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card scheduled">
-        <div class="stat-icon">
-          <v-icon>mdi-clock-outline</v-icon>
-        </div>
-        <div class="stat-info">
-          <span class="stat-label">Agendadas</span>
-          <span class="stat-value">{{ scheduledOffers.length }}</span>
+    <section class="kpi-strip">
+      <div class="kpi-tile">
+        <div class="kpi-head"><span class="kpi-label">Agendadas</span><span class="kpi-dot dot-blue"></span></div>
+        <p class="kpi-val">{{ scheduledOffers.length }}</p>
+        <p class="kpi-sub">Aguardando início</p>
+      </div>
+      <div class="kpi-div"></div>
+      <div class="kpi-tile">
+        <div class="kpi-head"><span class="kpi-label">Ativas Agora</span><span class="kpi-dot dot-green"></span></div>
+        <p class="kpi-val">{{ activeOffers.length }}</p>
+        <p class="kpi-sub">Descontos aplicados</p>
+      </div>
+      <div class="kpi-div"></div>
+      <div class="kpi-tile">
+        <div class="kpi-head"><span class="kpi-label">Finalizadas</span><span class="kpi-dot dot-gray"></span></div>
+        <p class="kpi-val">{{ expiredOffers.length }}</p>
+        <p class="kpi-sub">Encerradas</p>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="table-topbar">
+        <h2 class="table-title">Ofertas <span class="count-badge">{{ filteredOffers.length }}</span></h2>
+        <div class="filter-tabs">
+          <button v-for="tab in tabs" :key="tab.val" class="filter-tab" :class="{ active: currentTab === tab.val }"
+                  @click="currentTab = tab.val">
+            {{ tab.label }}
+          </button>
         </div>
       </div>
 
-      <div class="stat-card active">
-        <div class="stat-icon">
-          <v-icon>mdi-fire</v-icon>
-        </div>
-        <div class="stat-info">
-          <span class="stat-label">Ativas Agora</span>
-          <span class="stat-value">{{ activeOffers.length }}</span>
-        </div>
-      </div>
-
-      <div class="stat-card expired">
-        <div class="stat-icon">
-          <v-icon>mdi-history</v-icon>
-        </div>
-        <div class="stat-info">
-          <span class="stat-label">Finalizadas</span>
-          <span class="stat-value">{{ expiredOffers.length }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Offers List -->
-    <v-card class="offers-card" elevation="0">
-      <v-tabs v-model="currentTab" class="offers-tabs">
-        <v-tab value="all">Todas</v-tab>
-        <v-tab value="scheduled">Agendadas</v-tab>
-        <v-tab value="active">Ativas</v-tab>
-        <v-tab value="expired">Finalizadas</v-tab>
-      </v-tabs>
-
-      <div v-if="loading" class="loading-state">
-        <v-progress-circular indeterminate color="deep-purple-accent-3" size="64" />
-        <p>Carregando ofertas...</p>
+      <div v-if="loading" class="loader-state">
+        <div class="loader-ring"></div>
+        <span>Carregando ofertas...</span>
       </div>
 
       <div v-else-if="filteredOffers.length === 0" class="empty-state">
-        <v-icon size="80" color="grey-lighten-2">mdi-tag-off-outline</v-icon>
-        <h3>Nenhuma oferta encontrada</h3>
-        <p>Crie sua primeira oferta para começar</p>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+          <line x1="7" y1="7" x2="7.01" y2="7"/>
+        </svg>
+        <p class="empty-title">Nenhuma oferta encontrada</p>
+        <p class="empty-sub">Crie sua primeira oferta para começar</p>
       </div>
 
       <div v-else class="offers-list">
-        <div
-            v-for="offer in filteredOffers"
-            :key="offer.id"
-            class="offer-card"
-            :class="getOfferCardClass(offer)"
-        >
-          <div class="offer-header">
-            <div class="offer-title-group">
-              <h3>{{ offer.name }}</h3>
-              <div class="offer-badges">
-                <v-chip
-                    size="small"
-                    :color="getStatusColor(offer.status)"
-                    variant="flat"
-                >
-                  {{ getStatusLabel(offer.status) }}
-                </v-chip>
-                <v-chip
-                    v-if="offer.type === 'PERCENTAGE'"
-                    size="small"
-                    color="deep-purple"
-                    variant="tonal"
-                >
-                  -{{ offer.discountValue }}%
-                </v-chip>
-                <v-chip
-                    v-else
-                    size="small"
-                    color="deep-purple"
-                    variant="tonal"
-                >
-                  -R$ {{ offer.discountValue }}
-                </v-chip>
+        <div v-for="offer in filteredOffers" :key="offer.id" class="offer-row"
+             :class="'status-' + offer.status.toLowerCase()">
+          <div class="offer-left">
+            <div class="offer-disc-badge" :class="offer.type === 'PERCENTAGE' ? 'badge-purple' : 'badge-blue'">
+              {{ offer.type === 'PERCENTAGE' ? `-${offer.discountValue}%` : `-R$${offer.discountValue}` }}
+            </div>
+            <div class="offer-info">
+              <div class="offer-name-row">
+                <span class="offer-name">{{ offer.name }}</span>
+                <span :class="['status-chip', 'chip-' + offer.status.toLowerCase()]">{{
+                    getStatusLabel(offer.status)
+                  }}</span>
+              </div>
+              <p v-if="offer.description" class="offer-desc">{{ offer.description }}</p>
+              <div class="offer-meta">
+                <span class="meta-item">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect
+                      x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8"
+                                                                                                            y1="2"
+                                                                                                            x2="8"
+                                                                                                            y2="6"/><line
+                      x1="3" y1="10" x2="21" y2="10"/></svg>
+                  {{ formatDateTime(offer.startDate) }}
+                </span>
+                <span class="meta-sep">→</span>
+                <span class="meta-item">{{ formatDateTime(offer.endDate) }}</span>
+                <span v-if="offer.stockLimit" class="meta-item meta-stock">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  {{ offer.usedStock }}/{{ offer.stockLimit }} usados
+                </span>
               </div>
             </div>
-
-            <div class="offer-actions">
-              <v-switch
-                  v-model="offer.active"
-                  color="deep-purple-accent-3"
-                  hide-details
-                  density="compact"
-                  @change="toggleOffer(offer.id)"
-              />
-              <v-btn
-                  icon
-                  variant="text"
-                  size="small"
-                  @click="openOfferModal(offer)"
-              >
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn
-                  icon
-                  variant="text"
-                  size="small"
-                  color="error"
-                  @click="deleteOffer(offer.id)"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </div>
           </div>
 
-          <p v-if="offer.description" class="offer-description">
-            {{ offer.description }}
-          </p>
-
-          <div class="offer-details">
-            <div class="detail-item">
-              <v-icon size="16">mdi-calendar-start</v-icon>
-              <span>{{ formatDateTime(offer.startDate) }}</span>
+          <div class="offer-right">
+            <div class="offer-products" v-if="offer.products?.length">
+              <div v-for="(p, i) in offer.products.slice(0, 3)" :key="p.id" class="prod-avatar"
+                   :style="{ zIndex: 10 - i }">
+                <img :src="p.imagem || '/placeholder.png'" :alt="p.nome"/>
+              </div>
+              <span v-if="offer.products.length > 3" class="prod-more">+{{ offer.products.length - 3 }}</span>
             </div>
-            <div class="detail-item">
-              <v-icon size="16">mdi-calendar-end</v-icon>
-              <span>{{ formatDateTime(offer.endDate) }}</span>
-            </div>
-            <div v-if="offer.stockLimit" class="detail-item">
-              <v-icon size="16">mdi-package-variant</v-icon>
-              <span>{{ offer.usedStock }} / {{ offer.stockLimit }} usados</span>
-            </div>
+            <label class="toggle-wrap" :title="offer.active ? 'Desativar' : 'Ativar'">
+              <input type="checkbox" v-model="offer.active" @change="toggleOffer(offer.id)"/>
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+            <button class="act-btn act-edit" @click="openOfferModal(offer)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="act-btn act-delete" @click="deleteOffer(offer.id)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
           </div>
-
-          <div v-if="offer.products && offer.products.length > 0" class="offer-products">
-            <span class="products-label">Produtos:</span>
-            <div class="products-avatars">
-              <v-avatar
-                  v-for="(product, index) in offer.products.slice(0, 3)"
-                  :key="product.id"
-                  size="32"
-                  :style="{ marginLeft: index > 0 ? '-8px' : '0' }"
-              >
-                <v-img :src="product.imagem || '/placeholder.png'" />
-              </v-avatar>
-              <span v-if="offer.products.length > 3" class="products-more">
-                +{{ offer.products.length - 3 }}
-              </span>
-            </div>
-          </div>
-
-          <v-progress-linear
-              v-if="offer.isCurrentlyActive"
-              :model-value="getOfferProgress(offer)"
-              color="deep-purple-accent-3"
-              height="4"
-              rounded
-              class="offer-progress"
-          />
         </div>
       </div>
-    </v-card>
+    </section>
 
-    <!-- Offer Modal -->
-    <v-dialog v-model="offerModal" max-width="800px" persistent scrollable>
-      <v-card class="offer-modal">
-        <v-card-title class="modal-header">
-          <span>{{ editingOffer ? 'Editar Oferta' : 'Nova Oferta' }}</span>
-          <v-btn icon variant="text" @click="closeOfferModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
+    <!-- MODAL OFERTA -->
+    <v-dialog v-model="offerModal" max-width="700" persistent scrollable>
+      <div class="modal-card">
+        <div class="modal-hd">
+          <div>
+            <p class="modal-pre">{{ editingOffer ? 'Editar' : 'Nova' }} Oferta</p>
+            <h2 class="modal-title">{{ editingOffer ? 'Editar Oferta' : 'Criar Nova Oferta' }}</h2>
+          </div>
+          <button class="modal-close-btn" @click="closeOfferModal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
 
-        <v-card-text class="pa-6">
-          <v-form ref="offerForm">
-            <!-- Nome e Descrição -->
-            <div class="form-section">
-              <h3 class="section-title">Informações Básicas</h3>
-              <v-text-field
-                  v-model="offerData.name"
-                  label="Nome da Oferta *"
-                  variant="outlined"
-                  :rules="[rules.required]"
-              />
-              <v-textarea
-                  v-model="offerData.description"
-                  label="Descrição"
-                  variant="outlined"
-                  rows="3"
-              />
+        <div class="modal-body">
+          <div class="form-section">
+            <p class="form-section-label">Informações Básicas</p>
+            <div class="field-group">
+              <label class="field-label">Nome da Oferta <span class="req">*</span></label>
+              <input v-model="offerData.name" class="field-input" placeholder="Ex: Black Friday — 20% off"/>
             </div>
-
-            <!-- Tipo de Desconto -->
-            <div class="form-section">
-              <h3 class="section-title">Desconto</h3>
-              <v-row>
-                <v-col cols="6">
-                  <v-select
-                      v-model="offerData.type"
-                      :items="discountTypes"
-                      label="Tipo de Desconto *"
-                      variant="outlined"
-                      :rules="[rules.required]"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                      v-model.number="offerData.discountValue"
-                      label="Valor do Desconto *"
-                      type="number"
-                      variant="outlined"
-                      :prefix="offerData.type === 'FIXED' ? 'R$' : ''"
-                      :suffix="offerData.type === 'PERCENTAGE' ? '%' : ''"
-                      :rules="[rules.required, rules.positive]"
-                  />
-                </v-col>
-              </v-row>
+            <div class="field-group">
+              <label class="field-label">Descrição</label>
+              <textarea v-model="offerData.description" class="field-input field-textarea" rows="2"
+                        placeholder="Descrição opcional..."></textarea>
             </div>
+          </div>
 
-            <!-- Data e Hora -->
-            <div class="form-section">
-              <h3 class="section-title">Período</h3>
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                      v-model="offerData.startDate"
-                      label="Data/Hora de Início *"
-                      type="datetime-local"
-                      variant="outlined"
-                      :rules="[rules.required]"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                      v-model="offerData.endDate"
-                      label="Data/Hora de Fim *"
-                      type="datetime-local"
-                      variant="outlined"
-                      :rules="[rules.required]"
-                  />
-                </v-col>
-              </v-row>
+          <div class="form-section">
+            <p class="form-section-label">Desconto</p>
+            <div class="form-row">
+              <div class="field-group">
+                <label class="field-label">Tipo <span class="req">*</span></label>
+                <select v-model="offerData.type" class="field-input field-select">
+                  <option value="PERCENTAGE">Porcentagem (%)</option>
+                  <option value="FIXED">Valor Fixo (R$)</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Valor <span class="req">*</span></label>
+                <div class="input-prefix-wrap">
+                  <span class="input-prefix">{{ offerData.type === 'FIXED' ? 'R$' : '%' }}</span>
+                  <input v-model.number="offerData.discountValue" type="number" class="field-input input-with-prefix"
+                         placeholder="0"/>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <!-- Produtos -->
-            <div class="form-section">
-              <h3 class="section-title">Produtos</h3>
-              <v-autocomplete
-                  v-model="offerData.productIds"
-                  :items="products"
-                  item-title="nome"
-                  item-value="id"
-                  label="Selecionar Produtos"
-                  variant="outlined"
-                  multiple
-                  chips
-                  closable-chips
-              >
-                <template #chip="{ item }">
-                  <v-chip closable>
-                    {{ item.raw.nome }}
-                  </v-chip>
-                </template>
-              </v-autocomplete>
+          <div class="form-section">
+            <p class="form-section-label">Período</p>
+            <div class="form-row">
+              <div class="field-group">
+                <label class="field-label">Início <span class="req">*</span></label>
+                <input v-model="offerData.startDate" type="datetime-local" class="field-input"/>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Fim <span class="req">*</span></label>
+                <input v-model="offerData.endDate" type="datetime-local" class="field-input"/>
+              </div>
             </div>
+          </div>
 
-            <!-- Configurações Avançadas -->
-            <div class="form-section">
-              <h3 class="section-title">Configurações Avançadas</h3>
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                      v-model.number="offerData.stockLimit"
-                      label="Limite de Estoque"
-                      type="number"
-                      variant="outlined"
-                      hint="Deixe vazio para ilimitado"
-                      persistent-hint
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                      v-model.number="offerData.priority"
-                      label="Prioridade"
-                      type="number"
-                      variant="outlined"
-                      hint="Maior = mais prioritário"
-                      persistent-hint
-                  />
-                </v-col>
-              </v-row>
+          <div class="form-section">
+            <p class="form-section-label">Produtos</p>
+            <v-autocomplete
+                v-model="offerData.productIds"
+                :items="products"
+                item-title="nome"
+                item-value="id"
+                label="Selecionar Produtos"
+                variant="outlined"
+                multiple
+                chips
+                closable-chips
+                density="compact"
+                class="prd-autocomplete"
+            />
+          </div>
+
+          <div class="form-section">
+            <p class="form-section-label">Configurações</p>
+            <div class="form-row">
+              <div class="field-group">
+                <label class="field-label">Limite de Estoque</label>
+                <input v-model.number="offerData.stockLimit" type="number" class="field-input" placeholder="Ilimitado"/>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Prioridade</label>
+                <input v-model.number="offerData.priority" type="number" class="field-input" placeholder="0"/>
+              </div>
             </div>
-          </v-form>
-        </v-card-text>
+          </div>
+        </div>
 
-        <v-card-actions class="pa-6 pt-0">
-          <v-spacer />
-          <v-btn variant="text" @click="closeOfferModal">
-            Cancelar
-          </v-btn>
-          <v-btn
-              color="deep-purple-accent-3"
-              variant="flat"
-              @click="saveOffer"
-              :loading="saving"
-          >
-            {{ editingOffer ? 'Salvar Alterações' : 'Criar Oferta' }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+        <div class="modal-ft">
+          <button class="ft-cancel" @click="closeOfferModal">Cancelar</button>
+          <button class="ft-save" :disabled="saving" @click="saveOffer">
+            <span v-if="saving" class="spin-sm"></span>
+            <span v-else>{{ editingOffer ? 'Salvar Alterações' : 'Criar Oferta' }}</span>
+          </button>
+        </div>
+      </div>
     </v-dialog>
 
-    <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000">
-      {{ snackbarMessage }}
-    </v-snackbar>
+    <transition name="toast-slide">
+      <div v-if="snackbar" class="pm-toast" :class="`pm-toast--${snackbarColor}`">{{ snackbarMessage }}</div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import {ref, computed, onMounted} from 'vue'
 import api from '../api/api'
 
 const loading = ref(false)
@@ -358,6 +250,13 @@ const editingOffer = ref(null)
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 const snackbarColor = ref('success')
+
+const tabs = [
+  {val: 'all', label: 'Todas'},
+  {val: 'scheduled', label: 'Agendadas'},
+  {val: 'active', label: 'Ativas'},
+  {val: 'expired', label: 'Finalizadas'},
+]
 
 const offerData = ref({
   name: '',
@@ -373,30 +272,10 @@ const offerData = ref({
   productIds: []
 })
 
-const discountTypes = [
-  { title: 'Porcentagem (%)', value: 'PERCENTAGE' },
-  { title: 'Valor Fixo (R$)', value: 'FIXED' }
-]
-
-const rules = {
-  required: v => !!v || 'Campo obrigatório',
-  positive: v => v > 0 || 'Valor deve ser positivo'
-}
-
-const scheduledOffers = computed(() =>
-    offers.value.filter(o => o.status === 'SCHEDULED')
-)
-
-const activeOffers = computed(() =>
-    offers.value.filter(o => o.status === 'ACTIVE')
-)
-
-const expiredOffers = computed(() =>
-    offers.value.filter(o => o.status === 'EXPIRED')
-)
-
+const scheduledOffers = computed(() => offers.value.filter(o => o.status === 'SCHEDULED'))
+const activeOffers = computed(() => offers.value.filter(o => o.status === 'ACTIVE'))
+const expiredOffers = computed(() => offers.value.filter(o => o.status === 'EXPIRED'))
 const filteredOffers = computed(() => {
-  if (currentTab.value === 'all') return offers.value
   if (currentTab.value === 'scheduled') return scheduledOffers.value
   if (currentTab.value === 'active') return activeOffers.value
   if (currentTab.value === 'expired') return expiredOffers.value
@@ -404,31 +283,29 @@ const filteredOffers = computed(() => {
 })
 
 onMounted(async () => {
-  await loadOffers()
+  await loadOffers();
   await loadProducts()
 })
 
 const loadOffers = async () => {
   try {
-    loading.value = true
-    const { data } = await api.get('/api/offers')
+    loading.value = true;
+    const {data} = await api.get('/api/offers');
     offers.value = data
-  } catch (error) {
+  } catch {
     showSnackbar('Erro ao carregar ofertas', 'error')
   } finally {
     loading.value = false
   }
 }
-
 const loadProducts = async () => {
   try {
-    const { data } = await api.get('/produtos')
+    const {data} = await api.get('/produtos');
     products.value = data
-  } catch (error) {
-    console.error('Erro ao carregar produtos:', error)
+  } catch {
+    console.error('Erro ao carregar produtos')
   }
 }
-
 const openOfferModal = (offer = null) => {
   if (offer) {
     editingOffer.value = offer
@@ -446,414 +323,870 @@ const openOfferModal = (offer = null) => {
       productIds: offer.productIds || []
     }
   } else {
-    resetOfferData()
+    editingOffer.value = null
+    offerData.value = {
+      name: '',
+      description: '',
+      type: 'PERCENTAGE',
+      discountValue: 0,
+      startDate: '',
+      endDate: '',
+      active: true,
+      category: '',
+      stockLimit: null,
+      priority: 0,
+      productIds: []
+    }
   }
   offerModal.value = true
 }
-
 const closeOfferModal = () => {
-  offerModal.value = false
+  offerModal.value = false;
   editingOffer.value = null
-  resetOfferData()
 }
-
-const resetOfferData = () => {
-  offerData.value = {
-    name: '',
-    description: '',
-    type: 'PERCENTAGE',
-    discountValue: 0,
-    startDate: '',
-    endDate: '',
-    active: true,
-    category: '',
-    stockLimit: null,
-    priority: 0,
-    productIds: []
-  }
-}
-
 const saveOffer = async () => {
   try {
     saving.value = true
-
     const payload = {
       ...offerData.value,
       startDate: new Date(offerData.value.startDate).toISOString(),
       endDate: new Date(offerData.value.endDate).toISOString()
     }
-
     if (editingOffer.value) {
-      await api.put(`/api/offers/${editingOffer.value.id}`, payload)
-      showSnackbar('Oferta atualizada com sucesso!')
+      await api.put(`/api/offers/${editingOffer.value.id}`, payload);
+      showSnackbar('Oferta atualizada!')
     } else {
-      await api.post('/api/offers', payload)
-      showSnackbar('Oferta criada com sucesso!')
+      await api.post('/api/offers', payload);
+      showSnackbar('Oferta criada!')
     }
-
-    await loadOffers()
+    await loadOffers();
     closeOfferModal()
-  } catch (error) {
+  } catch {
     showSnackbar('Erro ao salvar oferta', 'error')
   } finally {
     saving.value = false
   }
 }
-
 const toggleOffer = async (offerId) => {
   try {
-    await api.patch(`/api/offers/${offerId}/toggle`)
+    await api.patch(`/api/offers/${offerId}/toggle`);
     showSnackbar('Status atualizado!')
-  } catch (error) {
-    showSnackbar('Erro ao atualizar status', 'error')
+  } catch {
+    showSnackbar('Erro ao atualizar', 'error');
     await loadOffers()
   }
 }
-
 const deleteOffer = async (offerId) => {
-  if (!confirm('Tem certeza que deseja excluir esta oferta?')) return
-
+  if (!confirm('Excluir esta oferta?')) return
   try {
-    await api.delete(`/api/offers/${offerId}`)
-    showSnackbar('Oferta excluída com sucesso!')
+    await api.delete(`/api/offers/${offerId}`);
+    showSnackbar('Oferta excluída.');
     await loadOffers()
-  } catch (error) {
-    showSnackbar('Erro ao excluir oferta', 'error')
+  } catch {
+    showSnackbar('Erro ao excluir', 'error')
   }
 }
-
-const getStatusColor = (status) => {
-  const colors = {
-    SCHEDULED: 'blue',
-    ACTIVE: 'success',
-    EXPIRED: 'grey',
-    PAUSED: 'warning',
-    CANCELLED: 'error'
-  }
-  return colors[status] || 'grey'
-}
-
-const getStatusLabel = (status) => {
-  const labels = {
-    SCHEDULED: 'Agendada',
-    ACTIVE: 'Ativa',
-    EXPIRED: 'Finalizada',
-    PAUSED: 'Pausada',
-    CANCELLED: 'Cancelada'
-  }
-  return labels[status] || status
-}
-
-const getOfferCardClass = (offer) => {
-  return `status-${offer.status.toLowerCase()}`
-}
-
-const getOfferProgress = (offer) => {
-  const now = new Date()
-  const start = new Date(offer.startDate)
-  const end = new Date(offer.endDate)
-  const total = end - start
-  const elapsed = now - start
-  return Math.min(100, Math.max(0, (elapsed / total) * 100))
-}
-
-const formatDateTime = (dateString) => {
-  return new Date(dateString).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const formatForInput = (dateString) => {
-  const date = new Date(dateString)
-  return date.toISOString().slice(0, 16)
-}
-
+const getStatusLabel = s => ({
+  SCHEDULED: 'Agendada',
+  ACTIVE: 'Ativa',
+  EXPIRED: 'Finalizada',
+  PAUSED: 'Pausada',
+  CANCELLED: 'Cancelada'
+}[s] || s)
+const formatDateTime = d => new Date(d).toLocaleString('pt-BR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit'
+})
+const formatForInput = d => new Date(d).toISOString().slice(0, 16)
 const showSnackbar = (message, color = 'success') => {
-  snackbarMessage.value = message
-  snackbarColor.value = color
-  snackbar.value = true
+  snackbarMessage.value = message;
+  snackbarColor.value = color;
+  snackbar.value = true;
+  setTimeout(() => {
+    snackbar.value = false
+  }, 3000)
 }
 </script>
 
 <style scoped>
-.offers-page {
-  padding: 40px;
-  background-color: #fafafa;
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.page-root {
+  font-family: 'DM Sans', sans-serif;
+  background: #F8FAFC;
   min-height: 100vh;
+  padding: 28px 32px 40px;
+  color: #0F172A;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.page-header {
-  margin-bottom: 32px;
+/* TOPBAR */
+.page-topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 }
 
-.header-content {
+.tb-breadcrumb {
+  font-size: 12px;
+  color: #94A3B8;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 4px;
+}
+
+.tb-breadcrumb .sep {
+  color: #CBD5E1;
+  margin: 0 4px;
+}
+
+.tb-breadcrumb .current {
+  color: #64748B;
+}
+
+.tb-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #0F172A;
+}
+
+.tb-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #0F172A;
+  border: none;
+  border-radius: 10px;
+  padding: 0 18px;
+  height: 38px;
+  font: 600 13px 'DM Sans', sans-serif;
+  color: #fff;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.tb-btn-primary:hover {
+  background: #1E293B;
+}
+
+/* KPI */
+.kpi-strip {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+
+.kpi-tile {
+  flex: 1;
+  padding: 18px 22px;
+  transition: background .15s;
+}
+
+.kpi-tile:hover {
+  background: #F8FAFC;
+}
+
+.kpi-div {
+  width: 1px;
+  background: #F1F5F9;
+  margin: 12px 0;
+}
+
+.kpi-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
 }
 
-.title-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: .06em;
 }
 
-.title-icon-wrapper {
-  width: 64px;
-  height: 64px;
-  background: #f5f3ff;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #e9d5ff;
+.kpi-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
-.title-text-group h1 {
-  font-size: 28px;
-  font-weight: 800;
-  margin: 0;
+.dot-blue {
+  background: #3B82F6;
 }
 
-.title-text-group p {
-  font-size: 14px;
-  color: #64748b;
-  margin: 4px 0 0 0;
+.dot-green {
+  background: #10B981;
 }
 
-.action-btn {
-  text-transform: none;
+.dot-gray {
+  background: #CBD5E1;
+}
+
+.kpi-val {
+  font-size: 26px;
   font-weight: 700;
-  height: 48px;
+  color: #0F172A;
+  letter-spacing: -0.03em;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 4px;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 32px;
+.kpi-sub {
+  font-size: 11px;
+  color: #CBD5E1;
+  font-family: 'DM Mono', monospace;
 }
 
-.stat-card {
-  background: white;
-  padding: 24px;
-  border-radius: 20px;
+/* TABLE CARD */
+.table-card {
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .03);
+}
+
+.table-topbar {
+  padding: 16px 20px;
+  border-bottom: 1px solid #F1F5F9;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 16px;
-  border: 1px solid #f1f5f9;
+  flex-wrap: wrap;
 }
 
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+.table-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
 }
 
-.stat-card.scheduled .stat-icon {
-  background: #dbeafe;
-  color: #3b82f6;
+.count-badge {
+  background: #F1F5F9;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 7px;
 }
 
-.stat-card.active .stat-icon {
-  background: #dcfce7;
-  color: #22c55e;
-}
-
-.stat-card.expired .stat-icon {
-  background: #f3f4f6;
-  color: #9ca3af;
-}
-
-.stat-info {
+.filter-tabs {
   display: flex;
-  flex-direction: column;
+  gap: 2px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 9px;
+  padding: 3px;
 }
 
-.stat-label {
-  font-size: 13px;
-  color: #64748b;
+.filter-tab {
+  border: none;
+  background: transparent;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font: 500 12px 'DM Sans', sans-serif;
+  color: #94A3B8;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.filter-tab.active {
+  background: #fff;
+  color: #0F172A;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
   font-weight: 600;
 }
 
-.stat-value {
-  font-size: 32px;
-  font-weight: 800;
-  color: #0f172a;
+/* LOADER / EMPTY */
+.loader-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 60px;
+  color: #64748B;
+  font-size: 14px;
 }
 
-.offers-card {
-  border-radius: 24px !important;
-  border: 1px solid #f1f5f9;
+.loader-ring {
+  width: 28px;
+  height: 28px;
+  border: 2px solid #E2E8F0;
+  border-top-color: #6366F1;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
 }
 
-.offers-tabs {
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.loading-state,
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
+  gap: 10px;
+  padding: 64px;
   text-align: center;
 }
 
-.empty-state h3 {
-  margin-top: 16px;
-  font-size: 20px;
-  font-weight: 700;
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
 }
 
-.empty-state p {
-  color: #64748b;
-  margin-top: 8px;
-}
-
-.offers-list {
-  padding: 24px;
-  display: grid;
-  gap: 16px;
-}
-
-.offer-card {
-  background: white;
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
-  padding: 24px;
-  transition: all 0.2s;
-}
-
-.offer-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.offer-card.status-active {
-  border-left: 4px solid #22c55e;
-}
-
-.offer-card.status-scheduled {
-  border-left: 4px solid #3b82f6;
-}
-
-.offer-card.status-expired {
-  opacity: 0.6;
-}
-
-.offer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.offer-title-group h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-}
-
-.offer-badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.offer-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.offer-description {
-  color: #64748b;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.offer-details {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.empty-sub {
   font-size: 13px;
-  color: #64748b;
+  color: #94A3B8;
+}
+
+/* OFFERS LIST */
+.offers-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.offer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #F8FAFC;
+  transition: background .15s;
+}
+
+.offer-row:last-child {
+  border-bottom: none;
+}
+
+.offer-row:hover {
+  background: #FAFAFA;
+}
+
+.offer-row.status-active {
+  border-left: 3px solid #10B981;
+}
+
+.offer-row.status-scheduled {
+  border-left: 3px solid #3B82F6;
+}
+
+.offer-row.status-expired {
+  border-left: 3px solid #E2E8F0;
+  opacity: .7;
+}
+
+.offer-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.offer-disc-badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 9px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+}
+
+.badge-purple {
+  background: #F5F3FF;
+  color: #6D28D9;
+}
+
+.badge-blue {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.offer-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.offer-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
+}
+
+.offer-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.status-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.chip-active {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+.chip-scheduled {
+  background: #EFF6FF;
+  color: #1E40AF;
+}
+
+.chip-expired {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.chip-paused {
+  background: #FFFBEB;
+  color: #B45309;
+}
+
+.chip-cancelled {
+  background: #FEF2F2;
+  color: #9F1239;
+}
+
+.offer-desc {
+  font-size: 12px;
+  color: #64748B;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
+}
+
+.offer-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #94A3B8;
+  font-family: 'DM Mono', monospace;
+}
+
+.meta-sep {
+  color: #CBD5E1;
+  font-size: 11px;
+}
+
+.meta-stock {
+  color: #64748B;
+}
+
+.offer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .offer-products {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid #f1f5f9;
 }
 
-.products-label {
-  font-size: 13px;
+.prod-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  overflow: hidden;
+  position: relative;
+  margin-left: -6px;
+  background: #F1F5F9;
+}
+
+.prod-avatar:first-child {
+  margin-left: 0;
+}
+
+.prod-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prod-more {
+  font-size: 11px;
+  color: #94A3B8;
   font-weight: 600;
-  color: #64748b;
+  margin-left: 4px;
 }
 
-.products-avatars {
+/* TOGGLE */
+.toggle-wrap {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
-.products-more {
-  margin-left: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
+.toggle-wrap input {
+  display: none;
 }
 
-.offer-progress {
-  margin-top: 16px;
+.toggle-track {
+  width: 36px;
+  height: 20px;
+  background: #E2E8F0;
+  border-radius: 10px;
+  position: relative;
+  transition: background .2s;
 }
 
-.offer-modal .modal-header {
+.toggle-wrap input:checked + .toggle-track {
+  background: #10B981;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left .2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+}
+
+.toggle-wrap input:checked + .toggle-track .toggle-thumb {
+  left: 18px;
+}
+
+.act-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.act-edit {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+  color: #475569;
+}
+
+.act-edit:hover {
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+.act-delete {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+.act-delete:hover {
+  background: #FEE2E2;
+}
+
+/* MODAIS */
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, .12);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.modal-hd {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  padding: 22px 26px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.modal-pre {
+  font-size: 10px;
+  color: #94A3B8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 3px;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+}
+
+.modal-close-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: transparent;
+  color: #94A3B8;
+  cursor: pointer;
+  display: flex;
   align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #f1f5f9;
+  justify-content: center;
+  transition: all .15s;
+}
+
+.modal-close-btn:hover {
+  background: #F8FAFC;
+  color: #0F172A;
+}
+
+.modal-body {
+  padding: 22px 26px;
+  max-height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .form-section {
-  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.section-title {
-  font-size: 14px;
+.form-section-label {
+  font-size: 11px;
   font-weight: 700;
+  color: #94A3B8;
   text-transform: uppercase;
-  color: #64748b;
-  margin-bottom: 16px;
+  letter-spacing: .1em;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.req {
+  color: #EF4444;
+}
+
+.field-input {
+  border: 1.5px solid #E2E8F0;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font: 500 13px 'DM Sans', sans-serif;
+  color: #0F172A;
+  background: #fff;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  width: 100%;
+}
+
+.field-input:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .1);
+}
+
+.field-select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.field-textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.input-prefix-wrap {
+  position: relative;
+}
+
+.input-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+.input-with-prefix {
+  padding-left: 30px;
+}
+
+:deep(.prd-autocomplete .v-field) {
+  border-radius: 9px !important;
+  font-size: 13px !important;
+}
+
+.modal-ft {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 26px;
+  border-top: 1px solid #F1F5F9;
+  background: #FAFAFA;
+}
+
+.ft-cancel {
+  background: transparent;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font: 600 13px 'DM Sans', sans-serif;
+  color: #64748B;
+  cursor: pointer;
+}
+
+.ft-save {
+  background: #0F172A;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font: 700 13px 'DM Sans', sans-serif;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .15s;
+}
+
+.ft-save:hover:not(:disabled) {
+  background: #1E293B;
+}
+
+.ft-save:disabled {
+  background: #E2E8F0;
+  color: #94A3B8;
+  cursor: not-allowed;
+}
+
+.spin-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, .3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pm-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font: 600 13px 'DM Sans', sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+  color: #fff;
+}
+
+.pm-toast--success {
+  background: #065F46;
+}
+
+.pm-toast--error {
+  background: #991B1B;
+}
+
+.toast-slide-enter-active, .toast-slide-leave-active {
+  transition: all .25s;
+}
+
+.toast-slide-enter-from, .toast-slide-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 @media (max-width: 768px) {
-  .stats-grid {
+  .page-root {
+    padding: 16px;
+  }
+
+  .offer-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .offer-right {
+    width: 100%;
+  }
+
+  .form-row {
     grid-template-columns: 1fr;
   }
 
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+  .kpi-strip {
+    flex-wrap: wrap;
+  }
+
+  .kpi-div {
+    display: none;
   }
 }
 </style>

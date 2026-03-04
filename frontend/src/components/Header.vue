@@ -69,11 +69,7 @@
 
           <v-menu v-else transition="slide-y-transition">
             <template #activator="{ props }">
-              <DropperBadge
-                  :isDropper="auth.user?.role === 'DROPPER' || auth.user?.role === 'OWNER'"
-                  :level="dropperProfile?.level"
-                  class="mr-2"
-              />
+              <DropperBadge :isDropper="isDropper" :level="dropperLevel" />
               <v-btn v-bind="props" variant="text" class="user-profile-btn text-none ml-2" rounded="xl">
                 <v-avatar size="32" class="mr-2">
                   <v-img :src="auth.user?.avatarUrl || '/avatar-default.png'" />
@@ -122,15 +118,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
+import {useDropperStore} from "../stores/dropper.js";
 import AuthModal from '../components/Auth.vue'
 import CartModal from '../components/CartModal.vue'
 import LogoDrop from '../assets/LogoDrop.png'
 import DropperBadge from "./DropperBadge.vue";
 
+const dropperStore = useDropperStore()
+
+const isDropper = computed(() =>
+    auth.user?.role === 'DROPPER' || auth.user?.role === 'OWNER'
+)
+
+const dropperLevel = computed(() => dropperStore.profile?.level ?? null)
 const router = useRouter()
 const auth = useAuthStore()
 const cartStore = useCartStore()

@@ -1,5 +1,4 @@
 <template>
-  <!-- Navigation Drawer / Sidebar -->
   <v-navigation-drawer
       v-model="drawer"
       temporary
@@ -7,7 +6,6 @@
       width="280"
       elevation="1"
   >
-    <!-- Header -->
     <div class="sidebar-header px-4 py-4 d-flex align-center justify-space-between">
       <img :src="LogoDrop" alt="Logo" style="width: 120px; object-fit: contain;" >
       <v-btn
@@ -24,7 +22,6 @@
 
     <v-divider class="border-opacity-50 mx-4"></v-divider>
 
-    <!-- Principal Section -->
     <div class="px-3 py-4">
       <div class="section-label mb-3">
         Principal
@@ -51,7 +48,6 @@
 
     <v-divider class="border-opacity-50 mx-4"></v-divider>
 
-    <!-- Conta Section -->
     <div class="px-3 py-4">
       <div class="section-label mb-3">
         Conta
@@ -107,7 +103,7 @@ const principalItems = reactive([
   { title: 'Home', path: '/home', icon: 'mdi-home', active: true },
   { title: 'Dashboard', path: '/metricas', icon: 'mdi-finance', active: false },
   { title: 'Produtos', path: '/produtos', icon: 'mdi-package', active: false },
-  { title: 'Etiquetas', path: '/etiquetas', icon: 'mdi-tag', active: false },
+  { title: 'Etiquetas', path: '/pedidos/droppers', icon: 'mdi-tag', active: false },
   { title: 'Pedidos', path: '/admin/pedidos', icon: 'mdi-truck', active: false },
   { title: 'Usuários', path: '/usuarios', icon: 'mdi-account', active: false},
   { title: 'Cadastar Oferta', path: '/oferta/cadastro', icon: 'mdi-sale', active: false},
@@ -121,22 +117,18 @@ const contaItems = reactive([
 const emit = defineEmits(['page-change'])
 
 function selectItem(item) {
-  // Desativa todos os itens
   principalItems.forEach(i => i.active = false)
   contaItems.forEach(i => i.active = false)
 
-  // Ativa o item selecionado
   item.active = true
 
-  // Emite o evento
   emit('page-change', item.title)
 
-  // Navega para a rota se existir
+
   if (item.path) {
     router.push(item.path)
   }
 
-  // Fecha o drawer
   drawer.value = false
 }
 
@@ -146,7 +138,6 @@ defineExpose({
 </script>
 
 <style scoped>
-/* Estilo geral da sidebar para um tom mais limpo */
 .admin-sidebar {
   background-color: #fafbfc !important;
   border-right: 1px solid #eceff1 !important;
@@ -156,7 +147,6 @@ defineExpose({
   background-color: transparent;
 }
 
-/* Labels de sessão padronizados (estilo uppercase espaçado) */
 .section-label {
   font-size: 0.7rem;
   font-weight: 700;
@@ -166,7 +156,6 @@ defineExpose({
   padding-left: 12px;
 }
 
-/* Itens de navegação */
 .nav-item {
   transition: all 0.2s ease;
   color: #546e7a !important;
@@ -180,15 +169,15 @@ defineExpose({
   color: #263238 !important;
 }
 
-/* Item Ativo - Design moderno com barra lateral e cor primária */
+
 .active-item {
-  background-color: #e0f7fa !important; /* Fundo cyan bem claro */
-  color: #00838f !important; /* Texto cyan escuro corporativo */
+  background-color: #e0f7fa !important;
+  color: #00838f !important;
   font-weight: 600;
   position: relative;
 }
 
-/* Barra indicadora esquerda no item ativo */
+
 .active-item::before {
   content: '';
   position: absolute;
@@ -200,7 +189,7 @@ defineExpose({
   border-radius: 0 4px 4px 0;
 }
 
-/* Rodapé e Card de Usuário */
+
 .bg-footer {
   background: linear-gradient(to top, #ffffff, #fafbfc);
   border-top: 1px solid #eceff1;
