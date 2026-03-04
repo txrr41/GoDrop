@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isDropper" class="dropper-badge" :class="'badge--' + level.toLowerCase()">
+  <div v-if="isDropper && level" class="dropper-badge" :class="'badge--' + level.toLowerCase()">
     <span class="badge-icon">{{ icon }}</span>
     <span class="badge-label">{{ label }}</span>
   </div>

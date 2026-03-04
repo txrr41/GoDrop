@@ -81,14 +81,10 @@ export const useAuthStore = defineStore('auth', {
             try {
                 await this.fetchUser()
 
-                if (this.user?.role === 'DROPPER' || this.user?.role === 'OWNER') {
+                if (this.user?.role === 'DROPPER') {
                     const dropperStore = useDropperStore()
                     await dropperStore.fetchProfile()
-                }
 
-                // Sempre tenta buscar desconto dropper para qualquer usuário logado
-                // O fetchDropperDiscount trata o caso de não ser dropper silenciosamente
-                if (this.user) {
                     const cartStore = useCartStore()
                     await cartStore.fetchDropperDiscount()
                 }
@@ -106,11 +102,9 @@ export const useAuthStore = defineStore('auth', {
                 const { data } = await api.post('/auth/login', { email, password })
                 this.user = data
 
-                // Só busca desconto dropper se o usuário for DROPPER
                 if (data.role === 'DROPPER') {
                     const dropperStore = useDropperStore()
                     const cartStore = useCartStore()
-                    // Pequena pausa para garantir que o cookie HttpOnly foi propagado
                     await new Promise(resolve => setTimeout(resolve, 100))
                     await dropperStore.fetchProfile()
                     await cartStore.fetchDropperDiscount()

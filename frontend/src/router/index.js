@@ -14,6 +14,7 @@ import Dashboard from "../pages/Dashboard.vue";
 import BeDropper from "../pages/BeDropper.vue";
 import UserProfile from "../pages/UserProfile.vue";
 import AcceptDroppers from "../pages/AcceptDroppers.vue";
+import DropperStoreLanding from "../pages/DropperStoreLanding.vue";
 
 async function permissionGuard(to, _from, next) {
     // Lazy import do store (evita problemas de inicialização)
@@ -156,6 +157,26 @@ const routes = [
         component: MainLayout,
         children: [{path: '', component: AcceptDroppers}],
     },
+    {
+        path: '/minha-loja',
+        component: MainLayout,
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: '',
+                component: () => import('../pages/DropperStoreSetup.vue'),
+            }
+        ]
+    },
+    {
+        path: '/loja/:slug',
+        component: () => import('../pages/PublicStore.vue'),
+    },
+    {
+        path: '/loja-info',
+        component: DropperStoreLanding
+    }
+
 
 ]
 

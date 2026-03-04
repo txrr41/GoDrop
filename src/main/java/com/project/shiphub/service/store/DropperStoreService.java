@@ -36,76 +36,63 @@ public class DropperStoreService {
     private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${anthropic.api.key}")
-    private String anthropicApiKey;
+    @Value("${groq.api.key}")
+    private String groqApiKey;
 
-    // ─── Gera tema via IA ────────────────────────────────────────────────────
     public AiThemeResponse generateThemeWithAI(String prompt) {
         log.info("🤖 Gerando tema com IA para prompt: {}", prompt);
 
         String systemPrompt = """
-            Você é um especialista em design de lojas virtuais.
-            Baseado na descrição do usuário, gere um tema para a loja.
-            
-            Responda APENAS com um JSON válido, sem texto antes ou depois, no formato:
-            {
-              "storeName": "nome sugerido para a loja",
-              "slogan": "slogan criativo e curto",
-              "primaryColor": "#HEXCODE",
-              "secondaryColor": "#HEXCODE",
-              "backgroundColor": "#HEXCODE",
-              "theme": "MODERN ou MINIMAL ou BOLD ou ELEGANT",
-              "description": "descrição da loja em 2 frases",
-              "reasoning": "por que escolhei esse estilo"
-            }
-            
-            Regras para cores:
-            - primaryColor: cor principal dos botões e destaques
-            - secondaryColor: cor complementar
-            - backgroundColor: sempre claro (#F8FAFC, #FFFFFF, #FFF9F0, etc)
-            - Use cores que combinam com o nicho descrito pelo usuário
-            """;
+        Você é um especialista em design de lojas virtuais.
+        Baseado na descrição do usuário, gere um tema para a loja.
+        
+        Responda APENAS com um JSON válido, sem texto antes ou depois, no formato:
+        {
+          "storeName": "nome sugerido para a loja",
+          "slogan": "slogan criativo e curto",
+          "primaryColor": "#HEXCODE",
+          "secondaryColor": "#HEXCODE",
+          "backgroundColor": "#HEXCODE",
+          "theme": "MODERN ou MINIMAL ou BOLD ou ELEGANT",
+          "description": "descrição da loja em 2 frases",
+          "reasoning": "por que escolhei esse estilo"
+        }
+        """;
 
         try {
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("x-api-key", anthropicApiKey);
-            headers.set("anthropic-version", "2023-06-01");
+            headers.set("Authorization", "Bearer " + groqApiKey);
 
             Map<String, Object> body = Map.of(
-                    "model", "claude-sonnet-4-20250514",
-                    "max_tokens", 500,
-                    "system", systemPrompt,
+                    "model", "llama-3.3-70b-versatile",
                     "messages", List.of(
+                            Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", prompt)
-                    )
+                    ),
+                    "max_tokens", 500,
+                    "temperature", 0.7
             );
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    "https://api.anthropic.com/v1/messages",
+                    "https://api.groq.com/openai/v1/chat/completions",
                     entity,
                     String.class
             );
 
-            // Extrai o texto da resposta da API da Anthropic
             JsonNode root = objectMapper.readTree(response.getBody());
-            String aiText = root.path("content").get(0).path("text").asText();
+            String aiText = root.path("choices").get(0).path("message").path("content").asText();
 
             log.info("🤖 Resposta da IA: {}", aiText);
 
-            // Parse do JSON retornado pela IA
-            AiThemeResponse theme = objectMapper.readValue(aiText, AiThemeResponse.class);
-            log.info("✅ Tema gerado: {} - {}", theme.getStoreName(), theme.getTheme());
-
-            return theme;
+            return objectMapper.readValue(aiText, AiThemeResponse.class);
 
         } catch (Exception e) {
-            log.error("❌ Erro ao chamar IA: {}", e.getMessage());
-            // Retorna tema padrão se a IA falhar
+            log.error("❌ Erro ao chamar Groq: {}", e.getMessage());
             AiThemeResponse fallback = new AiThemeResponse();
             fallback.setStoreName("Minha Loja");
             fallback.setSlogan("Os melhores produtos para você");
@@ -118,7 +105,6 @@ public class DropperStoreService {
         }
     }
 
-    // ─── Criar loja ──────────────────────────────────────────────────────────
     public DropperStoreDTO createStore(Long userId, DropperStoreRequest request) {
         log.info("🏪 Criando loja para userId: {}", userId);
 
@@ -133,7 +119,6 @@ public class DropperStoreService {
             throw new RuntimeException("Dropper já possui uma loja");
         }
 
-        // Gera slug único a partir do nome da loja
         String slug = generateSlug(request.getStoreName());
 
         List<Product> products = productRepository.findAllById(
@@ -153,7 +138,7 @@ public class DropperStoreService {
                 .slogan(request.getSlogan())
                 .theme(request.getTheme() != null ? request.getTheme() : "MODERN")
                 .aiPrompt(request.getAiPrompt())
-                .active(false) // começa inativa, dropper ativa depois
+                .active(false)
                 .products(products)
                 .build();
 
@@ -163,7 +148,6 @@ public class DropperStoreService {
         return new DropperStoreDTO(saved);
     }
 
-    // ─── Atualizar loja ───────────────────────────────────────────────────────
     public DropperStoreDTO updateStore(Long userId, DropperStoreRequest request) {
         DropperStore store = storeRepository.findByDropperProfileUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada"));
@@ -186,21 +170,18 @@ public class DropperStoreService {
         return new DropperStoreDTO(storeRepository.save(store));
     }
 
-    // ─── Buscar minha loja ────────────────────────────────────────────────────
     public DropperStoreDTO getMyStore(Long userId) {
         DropperStore store = storeRepository.findByDropperProfileUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada"));
         return new DropperStoreDTO(store);
     }
 
-    // ─── Loja pública por slug ────────────────────────────────────────────────
     public DropperStoreDTO getPublicStore(String slug) {
         DropperStore store = storeRepository.findActiveBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada ou inativa"));
         return new DropperStoreDTO(store);
     }
 
-    // ─── Ativar/Desativar loja ────────────────────────────────────────────────
     public DropperStoreDTO toggleStore(Long userId) {
         DropperStore store = storeRepository.findByDropperProfileUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Loja não encontrada"));
@@ -209,13 +190,11 @@ public class DropperStoreService {
         return new DropperStoreDTO(storeRepository.save(store));
     }
 
-    // ─── Gera slug a partir do nome ───────────────────────────────────────────
     private String generateSlug(String name) {
         String slug = Normalizer.normalize(name, Normalizer.Form.NFD);
         slug = Pattern.compile("[^\\p{ASCII}]").matcher(slug).replaceAll("");
         slug = slug.toLowerCase().trim().replaceAll("[^a-z0-9\\s-]", "").replaceAll("\\s+", "-");
 
-        // Garante unicidade
         String baseSlug = slug;
         int counter = 1;
         while (storeRepository.existsBySlug(slug)) {
