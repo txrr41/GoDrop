@@ -93,8 +93,8 @@
         <nav class="nav-links d-flex align-center">
           <a href="/catalogo" class="nav-link">Catalogo</a>
           <a href="/api" class="nav-link">API</a>
-          <a href="#" class="nav-link">Feminino</a>
-          <a href="#" class="nav-link">Acessórios</a>
+          <a href="/loja-info" class="nav-link">Criar minha loja</a>
+          <a href="/dropper" class="nav-link">Seja Dropper</a>
           <a href="#" class="nav-link">Ofertas</a>
           <v-menu open-on-hover transition="slide-y-transition">
             <template #activator="{ props }">
