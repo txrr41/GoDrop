@@ -1,7 +1,7 @@
 package com.project.shiphub.model.store;
 
 import com.project.shiphub.model.auth.DropperProfile;
-import com.project.shiphub.model.product.Product;
+import com.project.shiphub.model.store.StoreProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,14 +66,11 @@ public class DropperStore {
     @Builder.Default
     private Boolean active = false;
 
-    @ManyToMany
-    @JoinTable(
-            name = "store_products",
-            joinColumns = @JoinColumn(name = "store_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
+    // Substituído @ManyToMany por @OneToMany com entidade intermediária
+    // para suportar customPrice por produto
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Product> products = new ArrayList<>();
+    private List<StoreProduct> storeProducts = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String aiPrompt;

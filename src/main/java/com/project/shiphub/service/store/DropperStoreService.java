@@ -9,6 +9,7 @@ import com.project.shiphub.model.auth.DropperProfile;
 import com.project.shiphub.model.auth.DropperStatus;
 import com.project.shiphub.model.product.Product;
 import com.project.shiphub.model.store.DropperStore;
+import com.project.shiphub.model.store.StoreProduct;
 import com.project.shiphub.repository.auth.DropperProfileRepository;
 import com.project.shiphub.repository.product.ProductRepository;
 import com.project.shiphub.repository.store.DropperStoreRepository;
@@ -20,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -121,10 +124,6 @@ public class DropperStoreService {
 
         String slug = generateSlug(request.getStoreName());
 
-        List<Product> products = productRepository.findAllById(
-                request.getProductIds() != null ? request.getProductIds() : List.of()
-        );
-
         DropperStore store = DropperStore.builder()
                 .dropperProfile(profile)
                 .slug(slug)
@@ -139,13 +138,16 @@ public class DropperStoreService {
                 .theme(request.getTheme() != null ? request.getTheme() : "MODERN")
                 .aiPrompt(request.getAiPrompt())
                 .active(false)
-                .products(products)
                 .build();
 
         DropperStore saved = storeRepository.save(store);
-        log.info("✅ Loja criada: {} (slug: {})", saved.getStoreName(), saved.getSlug());
 
-        return new DropperStoreDTO(saved);
+        if (request.getProducts() != null && !request.getProducts().isEmpty()) {
+            buildStoreProducts(saved, request.getProducts());
+        }
+
+        log.info("✅ Loja criada: {} (slug: {})", saved.getStoreName(), saved.getSlug());
+        return new DropperStoreDTO(storeRepository.save(saved));
     }
 
     public DropperStoreDTO updateStore(Long userId, DropperStoreRequest request) {
@@ -162,9 +164,10 @@ public class DropperStoreService {
         if (request.getSlogan() != null) store.setSlogan(request.getSlogan());
         if (request.getTheme() != null) store.setTheme(request.getTheme());
 
-        if (request.getProductIds() != null) {
-            List<Product> products = productRepository.findAllById(request.getProductIds());
-            store.setProducts(products);
+        if (request.getProducts() != null) {
+            store.getStoreProducts().clear();
+            storeRepository.save(store);
+            buildStoreProducts(store, request.getProducts());
         }
 
         return new DropperStoreDTO(storeRepository.save(store));
@@ -188,6 +191,30 @@ public class DropperStoreService {
 
         store.setActive(!store.getActive());
         return new DropperStoreDTO(storeRepository.save(store));
+    }
+
+
+
+    private void buildStoreProducts(DropperStore store, List<DropperStoreRequest.StoreProductItem> items) {
+        for (DropperStoreRequest.StoreProductItem item : items) {
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + item.getProductId()));
+
+            BigDecimal customPrice = item.getCustomPrice();
+
+            if (customPrice == null || customPrice.compareTo(product.getPreco()) < 0) {
+                log.warn("⚠️ customPrice inválido para produto {}, usando preço de custo como mínimo", product.getId());
+                customPrice = product.getPreco();
+            }
+
+            StoreProduct sp = StoreProduct.builder()
+                    .store(store)
+                    .product(product)
+                    .customPrice(customPrice)
+                    .build();
+
+            store.getStoreProducts().add(sp);
+        }
     }
 
     private String generateSlug(String name) {

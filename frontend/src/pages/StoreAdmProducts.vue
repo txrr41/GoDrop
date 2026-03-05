@@ -189,6 +189,7 @@
       </div>
     </Teleport>
 
+    <!-- Toast -->
     <Teleport to="body">
       <transition name="toast">
         <div v-if="toast.show" class="toast" :class="toast.type">
@@ -202,16 +203,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useProductStore } from '../stores/product'
+import { useProductStore } from '@/stores/product'
 
 const productStore = useProductStore()
-
 
 const search    = ref('')
 const activeTab = ref('all')
 const showModal = ref(false)
 const showDelete = ref(false)
-const editing   = ref(null)
+const editing   = ref(null)   // product object when editing
 const deleteTarget = ref(null)
 const formError = ref('')
 
@@ -254,7 +254,6 @@ const filtered = computed(() => {
   }
   return list
 })
-
 
 const formatPrice = (v) => Number(v).toFixed(2).replace('.', ',')
 
@@ -330,7 +329,6 @@ const handleDelete = async () => {
     showToast('Erro ao excluir produto.', 'error')
   }
 }
-
 
 onMounted(() => productStore.fetchProducts())
 </script>
@@ -616,7 +614,6 @@ onMounted(() => productStore.fetchProducts())
 .stock-low  { background: #FEF9C3; color: #CA8A04; }
 .stock-zero { background: #FEE2E2; color: #DC2626; }
 
-/* ── Modal ──────────────────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;

@@ -1,7 +1,7 @@
 package com.project.shiphub.dto.store;
 
 import com.project.shiphub.model.store.DropperStore;
-import com.project.shiphub.model.product.Product;
+import com.project.shiphub.model.store.StoreProduct;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -46,7 +46,7 @@ public class DropperStoreDTO {
         this.dropperName = store.getDropperProfile().getUser().getName();
         this.dropperLevel = store.getDropperProfile().getLevel().name();
 
-        this.products = store.getProducts().stream()
+        this.products = store.getStoreProducts().stream()
                 .map(StoreProductDTO::new)
                 .collect(Collectors.toList());
     }
@@ -56,19 +56,23 @@ public class DropperStoreDTO {
         private Long id;
         private String nome;
         private BigDecimal preco;
+        private BigDecimal precoCusto;
+        private BigDecimal margemDropper;
         private String descricao;
         private String imagem;
         private String categoria;
         private Integer estoque;
 
-        public StoreProductDTO(Product product) {
-            this.id = product.getId();
-            this.nome = product.getNome();
-            this.preco = product.getPreco();
-            this.descricao = product.getDescricao();
-            this.imagem = product.getImagem();
-            this.categoria = product.getCategoria();
-            this.estoque = product.getEstoque();
+        public StoreProductDTO(StoreProduct sp) {
+            this.id = sp.getProduct().getId();
+            this.nome = sp.getProduct().getNome();
+            this.preco = sp.getCustomPrice();
+            this.precoCusto = sp.getProduct().getPreco();
+            this.margemDropper = sp.getCustomPrice().subtract(sp.getProduct().getPreco());
+            this.descricao = sp.getProduct().getDescricao();
+            this.imagem = sp.getProduct().getImagem();
+            this.categoria = sp.getProduct().getCategoria();
+            this.estoque = sp.getProduct().getEstoque();
         }
     }
 }
