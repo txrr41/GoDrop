@@ -34,12 +34,6 @@ public class WebhookController {
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader
     ) {
-        // ✅✅✅ ADICIONE ESTAS LINHAS ✅✅✅
-        System.out.println("\n\n");
-        System.out.println("Webhook recebido");
-        System.out.println("Tamanho do payload: " + payload.length() + " bytes");
-        System.out.println("Signature: " + sigHeader.substring(0, Math.min(30, sigHeader.length())));
-        System.out.println("\n");
 
         Event event;
 

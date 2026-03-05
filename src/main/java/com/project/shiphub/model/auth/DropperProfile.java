@@ -49,6 +49,18 @@ public class DropperProfile {
     @Builder.Default
     private DropperStatus status = DropperStatus.PENDING;
 
+    @Column(name = "stripe_account_id", unique = true, length = 100)
+    private String stripeAccountId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "stripe_account_status")
+    @Builder.Default
+    private DropperStripeStatus stripeAccountStatus = DropperStripeStatus.NOT_CONNECTED;
+
+    @Column(name = "stripe_charges_enabled", nullable = false)
+    @Builder.Default
+    private Boolean stripeChargesEnabled = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
