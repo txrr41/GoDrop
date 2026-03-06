@@ -7,12 +7,7 @@
     <div class="w-100 h-100 d-flex flex-column">
 
       <div class="top-row d-flex align-center px-md-10 px-4 flex-grow-1">
-        <v-btn
-            icon
-            variant="text"
-            class="nav-toggle-btn mr-2"
-            @click="emit('toggle-sidebar')"
-        >
+        <v-btn v-if="auth.isStaff || auth.isOwner" icon @click="emit('toggle-sidebar')">
           <v-icon size="24">mdi-menu-variant</v-icon>
         </v-btn>
 
