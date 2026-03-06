@@ -1,19 +1,25 @@
 package com.project.shiphub.controller.webhook;
 
+import com.project.shiphub.model.order.Order;
+import com.project.shiphub.model.order.OrderItem;
+import com.project.shiphub.model.order.OrderStatus;
+import com.project.shiphub.model.product.Product;
 import com.project.shiphub.repository.order.OrderRepository;
+import com.project.shiphub.repository.product.ProductRepository;
 import com.project.shiphub.service.auth.DropperService;
+import com.project.shiphub.service.email.EmailService;
 import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
-import com.project.shiphub.model.order.Order;
-import com.project.shiphub.model.order.OrderStatus;
-import com.project.shiphub.service.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 
 @RestController
@@ -23,6 +29,7 @@ import java.time.LocalDateTime;
 public class WebhookController {
 
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
     private final DropperService dropperService;
     private final EmailService emailService;
 
@@ -34,167 +41,121 @@ public class WebhookController {
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader
     ) {
-
         Event event;
-
         try {
-            event = Webhook.constructEvent(
-                    payload,
-                    sigHeader,
-                    webhookSecret
-            );
-
-            System.out.println("✅ Evento validado com sucesso!");
-            System.out.println("Tipo: " + event.getType());
-
+            event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
+            log.info("✅ Webhook recebido: {}", event.getType());
         } catch (SignatureVerificationException e) {
-            System.out.println("❌ ERRO: Assinatura inválida!");
-            System.out.println("Webhook secret configurado: " + (webhookSecret != null ? "SIM" : "NÃO"));
+            log.error("❌ Assinatura inválida");
             return ResponseEntity.status(400).body("Invalid signature");
         }
 
-        String eventType = event.getType();
-        System.out.println("📬 Tipo de evento: " + eventType);
-
         try {
-            switch (eventType) {
-                case "payment_intent.succeeded":
-                    System.out.println("🎉 PROCESSANDO PAGAMENTO APROVADO!");
-                    handlePaymentSucceeded(event);
-                    break;
-
-                case "payment_intent.payment_failed":
-                    System.out.println("❌ PROCESSANDO PAGAMENTO FALHO");
-                    handlePaymentFailed(event);
-                    break;
-
-                default:
-                    System.out.println("ℹ️ Evento não processado: " + eventType);
+            switch (event.getType()) {
+                case "payment_intent.succeeded"      -> handlePaymentSucceeded(event);
+                case "payment_intent.payment_failed" -> handlePaymentFailed(event);
+                default -> log.info("ℹ️ Evento ignorado: {}", event.getType());
             }
-
-            System.out.println("✅ Webhook processado com sucesso!\n\n");
-            return ResponseEntity.ok("Webhook processed successfully");
-
+            return ResponseEntity.ok("ok");
         } catch (Exception e) {
-            System.out.println("❌ ERRO ao processar webhook:");
-            e.printStackTrace();
+            log.error("❌ Erro ao processar webhook: {}", e.getMessage(), e);
             return ResponseEntity.status(500).body("Webhook processing failed");
         }
     }
 
-    private void handlePaymentSucceeded(Event event) {
+    private void handlePaymentSucceeded(Event event) throws StripeException {
+        // Busca o PaymentIntent diretamente na Stripe pelo ID do evento
+        // Evita problemas de incompatibilidade de versão na deserialização
+        String paymentIntentId = event.getDataObjectDeserializer()
+                .getRawJson()
+                .contains("\"id\"") ? extractIdFromEvent(event) : null;
+
+        if (paymentIntentId == null) {
+            log.error("❌ Não foi possível extrair o PaymentIntent ID do evento");
+            return;
+        }
+
+        log.info("🔍 Buscando PaymentIntent na Stripe: {}", paymentIntentId);
+        PaymentIntent pi = PaymentIntent.retrieve(paymentIntentId);
+
+        String orderIdStr = pi.getMetadata().get("order_id");
+        if (orderIdStr == null) {
+            log.error("❌ order_id não encontrado nos metadados do PaymentIntent {}", paymentIntentId);
+            return;
+        }
+
+        Long orderId = Long.parseLong(orderIdStr);
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new RuntimeException("Pedido #" + orderId + " não encontrado"));
+
+        if (order.getStatus() == OrderStatus.PAYMENT_APPROVED) {
+            log.warn("⚠️ Pedido #{} já aprovado — ignorando duplicata", orderId);
+            return;
+        }
+
+        // ✅ Desconta estoque de cada item do pedido
+        for (OrderItem item : order.getItems()) {
+            Product product = item.getProduct();
+            int estoqueAtual = product.getEstoque() != null ? product.getEstoque() : 0;
+            int novoEstoque  = Math.max(0, estoqueAtual - item.getQuantity());
+            product.setEstoque(novoEstoque);
+            productRepository.save(product);
+            log.info("📦 Estoque: {} | {} → {}", product.getNome(), estoqueAtual, novoEstoque);
+        }
+
+        order.setStatus(OrderStatus.PAYMENT_APPROVED);
+        orderRepository.save(order);
+        log.info("✅ Pedido #{} aprovado e estoque atualizado", orderId);
+
         try {
-            PaymentIntent paymentIntent = (PaymentIntent) event
-                    .getDataObjectDeserializer()
-                    .deserializeUnsafe();
-
-
-            System.out.println("PaymentIntent ID: " + paymentIntent.getId());
-            System.out.println("Valor: R$ " + (paymentIntent.getAmountReceived() / 100.0));
-
-            System.out.println("\n📦 METADADOS RECEBIDOS:");
-            if (paymentIntent.getMetadata() != null && !paymentIntent.getMetadata().isEmpty()) {
-                paymentIntent.getMetadata().forEach((key, value) ->
-                        System.out.println("   " + key + " = " + value)
-                );
-            } else {
-                System.out.println("⚠️ NENHUM METADATA!");
-            }
-
-            String orderIdStr = paymentIntent.getMetadata().get("order_id");
-
-            if (orderIdStr == null || orderIdStr.isEmpty()) {
-                System.out.println("❌ ERRO: order_id NÃO ENCONTRADO!");
-                System.out.println("Metadata disponível: " + paymentIntent.getMetadata());
-                return;
-            }
-
-            System.out.println("✅ order_id encontrado: " + orderIdStr);
-
-            Long orderId = Long.parseLong(orderIdStr);
-            System.out.println("Buscando pedido #" + orderId + " no banco...");
-
-            Order order = orderRepository.findByIdWithItems(orderId)
-                    .orElseThrow(() -> {
-                        System.out.println("❌ Pedido #" + orderId + " NÃO ENCONTRADO no banco!");
-                        return new RuntimeException("Pedido não encontrado");
-                    });
-
-            System.out.println("✅ Pedido encontrado!");
-            System.out.println("   ID: " + order.getId());
-            System.out.println("   Status ATUAL: " + order.getStatus());
-            System.out.println("   Comprador: " + order.getBuyerEmail());
-
-            System.out.println("\n🔄 Atualizando status...");
-            OrderStatus statusAnterior = order.getStatus();
-            order.setStatus(OrderStatus.PAYMENT_APPROVED);
-
-            Order saved = orderRepository.save(order);
-
-            System.out.println("✅ Status atualizado!");
-            System.out.println("   Antes: " + statusAnterior);
-            System.out.println("   Depois: " + saved.getStatus());
-
-
-            Order verificacao = orderRepository.findById(orderId).orElse(null);
-            if (verificacao != null) {
-                System.out.println("\n🔍 Verificação no banco:");
-                System.out.println("   Status: " + verificacao.getStatus());
-
-                if (verificacao.getStatus() != OrderStatus.PAYMENT_APPROVED) {
-                    System.out.println("❌❌❌ ERRO: Status NÃO salvou!");
-                }
-            }
-
-            System.out.println("\n📧 Enviando email...");
-            try {
-                emailService.sendOrderConfirmationEmail(order, LocalDateTime.now());
-                System.out.println("✅ Email enviado!");
-            } catch (Exception e) {
-                System.out.println("⚠️ Erro ao enviar email: " + e.getMessage());
-            }
-
-            try {
-                dropperService.updateSalesAndLevel(order.getUser().getId(), order.getTotalAmount());
-                System.out.println("Sales e level do dropper atualizados!");
-            } catch (Exception e) {
-                System.out.println("Usuário não é dropper ou erro ao atualizar: " + e.getMessage());
-            }
-
+            emailService.sendOrderConfirmationEmail(order, LocalDateTime.now());
         } catch (Exception e) {
-            System.out.println("❌ ERRO em handlePaymentSucceeded:");
-            e.printStackTrace();
-            throw new RuntimeException("Erro ao processar pagamento", e);
+            log.warn("⚠️ Erro ao enviar email: {}", e.getMessage());
+        }
+
+        try {
+            dropperService.updateSalesAndLevel(order.getUser().getId(), order.getTotalAmount());
+        } catch (Exception e) {
+            log.debug("Usuário não é dropper: {}", e.getMessage());
         }
     }
 
     private void handlePaymentFailed(Event event) {
+        String paymentIntentId = extractIdFromEvent(event);
+        if (paymentIntentId == null) return;
+
         try {
-            PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                    .getObject()
-                    .orElseThrow(() -> new RuntimeException("Failed to deserialize PaymentIntent"));
-
-            String errorMessage = paymentIntent.getLastPaymentError() != null
-                    ? paymentIntent.getLastPaymentError().getMessage()
-                    : "Erro desconhecido";
-
-            System.out.println("❌ Pagamento falhou: " + errorMessage);
-
-            String orderIdStr = paymentIntent.getMetadata().get("order_id");
+            PaymentIntent pi = PaymentIntent.retrieve(paymentIntentId);
+            String orderIdStr = pi.getMetadata().get("order_id");
             if (orderIdStr == null) return;
 
-            Long orderId = Long.parseLong(orderIdStr);
-            Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+            orderRepository.findById(Long.parseLong(orderIdStr)).ifPresent(order -> {
+                order.setStatus(OrderStatus.PAYMENT_FAILED);
+                orderRepository.save(order);
+                log.info("❌ Pedido #{} marcado como PAYMENT_FAILED", order.getId());
+            });
+        } catch (StripeException e) {
+            log.error("❌ Erro ao buscar PaymentIntent: {}", e.getMessage());
+        }
+    }
 
-            order.setStatus(OrderStatus.PAYMENT_FAILED);
-            orderRepository.save(order);
-
-            System.out.println("Pedido #" + orderId + " marcado como PAYMENT_FAILED");
-
+    /**
+     * Extrai o "id" do objeto de dados do evento diretamente do JSON bruto.
+     * Mais robusto que deserializar, funciona independente da versão da lib.
+     */
+    private String extractIdFromEvent(Event event) {
+        try {
+            EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
+            String raw = deserializer.getRawJson();
+            // O JSON tem formato: {"id":"pi_xxx", ...}
+            int idx = raw.indexOf("\"id\":\"");
+            if (idx == -1) return null;
+            int start = idx + 6;
+            int end   = raw.indexOf("\"", start);
+            return raw.substring(start, end);
         } catch (Exception e) {
-            System.out.println("❌ Erro em handlePaymentFailed:");
-            e.printStackTrace();
+            log.error("❌ Erro ao extrair ID do evento: {}", e.getMessage());
+            return null;
         }
     }
 }

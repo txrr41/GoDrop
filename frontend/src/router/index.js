@@ -175,7 +175,26 @@ const routes = [
     {
         path: '/loja-info',
         component: DropperStoreLanding
-    }
+    },
+    {
+        path: '/dropper/dashboard',
+        component: MainLayout,
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: '',
+                component: () => import('../pages/DropperStoreDashboard.vue'),
+            }
+        ]
+    },
+    {
+        path: '/dropper/stripe/return',
+        redirect: '/dropper/dashboard?stripe=return'
+    },
+    {
+        path: '/dropper/stripe/refresh',
+        redirect: '/dropper/dashboard?stripe=refresh'
+    },
 
 
 ]

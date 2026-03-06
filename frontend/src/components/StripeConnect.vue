@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import api from '../api/api'
 
 const props = defineProps({
@@ -165,13 +165,6 @@ const snackbar = ref(false)
 const snackbarMsg = ref('')
 const snackbarColor = ref('success')
 
-onMounted(() => {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('stripe') === 'return') {
-    syncAccount()
-    window.history.replaceState({}, '', window.location.pathname)
-  }
-})
 
 async function startOnboarding() {
   try {

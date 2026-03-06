@@ -1,5 +1,5 @@
 <template>
-  <div class="dash-root">
+  <div v-if="store" class="dash-root">
 
     <div class="store-banner"
          :style="`background: linear-gradient(135deg, ${store.primaryColor}E6, ${store.secondaryColor}E6)`">
@@ -62,8 +62,7 @@
       <div class="stat-card">
         <div class="sc-icon blue">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path
-                d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
           </svg>
         </div>
         <div class="sc-data">
@@ -86,8 +85,7 @@
       <div class="stat-card">
         <div class="sc-icon amber">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
         </div>
         <div class="sc-data">
@@ -95,13 +93,10 @@
           <span class="sc-label">Nível atual</span>
         </div>
       </div>
-      <!-- Card de status Stripe -->
       <div class="stat-card" style="cursor:pointer" @click="tab = 'payments'">
         <div class="sc-icon" :class="stripeIconClass">
           <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
-            <path
-                d="M22.5 18.5c0-1.1.9-1.5 2.3-1.5 2.1 0 4.7.6 6.7 1.7v-6.3c-2.2-.9-4.5-1.4-6.7-1.4-5.5 0-9.2 2.9-9.2 7.7 0 7.5 10.3 6.3 10.3 9.5 0 1.3-1.1 1.7-2.6 1.7-2.3 0-5.2-.9-7.5-2.2v6.4c2.5 1.1 5.1 1.6 7.5 1.6 5.7 0 9.6-2.8 9.6-7.7-.1-8.1-10.4-6.6-10.4-9.5z"
-                fill="currentColor"/>
+            <path d="M22.5 18.5c0-1.1.9-1.5 2.3-1.5 2.1 0 4.7.6 6.7 1.7v-6.3c-2.2-.9-4.5-1.4-6.7-1.4-5.5 0-9.2 2.9-9.2 7.7 0 7.5 10.3 6.3 10.3 9.5 0 1.3-1.1 1.7-2.6 1.7-2.3 0-5.2-.9-7.5-2.2v6.4c2.5 1.1 5.1 1.6 7.5 1.6 5.7 0 9.6-2.8 9.6-7.7-.1-8.1-10.4-6.6-10.4-9.5z" fill="currentColor"/>
           </svg>
         </div>
         <div class="sc-data">
@@ -114,8 +109,7 @@
     <div class="tabs-nav">
       <button class="tab-btn" :class="{ active: tab === 'products' }" @click="tab = 'products'">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path
-              d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
         </svg>
         Produtos
       </button>
@@ -125,8 +119,7 @@
           <circle cx="17.5" cy="10.5" r=".5"/>
           <circle cx="8.5" cy="7.5" r=".5"/>
           <circle cx="6.5" cy="12.5" r=".5"/>
-          <path
-              d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
         </svg>
         Aparência
       </button>
@@ -136,7 +129,6 @@
           <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
         Pagamentos
-        <!-- bolinha vermelha se não conectou ainda -->
         <span v-if="stripeStatus === 'NOT_CONNECTED' || stripeStatus === 'PENDING'" class="tab-alert"></span>
       </button>
     </div>
@@ -204,6 +196,7 @@
       </div>
     </div>
 
+    <!-- ABA: APARÊNCIA -->
     <div v-show="tab === 'appearance'" class="tab-panel">
       <div class="appearance-grid">
         <div class="appearance-form">
@@ -347,63 +340,68 @@
     </transition>
 
   </div>
+
+  <!-- Loading enquanto busca os dados -->
+  <div v-else class="loading-state">
+    <div class="spinner"></div>
+  </div>
 </template>
 
 <script setup>
-import {ref, computed, onMounted} from 'vue'
-import {useStoreStore} from '../stores/store'
-import {useDropperStore} from '../stores/dropper'
+import { ref, computed, onMounted } from 'vue'
+import { useStoreStore } from '../stores/store'
+import { useDropperStore } from '../stores/dropper'
+import api from '../api/api.js'
 import DropperProductSelector from '../components/DropperProductSelector.vue'
 import StripeConnect from '../components/StripeConnect.vue'
 
-const storeStore = useStoreStore()
+const storeStore   = useStoreStore()
 const dropperStore = useDropperStore()
 
-const tab = ref('products')
+const tab              = ref('products')
 const managingProducts = ref(false)
-const snackbar = ref(false)
-const snackbarMessage = ref('')
-const snackbarColor = ref('success')
-const copied = ref(false)
+const snackbar         = ref(false)
+const snackbarMessage  = ref('')
+const snackbarColor    = ref('success')
+const copied           = ref(false)
 
-const store = computed(() => storeStore.myStore)
+const store          = computed(() => storeStore.myStore)
 const dropperProfile = computed(() => dropperStore.profile)
 
-// Status Stripe vem do perfil do dropper
 const stripeStatus = ref('NOT_CONNECTED')
 
 const stripeStatusLabel = computed(() => ({
   NOT_CONNECTED: 'Não conectada',
-  PENDING: 'Incompleta',
-  RESTRICTED: 'Pendente',
-  ACTIVE: 'Ativa ✓',
-  DISABLED: 'Desabilitada',
+  PENDING:       'Incompleta',
+  RESTRICTED:    'Pendente',
+  ACTIVE:        'Ativa ✓',
+  DISABLED:      'Desabilitada',
 }[stripeStatus.value] ?? 'Desconhecido'))
 
 const stripeIconClass = computed(() => ({
   NOT_CONNECTED: 'stripe-nc',
-  PENDING: 'stripe-pending',
-  RESTRICTED: 'stripe-restricted',
-  ACTIVE: 'stripe-active',
-  DISABLED: 'stripe-nc',
+  PENDING:       'stripe-pending',
+  RESTRICTED:    'stripe-restricted',
+  ACTIVE:        'stripe-active',
+  DISABLED:      'stripe-nc',
 }[stripeStatus.value] ?? 'stripe-nc'))
 
 const colorFields = [
-  {key: 'primaryColor', label: 'Primária'},
-  {key: 'secondaryColor', label: 'Secundária'},
-  {key: 'backgroundColor', label: 'Fundo'},
+  { key: 'primaryColor',    label: 'Primária' },
+  { key: 'secondaryColor',  label: 'Secundária' },
+  { key: 'backgroundColor', label: 'Fundo' },
 ]
 
 const editForm = ref({
-  storeName: '',
-  slogan: '',
-  primaryColor: '#2563EB',
-  secondaryColor: '#0EA5E9',
+  storeName:       '',
+  slogan:          '',
+  primaryColor:    '#2563EB',
+  secondaryColor:  '#0EA5E9',
   backgroundColor: '#F8FAFC',
 })
 
 function formatMoney(value) {
-  return (value ?? 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})
+  return (value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
 }
 
 async function toggleStore() {
@@ -430,7 +428,6 @@ async function onProductsUpdated(newIds) {
   notify(`${newIds.length} produto(s) salvos na loja! 🛍️`)
 }
 
-// Chamado pelo StripeConnect quando o status muda
 function onStripeStatusChanged(data) {
   stripeStatus.value = data.status
   if (data.status === 'ACTIVE') {
@@ -440,31 +437,45 @@ function onStripeStatusChanged(data) {
 
 function notify(message, color = 'success') {
   snackbarMessage.value = message
-  snackbarColor.value = color
-  snackbar.value = true
+  snackbarColor.value   = color
+  snackbar.value        = true
   setTimeout(() => snackbar.value = false, 3000)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Carrega store e perfil em paralelo antes de renderizar
+  await Promise.all([
+    storeStore.fetchMyStore(),
+    dropperStore.fetchProfile()
+  ])
+
+  // Preenche o formulário de aparência com os dados carregados
   if (store.value) {
     editForm.value = {
-      storeName: store.value.storeName,
-      slogan: store.value.slogan,
-      primaryColor: store.value.primaryColor,
-      secondaryColor: store.value.secondaryColor,
+      storeName:       store.value.storeName,
+      slogan:          store.value.slogan,
+      primaryColor:    store.value.primaryColor,
+      secondaryColor:  store.value.secondaryColor,
       backgroundColor: store.value.backgroundColor,
     }
   }
-  // Pega o status Stripe do perfil do dropper
+
+  // Pega status Stripe do perfil
   if (dropperProfile.value?.stripeAccountStatus) {
     stripeStatus.value = dropperProfile.value.stripeAccountStatus
   }
 
-  // Se voltou do onboarding da Stripe
+  // Voltou do onboarding da Stripe → sincroniza automaticamente
   const params = new URLSearchParams(window.location.search)
   if (params.get('stripe') === 'return' || params.get('stripe') === 'refresh') {
     tab.value = 'payments'
     window.history.replaceState({}, '', window.location.pathname)
+    try {
+      const { data } = await api.post('/api/dropper/stripe/sync')
+      stripeStatus.value = data.status
+    } catch (e) {
+      console.error('Erro ao sincronizar Stripe:', e)
+    }
   }
 })
 </script>
@@ -476,6 +487,23 @@ onMounted(() => {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* ── LOADING ── */
+.loading-state {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E2E8F0;
+  border-top-color: #0F172A;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 .dash-root {
@@ -725,40 +753,13 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.sc-icon.blue {
-  background: #EFF6FF;
-  color: #2563EB;
-}
-
-.sc-icon.green {
-  background: #F0FDF4;
-  color: #16A34A;
-}
-
-.sc-icon.amber {
-  background: #FFFBEB;
-  color: #D97706;
-}
-
-.sc-icon.stripe-active {
-  background: #F0FDF4;
-  color: #16A34A;
-}
-
-.sc-icon.stripe-pending {
-  background: #FFFBEB;
-  color: #D97706;
-}
-
-.sc-icon.stripe-restricted {
-  background: #FFF7ED;
-  color: #EA580C;
-}
-
-.sc-icon.stripe-nc {
-  background: #F1F5F9;
-  color: #94A3B8;
-}
+.sc-icon.blue            { background: #EFF6FF; color: #2563EB; }
+.sc-icon.green           { background: #F0FDF4; color: #16A34A; }
+.sc-icon.amber           { background: #FFFBEB; color: #D97706; }
+.sc-icon.stripe-active   { background: #F0FDF4; color: #16A34A; }
+.sc-icon.stripe-pending  { background: #FFFBEB; color: #D97706; }
+.sc-icon.stripe-restricted { background: #FFF7ED; color: #EA580C; }
+.sc-icon.stripe-nc       { background: #F1F5F9; color: #94A3B8; }
 
 .sc-data {
   display: flex;
@@ -1110,9 +1111,7 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 /* ── LIVE PREVIEW ── */
@@ -1158,17 +1157,9 @@ onMounted(() => {
   border-radius: 50%;
 }
 
-.apb-dots span:nth-child(1) {
-  background: #EF4444;
-}
-
-.apb-dots span:nth-child(2) {
-  background: #F59E0B;
-}
-
-.apb-dots span:nth-child(3) {
-  background: #22C55E;
-}
+.apb-dots span:nth-child(1) { background: #EF4444; }
+.apb-dots span:nth-child(2) { background: #F59E0B; }
+.apb-dots span:nth-child(3) { background: #22C55E; }
 
 .apb-url {
   flex: 1;
@@ -1225,25 +1216,9 @@ onMounted(() => {
   gap: 4px;
 }
 
-.apbp-name {
-  height: 7px;
-  background: #E2E8F0;
-  border-radius: 4px;
-}
-
-.apbp-price {
-  height: 7px;
-  width: 55%;
-  border-radius: 4px;
-  transition: background 0.4s;
-}
-
-.apbp-btn {
-  height: 22px;
-  border-radius: 5px;
-  margin-top: 2px;
-  transition: background 0.4s;
-}
+.apbp-name  { height: 7px; background: #E2E8F0; border-radius: 4px; }
+.apbp-price { height: 7px; width: 55%; border-radius: 4px; transition: background 0.4s; }
+.apbp-btn   { height: 22px; border-radius: 5px; margin-top: 2px; transition: background 0.4s; }
 
 /* ── PAYMENTS TAB ── */
 .stripe-warning {
@@ -1313,22 +1288,9 @@ onMounted(() => {
   gap: 3px;
 }
 
-.se-text strong {
-  font-size: 13px;
-  font-weight: 600;
-  color: #0F172A;
-}
-
-.se-text span {
-  font-size: 12px;
-  color: #64748B;
-}
-
-.se-arrow {
-  font-size: 20px;
-  color: #CBD5E1;
-  flex-shrink: 0;
-}
+.se-text strong { font-size: 13px; font-weight: 600; color: #0F172A; }
+.se-text span   { font-size: 12px; color: #64748B; }
+.se-arrow       { font-size: 20px; color: #CBD5E1; flex-shrink: 0; }
 
 /* ── TOAST ── */
 .toast {
@@ -1344,21 +1306,10 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.toast.success {
-  background: #0F172A;
-  color: white;
-}
+.toast.success { background: #0F172A; color: white; }
+.toast.warning { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
 
-.toast.warning {
-  background: #FEF3C7;
-  color: #92400E;
-  border: 1px solid #FDE68A;
-}
-
-.toast-enter-active, .toast-leave-active {
-  transition: all 0.3s ease;
-}
-
+.toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
 .toast-enter-from, .toast-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(10px);
@@ -1366,44 +1317,17 @@ onMounted(() => {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .stats-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-
-  .appearance-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .banner-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .banner-right {
-    flex-direction: row;
-  }
-
-  .appearance-preview {
-    position: static;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .se-steps {
-    flex-direction: column;
-  }
-
-  .se-arrow {
-    transform: rotate(90deg);
-  }
+  .stats-row          { grid-template-columns: 1fr; }
+  .appearance-grid    { grid-template-columns: 1fr; }
+  .banner-inner       { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .banner-right       { flex-direction: row; }
+  .appearance-preview { position: static; }
+  .form-row           { grid-template-columns: 1fr; }
+  .se-steps           { flex-direction: column; }
+  .se-arrow           { transform: rotate(90deg); }
 }
 </style>

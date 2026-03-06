@@ -4,6 +4,10 @@ import com.project.shiphub.dto.payment.CreatePaymentRequest;
 import com.project.shiphub.dto.payment.PaymentResponse;
 import com.project.shiphub.model.auth.User;
 import com.project.shiphub.model.order.Order;
+import com.project.shiphub.model.product.Product;
+import com.project.shiphub.model.store.DropperStore;
+import com.project.shiphub.model.store.StoreProduct;
+import com.project.shiphub.repository.store.DropperStoreRepository;
 import com.project.shiphub.service.auth.DropperService;
 import com.project.shiphub.service.order.OrderService;
 import com.project.shiphub.service.payment.StripePaymentService;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -26,6 +32,7 @@ public class PaymentController {
     private final StripePaymentService stripePaymentService;
     private final OrderService orderService;
     private final DropperService dropperService;
+    private final DropperStoreRepository dropperStoreRepository;
 
     @PostMapping("/create")
     public ResponseEntity<PaymentResponse> createPayment(
@@ -37,37 +44,93 @@ public class PaymentController {
         try {
             User user = (User) authentication.getPrincipal();
 
+            // Aplica desconto de nível do dropper (comprador)
             int discount = dropperService.getDiscount(user.getId());
-            long originalAmount = request.getAmountInCents();
-                if (discount > 0) {
-                   BigDecimal amount = new BigDecimal(request.getAmountInCents());
-                   BigDecimal discountPercent = new BigDecimal(discount);
+            if (discount > 0) {
+                long original = request.getAmountInCents();
+                BigDecimal discounted = new BigDecimal(original)
+                        .multiply(new BigDecimal(100 - discount))
+                        .divide(new BigDecimal(100), 0, RoundingMode.HALF_UP);
+                request.setAmountInCents(discounted.longValue());
+                log.info("Desconto dropper {}% aplicado: {} → {}", discount, original, discounted);
+            }
 
-                   BigDecimal discountRank = amount
-                           .multiply(discountPercent)
-                           .divide(new BigDecimal(100), 0, RoundingMode.HALF_UP);
-                    BigDecimal finalAmount = amount.subtract(discountRank);
+            // Se for compra em loja de dropper, calcula margem e configura split
+            if (request.getStoreSlug() != null && !request.getStoreSlug().isBlank()) {
+                dropperStoreRepository.findActiveBySlug(request.getStoreSlug())
+                        .ifPresent(store -> configurarSplit(store, request));
+            }
 
-                    request.setAmountInCents(finalAmount.longValue());
-                    log.info("Desconto dropper de {}% aplicado. De {} Para {}", discount,  originalAmount, finalAmount);
-                }
-
-            BigDecimal total = BigDecimal.valueOf(request.getAmountInCents()).divide(new BigDecimal(100));
+            BigDecimal total = BigDecimal.valueOf(request.getAmountInCents())
+                    .divide(new BigDecimal(100));
 
             Order order = orderService.createOrder(user, total, request);
             request.setOrderId(order.getId());
             request.setBuyerEmail(order.getBuyerEmail());
 
             PaymentResponse response = stripePaymentService.createPayment(request);
-
-            log.info("✅ PaymentIntent criado para pedido #{}", order.getId());
-
+            log.info("✅ Pagamento criado para pedido #{}", order.getId());
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            log.error("❌ Erro ao processar pedido/pagamento", e);
+            log.error("❌ Erro ao processar pagamento", e);
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    private void configurarSplit(DropperStore store, CreatePaymentRequest request) {
+        String stripeAccountId = store.getDropperProfile().getStripeAccountId();
+        Boolean chargesEnabled = store.getDropperProfile().getStripeChargesEnabled();
+
+        if (stripeAccountId == null || !Boolean.TRUE.equals(chargesEnabled)) {
+            log.warn("⚠️ Dropper da loja '{}' sem Stripe ativo — sem split", request.getStoreSlug());
+            return;
+        }
+
+        Map<Long, BigDecimal> customPrices = store.getStoreProducts().stream()
+                .collect(Collectors.toMap(
+                        sp -> sp.getProduct().getId(),
+                        StoreProduct::getCustomPrice
+                ));
+
+        BigDecimal margemTotal = BigDecimal.ZERO;
+
+        for (CreatePaymentRequest.CartItemDTO item : request.getItems()) {
+            BigDecimal customPrice = customPrices.get(item.getProductId());
+            if (customPrice == null) continue;
+
+            Product produto = store.getStoreProducts().stream()
+                    .filter(sp -> sp.getProduct().getId().equals(item.getProductId()))
+                    .map(StoreProduct::getProduct)
+                    .findFirst()
+                    .orElse(null);
+
+            if (produto == null) continue;
+
+            BigDecimal custo = produto.getPreco();
+            BigDecimal margem = customPrice.subtract(custo)
+                    .multiply(new BigDecimal(item.getQuantity()));
+
+            if (margem.compareTo(BigDecimal.ZERO) > 0) {
+                margemTotal = margemTotal.add(margem);
+            }
+        }
+
+        long margemCentavos = margemTotal
+                .multiply(new BigDecimal(100))
+                .setScale(0, RoundingMode.HALF_UP)
+                .longValue();
+
+        if (margemCentavos <= 0) {
+            log.warn("⚠️ Margem do dropper é zero ou negativa — sem split");
+            return;
+        }
+
+        request.setDropperStripeAccountId(stripeAccountId);
+        request.setDropperMarginInCents(margemCentavos);
+
+        log.info("💸 Split configurado: conta={}, margem={} centavos",
+                stripeAccountId, margemCentavos);
     }
 
     @GetMapping("/{id}")
@@ -78,8 +141,7 @@ public class PaymentController {
     @PostMapping("/{id}/refund")
     public ResponseEntity<PaymentResponse> refundPayment(@PathVariable Long id) {
         try {
-            PaymentResponse response = stripePaymentService.refundPayment(id);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(stripePaymentService.refundPayment(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

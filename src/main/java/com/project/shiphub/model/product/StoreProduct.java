@@ -29,7 +29,6 @@ public class StoreProduct {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // Preço definido pelo dropper — GoDrop fica com product.preco, dropper fica com (customPrice - product.preco)
     @Column(name = "custom_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal customPrice;
 }

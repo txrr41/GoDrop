@@ -30,6 +30,9 @@ public class CreatePaymentRequest {
     private String shippingNeighborhood;
     private String shippingCity;
     private String shippingState;
+    private String storeSlug;
+    private String dropperStripeAccountId;
+    private Long dropperMarginInCents;
 
     private List<CartItemDTO> items;
 
@@ -39,5 +42,4 @@ public class CreatePaymentRequest {
         private Integer quantity;
         private Double unitPrice;
     }
-
 }
