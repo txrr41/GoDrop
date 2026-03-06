@@ -108,9 +108,6 @@ public class StripePaymentServiceImp implements StripePaymentService {
         }
 
         if (dropperAccountId != null && dropperMarginCents != null && dropperMarginCents > 0) {
-            // ✅ Regra da Stripe: transfer_data[amount] e application_fee_amount são EXCLUSIVOS.
-            // Usando transfer_data[amount]: a Stripe envia exatamente a margem pro dropper
-            // e a plataforma fica com o restante (total - margem = custo do produto).
             params.setTransferData(
                     PaymentIntentCreateParams.TransferData.builder()
                             .setDestination(dropperAccountId)

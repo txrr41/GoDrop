@@ -107,12 +107,6 @@ public class WebhookServiceImp implements WebhookService {
         orderRepository.save(order);
         log.info("📦 Order status atualizado: PAYMENT_APPROVED");
 
-        // - Enviar email de confirmação
-        // - Gerar nota fiscal
-        // - Notificar vendedor
-        // - Atualizar estoque
-        // - Criar label de envio
-
         log.info("🎉 Pagamento processado com sucesso!");
     }
 
@@ -180,11 +174,6 @@ public class WebhookServiceImp implements WebhookService {
     public void handleRefund(Event event) {
         log.info("↩️ Reembolso processado");
 
-        // Implementar lógica de reembolso
-        // - Atualizar status do pagamento para REFUNDED
-        // - Atualizar status do pedido
-        // - Devolver estoque
-        // - Notificar cliente e vendedor
     }
 
     @Override

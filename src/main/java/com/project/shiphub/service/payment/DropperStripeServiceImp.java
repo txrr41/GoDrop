@@ -25,7 +25,6 @@ public class DropperStripeServiceImp {
     @Value("${stripe.api.key}")
     private String stripeSecretKey;
 
-    // URL base do seu frontend — configure no application.properties
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
