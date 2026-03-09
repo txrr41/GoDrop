@@ -1,9 +1,7 @@
 <template>
-  <!-- OVERLAY -->
   <div class="overlay" @click.self="$emit('close')">
     <div class="auth-container">
       <div class="auth-card">
-        <!-- Logo e Header -->
         <div class="auth-header">
           <div class="logo-container">
             <img :src="LogoDrop" alt="Go Drop" class="auth-logo" />
@@ -15,7 +13,6 @@
           </button>
         </div>
 
-        <!-- Tabs -->
         <div class="auth-tabs">
           <button
               @click="isSignUp = false"
@@ -34,15 +31,12 @@
           <div class="tab-indicator" :class="{ 'sign-up': isSignUp }"></div>
         </div>
 
-        <!-- Title -->
         <div class="auth-title">
           <h1>{{ isSignUp ? 'Comece sua jornada' : 'Bem-vindo de volta' }}</h1>
           <p>{{ isSignUp ? 'Crie sua conta para continuar' : 'Entre com suas credenciais' }}</p>
         </div>
 
-        <!-- Form -->
         <form @submit.prevent="handleSubmit" class="auth-form">
-          <!-- Nome (apenas no cadastro) -->
           <div v-if="isSignUp" class="form-group">
             <label class="form-label">Nome completo</label>
             <div class="input-wrapper">
@@ -57,10 +51,11 @@
                   class="form-input"
                   required
               />
+
             </div>
+            <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
           </div>
 
-          <!-- Email -->
           <div class="form-group">
             <label class="form-label">E-mail</label>
             <div class="input-wrapper">
@@ -75,10 +70,11 @@
                   class="form-input"
                   required
               />
+
             </div>
+            <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
           </div>
 
-          <!-- Senha -->
           <div class="form-group">
             <label class="form-label">Senha</label>
             <div class="input-wrapper">
@@ -92,6 +88,7 @@
                   placeholder="••••••••"
                   class="form-input"
                   required
+
               />
               <button
                   type="button"
@@ -106,11 +103,13 @@
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                   <line x1="1" y1="1" x2="23" y2="23"/>
                 </svg>
+
               </button>
+
             </div>
+            <p v-if="errors.password" class="field-error">{{ errors.password }}</p>
           </div>
 
-          <!-- Password Strength (apenas no cadastro) -->
           <div v-if="isSignUp && password" class="password-strength">
             <div class="strength-bars">
               <div
@@ -124,14 +123,12 @@
             </p>
           </div>
 
-          <!-- Forgot Password (apenas no login) -->
           <div v-if="!isSignUp" class="forgot-password">
             <button type="button" class="forgot-link">
               Esqueceu a senha?
             </button>
           </div>
 
-          <!-- Submit Button -->
           <button type="submit" class="submit-button">
             {{ isSignUp ? 'Criar minha conta' : 'Entrar na plataforma' }}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -141,7 +138,6 @@
           </button>
         </form>
 
-        <!-- Footer -->
         <div class="auth-footer">
           <div class="divider">
             <span>ou continue com</span>
@@ -206,7 +202,25 @@ const str = computed(() => {
   return s
 })
 
+const errors = ref({})
+
+const validateRegister = () => {
+  errors.value = {}
+
+  if (!name.value || name.value.trim().length < 3)
+    errors.value.name = 'Nome deve ter ao menos 3 caracteres'
+
+  if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))
+    errors.value.email = 'E-mail inválido'
+
+  if (str.value < 3)
+    errors.value.password = 'Senha muito fraca — use maiúscula, minúscula e número'
+
+  return Object.keys(errors.value).length === 0
+}
+
 const handleSubmit = async () => {
+  if (isSignUp.value && !validateRegister()) return
   try {
     if (isSignUp.value) {
       await auth.register({
@@ -595,6 +609,13 @@ watch(
   background: #f8fafc;
 }
 
+
+.field-error {
+  color: #ef4444;
+  font-size: 13px;
+  margin: 4px 0 0 4px;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .auth-header,
@@ -621,5 +642,6 @@ watch(
   .social-buttons {
     grid-template-columns: 1fr;
   }
+
 }
 </style>
