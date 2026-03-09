@@ -44,7 +44,7 @@ public class PaymentController {
         try {
             User user = (User) authentication.getPrincipal();
 
-            // Aplica desconto de nível do dropper (comprador)
+            // Aplica desconto de nível do dropper
             int discount = dropperService.getDiscount(user.getId());
             if (discount > 0) {
                 long original = request.getAmountInCents();

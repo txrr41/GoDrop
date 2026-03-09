@@ -77,7 +77,6 @@ public class DropperServiceImp implements DropperService {
         return new DropperProfileDTO(updated);
     }
 
-    // ✅ Novo método para recusar
     public DropperProfileDTO reject(Long dropperProfileId) {
         log.info("❌ Recusando dropper ID: {}", dropperProfileId);
 
@@ -106,7 +105,7 @@ public class DropperServiceImp implements DropperService {
                 .toList();
     }
 
-    // ✅ Lista todos os droppers (sem filtro de status)
+
     public List<DropperProfileDTO> listAll() {
         return dropperProfileRepository.findAll()
                 .stream()

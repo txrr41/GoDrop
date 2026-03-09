@@ -1,7 +1,6 @@
 <template>
   <div class="landing">
 
-    <!-- ── NAV ──────────────────────────────────────── -->
     <nav class="nav">
       <div class="nav-inner">
         <div class="nav-brand">
@@ -24,7 +23,6 @@
       </div>
     </nav>
 
-    <!-- ── HERO ──────────────────────────────────────── -->
     <section class="hero">
       <div class="hero-bg-shape"></div>
       <div class="hero-dots"></div>
@@ -77,7 +75,6 @@
         </div>
 
         <div class="hero-right">
-          <!-- browser mockup -->
           <div class="browser">
             <div class="browser-top">
               <div class="browser-circles">
@@ -105,7 +102,6 @@
             </div>
           </div>
 
-          <!-- theme picker -->
           <div class="theme-row">
             <span class="theme-label">Tema:</span>
             <div class="theme-dots">
@@ -121,7 +117,6 @@
             <span class="theme-name">{{ mockStore.name }}</span>
           </div>
 
-          <!-- floating badge -->
           <div class="hero-badge-float">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
             IA gerou em 3 segundos
@@ -129,14 +124,12 @@
         </div>
       </div>
 
-      <!-- scroll hint -->
       <div class="scroll-hint">
         <div class="scroll-line"></div>
         <span>Role para baixo</span>
       </div>
     </section>
 
-    <!-- ── COMO FUNCIONA ──────────────────────────────── -->
     <section class="how-section" id="how">
       <div class="section-wrap">
         <div class="section-tag">Como funciona</div>
@@ -155,7 +148,6 @@
       </div>
     </section>
 
-    <!-- ── IA SECTION ────────────────────────────────── -->
     <section class="ai-section">
       <div class="ai-bg-accent"></div>
       <div class="section-wrap ai-layout">
@@ -224,7 +216,6 @@
       </div>
     </section>
 
-    <!-- ── NÍVEIS ──────────────────────────────────────── -->
     <section class="levels-section" id="levels">
       <div class="section-wrap">
         <div class="section-tag">Programa de Níveis</div>
@@ -250,7 +241,6 @@
       </div>
     </section>
 
-    <!-- ── FEATURES ────────────────────────────────────── -->
     <section class="features-section">
       <div class="section-wrap">
         <div class="section-tag">Recursos</div>
@@ -265,7 +255,6 @@
       </div>
     </section>
 
-    <!-- ── FAQ ───────────────────────────────────────────── -->
     <section class="faq-section" id="faq">
       <div class="section-wrap faq-layout">
         <div class="faq-left">
@@ -286,7 +275,6 @@
       </div>
     </section>
 
-    <!-- ── CTA ───────────────────────────────────────────── -->
     <section class="cta-section">
       <div class="cta-glow"></div>
       <div class="cta-inner">

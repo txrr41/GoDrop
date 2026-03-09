@@ -1,9 +1,10 @@
 <template>
   <div class="dropper-page">
+
     <!-- HERO SECTION -->
     <section class="hero">
-      <div class="hero-grid-bg"></div>
-      <div class="hero-glow"></div>
+      <div class="hero-bg-shape"></div>
+      <div class="hero-dots"></div>
 
       <nav class="hero-nav">
         <img :src="LogoDrop" alt="Go Drop" class="nav-logo" />
@@ -13,53 +14,51 @@
         </a>
       </nav>
 
-      <div class="hero-content">
-        <div class="hero-eyebrow">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-pill">
+            <span class="pill-dot"></span>
             Go Drop Partners
           </div>
+
+          <h1 class="hero-h1">
+            Escale suas vendas<br/>
+            <em class="hero-em">sem investir em estoque.</em>
+          </h1>
+
+          <p class="hero-p">
+            O programa definitivo para empreendedores. Cadastre seu CNPJ, conecte-se ao nosso centro de distribuição e transforme seu volume de vendas em até <strong>30% de desconto real</strong>.
+          </p>
+
+          <div class="hero-btns">
+            <button class="btn-solid" @click="scrollToForm">
+              Iniciar meu cadastro
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn-outline" @click="scrollToTiers">
+              Conhecer os Níveis
+            </button>
+          </div>
+
+          <div class="hero-trust">
+            <div class="trust-stat">
+              <span class="ts-num">2.4k+</span>
+              <span class="ts-lbl">Empresas parceiras</span>
+            </div>
+            <div class="trust-sep"></div>
+            <div class="trust-stat">
+              <span class="ts-num">R$ 0</span>
+              <span class="ts-lbl">Custo de adesão</span>
+            </div>
+            <div class="trust-sep"></div>
+            <div class="trust-stat">
+              <span class="ts-num">Auto</span>
+              <span class="ts-lbl">Cálculo de nível</span>
+            </div>
+          </div>
         </div>
 
-        <h1 class="hero-title">
-          Escale suas vendas<br />
-          <span class="title-gradient">sem investir em estoque.</span>
-        </h1>
-
-        <p class="hero-desc">
-          O programa definitivo para empreendedores. Cadastre seu CNPJ, conecte-se ao nosso centro de distribuição e transforme seu volume de vendas em até <strong>30% de desconto real</strong>.
-        </p>
-
-        <div class="hero-actions">
-          <button class="btn-primary" @click="scrollToForm">
-            Iniciar meu cadastro
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-          <button class="btn-secondary" @click="scrollToTiers">
-            Conhecer os Níveis
-          </button>
-        </div>
-
-        <div class="hero-trust">
-          <div class="trust-item">
-            <span class="trust-num">2.4k+</span>
-            <span class="trust-lbl">Empresas parceiras</span>
-          </div>
-          <div class="trust-sep"></div>
-          <div class="trust-item">
-            <span class="trust-num">R$ 0</span>
-            <span class="trust-lbl">Custo de adesão</span>
-          </div>
-          <div class="trust-sep"></div>
-          <div class="trust-item">
-            <span class="trust-num">Automático</span>
-            <span class="trust-lbl">Cálculo de nível</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="visual-wrapper">
+        <div class="hero-right">
           <div class="glass-panel main-dashboard">
             <div class="dash-header">
               <div class="dash-title">Performance Mensal</div>
@@ -77,9 +76,9 @@
             </div>
           </div>
 
-          <div class="glass-panel floating-stat fs-1">
+          <div class="floating-stat fs-1">
             <div class="fs-icon blue-bg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
             <div class="fs-info">
               <span class="fs-val">100% Sincronizado</span>
@@ -87,9 +86,9 @@
             </div>
           </div>
 
-          <div class="glass-panel floating-stat fs-2">
+          <div class="floating-stat fs-2">
             <div class="fs-icon green-bg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
             <div class="fs-info">
               <span class="fs-val">Margem de Lucro</span>
@@ -98,21 +97,27 @@
           </div>
         </div>
       </div>
+
+      <div class="scroll-hint">
+        <div class="scroll-line"></div>
+        <span>Role para baixo</span>
+      </div>
     </section>
 
     <!-- COMO FUNCIONA -->
-    <section class="how">
-      <div class="section-container">
+    <section class="how-section" id="how">
+      <div class="section-wrap">
         <div class="section-header">
           <p class="section-eyebrow">Aceleração de negócios</p>
-          <h2 class="section-title">Operação otimizada em 4 passos</h2>
+          <h2 class="section-title">Operação otimizada em <span class="text-blue">4 passos</span></h2>
+          <p class="section-subtitle">Simples, rápido e sem burocracia. Do cadastro à primeira venda em minutos.</p>
         </div>
-        <div class="how-steps">
+
+        <div class="steps-grid">
           <div class="step-line"></div>
-          <div class="step" v-for="(s, i) in steps" :key="i">
-            <div class="step-marker">
-              <div class="step-num">0{{ i + 1 }}</div>
-            </div>
+          <div class="step-card" v-for="(s, i) in steps" :key="i">
+            <div class="step-num-big">0{{ i + 1 }}</div>
+            <div class="step-icon-box">{{ s.icon }}</div>
             <h3 class="step-title">{{ s.title }}</h3>
             <p class="step-desc">{{ s.desc }}</p>
           </div>
@@ -121,21 +126,22 @@
     </section>
 
     <!-- NÍVEIS -->
-    <section class="tiers" id="tiers" ref="tiersSection">
-      <div class="section-container">
+    <section class="tiers-section" id="tiers" ref="tiersSection">
+      <div class="section-wrap">
         <div class="section-header">
           <p class="section-eyebrow">Estrutura de benefícios</p>
-          <h2 class="section-title">Crescimento escalonável</h2>
+          <h2 class="section-title">Crescimento <span class="text-blue">escalonável</span></h2>
           <p class="section-subtitle">Um modelo meritocrático: seu volume de vendas dita sua margem de lucro.</p>
         </div>
 
         <div class="tiers-grid">
-          <div class="tier-card" v-for="tier in tiers" :key="tier.name" :class="['tier-' + tier.key, { 'tier-featured': tier.featured }]">
+          <div class="tier-card" v-for="tier in tiers" :key="tier.name"
+               :class="{ 'tier-featured': tier.featured }">
             <div v-if="tier.featured" class="featured-banner">Plano Recomendado</div>
 
             <div class="tier-header">
-              <div class="tier-icon-wrapper" :style="{ color: tier.color, background: tier.bg }">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <div class="tier-icon-wrapper" :style="{ color: tier.color, background: tier.lightBg }">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               </div>
               <h3 class="tier-name" :style="{ color: tier.color }">{{ tier.name }}</h3>
             </div>
@@ -154,7 +160,7 @@
 
             <ul class="tier-perks">
               <li v-for="perk in tier.perks" :key="perk">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
                 <span>{{ perk }}</span>
               </li>
             </ul>
@@ -165,18 +171,19 @@
 
     <!-- FORMULÁRIO -->
     <section class="form-section" id="form" ref="formSection">
-      <div class="section-container">
+      <div class="section-wrap">
         <div class="form-wrapper">
           <div class="form-left">
-            <h2 class="form-title">Inicie sua jornada<br/>como Parceiro</h2>
-            <p class="form-subtitle">
-              O processo de homologação é instantâneo. Insira os dados da sua empresa abaixo e libere o acesso ao nosso ecossistema de logística e vendas imediatamente.
+            <p class="section-eyebrow">Cadastro de Parceiro</p>
+            <h2 class="section-title">Inicie sua jornada<br/><span class="text-blue">como Parceiro</span></h2>
+            <p class="section-subtitle">
+              O processo de homologação é instantâneo. Insira os dados da sua empresa e libere o acesso ao nosso ecossistema de logística e vendas.
             </p>
 
             <div class="benefits-compact">
               <div class="bc-item" v-for="b in benefitsCompact" :key="b.title">
                 <div class="bc-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
                 <div>
                   <h4>{{ b.title }}</h4>
@@ -187,16 +194,16 @@
           </div>
 
           <div class="form-right">
-            <div class="premium-form-card">
+            <div class="form-card">
               <div v-if="!submitted" class="signup-form">
 
                 <div v-if="!auth.isLogged" class="form-not-logged">
                   <div class="lock-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   </div>
                   <h3>Autenticação Necessária</h3>
                   <p>Acesse sua conta corporativa Go Drop para vincular seu CNPJ ao programa de parceiros.</p>
-                  <button class="btn-primary full-width" @click="goToLogin">
+                  <button class="btn-solid full-width" @click="goToLogin">
                     Fazer Login na Plataforma
                   </button>
                 </div>
@@ -212,7 +219,7 @@
 
                   <div v-if="auth.user?.role === 'DROPPER'" class="already-dropper">
                     <div class="success-ring">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </div>
                     <h3>Conta Homologada</h3>
                     <p>Seu CNPJ já está vinculado ao programa de Parceiros. Boas vendas!</p>
@@ -231,8 +238,8 @@
                             @input="formatCNPJ"
                         />
                         <div class="input-status-icon">
-                          <svg v-if="cnpjStatus === 'valid'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                          <svg v-if="cnpjStatus === 'invalid'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          <svg v-if="cnpjStatus === 'valid'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                          <svg v-if="cnpjStatus === 'invalid'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </div>
                       </div>
                       <p v-if="cnpjError" class="input-error">{{ cnpjError }}</p>
@@ -251,13 +258,13 @@
                     <label class="checkbox-label">
                       <input type="checkbox" v-model="acceptedTerms" class="checkbox-input" />
                       <span class="checkbox-box">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                       </span>
                       <span class="checkbox-text">Declaro que li e concordo com os <a href="#">Termos e Condições Comerciais</a>.</span>
                     </label>
 
                     <button
-                        class="btn-primary btn-submit full-width"
+                        class="btn-solid btn-submit full-width"
                         :disabled="loading || !acceptedTerms || cnpj.length < 18"
                         @click="handleSubmit"
                     >
@@ -270,11 +277,10 @@
 
               <div v-else class="form-success">
                 <div class="success-shield">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                 </div>
                 <h3 class="success-title">Empresa Homologada</h3>
                 <p class="success-desc">Bem-vindo ao Go Drop Partners. Sua infraestrutura de e-commerce acaba de subir de nível.</p>
-
                 <div class="success-card">
                   <div class="sc-row">
                     <span class="sc-lbl">CNPJ Registrado</span>
@@ -285,8 +291,7 @@
                     <span class="sc-val bronze-text">Bronze (5% OFF)</span>
                   </div>
                 </div>
-
-                <button class="btn-primary full-width" @click="goToLogin">
+                <button class="btn-solid full-width" @click="goToLogin">
                   Acessar Dashboard
                 </button>
               </div>
@@ -301,10 +306,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth' // Mantenha seus imports reais
-import LogoDrop from '../assets/LogoDrop.png' // Mantenha seus imports reais
-import api from "../api/api.js";
-import {useDropperStore} from "../stores/dropper.js";// Mantenha seus imports reais
+import { useAuthStore } from '../stores/auth'
+import LogoDrop from '../assets/LogoDrop.png'
+import api from "../api/api.js"
+import { useDropperStore } from "../stores/dropper.js"
 
 const auth = useAuthStore()
 const dropperStore = useDropperStore()
@@ -322,58 +327,56 @@ const tiersSection = ref(null)
 const formSection = ref(null)
 
 const steps = [
-  { title: 'Criação da Conta', desc: 'Registro na plataforma Go Drop com foco em dados corporativos.' },
-  { title: 'Homologação de CNPJ', desc: 'Validação fiscal automática e imediata pela nossa API.' },
-  { title: 'Seleção de Portfólio', desc: 'Acesso ao catálogo de produtos com preço de custo para revenda.' },
-  { title: 'Operação e Escala', desc: 'Venda para seus clientes; nós cuidamos da separação, embalagem e envio.' },
+  { icon: '🏢', title: 'Criação da Conta',      desc: 'Registro na plataforma Go Drop com foco em dados corporativos.' },
+  { icon: '✅', title: 'Homologação de CNPJ',   desc: 'Validação fiscal automática e imediata pela nossa API.' },
+  { icon: '📦', title: 'Seleção de Portfólio',  desc: 'Acesso ao catálogo de produtos com preço de custo para revenda.' },
+  { icon: '🚀', title: 'Operação e Escala',     desc: 'Venda para seus clientes; nós cuidamos da separação, embalagem e envio.' },
 ]
 
 const tiers = [
   {
-    key: 'bronze', name: 'Bronze', color: '#B08D57', bg: 'rgba(176, 141, 87, 0.1)', discount: 5, threshold: 'R$ 0',
+    key: 'bronze', name: 'Bronze', color: '#92400E', lightBg: 'rgba(180,83,9,0.08)', discount: 5, threshold: 'R$ 0',
     featured: false,
     perks: ['Desconto base ativo', 'Acesso ao catálogo atacadista', 'Suporte ticket standard']
   },
   {
-    key: 'silver', name: 'Silver', color: '#9CA3AF', bg: 'rgba(156, 163, 175, 0.1)', discount: 10, threshold: 'R$ 5.000',
+    key: 'silver', name: 'Silver', color: '#475569', lightBg: 'rgba(71,85,105,0.08)', discount: 10, threshold: 'R$ 5.000',
     featured: false,
     perks: ['Selo de parceiro verificado', 'Suporte prioritário (SLA 12h)', 'Dashboard analítico avançado']
   },
   {
-    key: 'gold', name: 'Gold', color: '#FBBF24', bg: 'rgba(251, 191, 36, 0.1)', discount: 15, threshold: 'R$ 20.000',
+    key: 'gold', name: 'Gold', color: '#D97706', lightBg: 'rgba(217,119,6,0.08)', discount: 15, threshold: 'R$ 20.000',
     featured: true,
     perks: ['Acesso early-bird a estoques', 'Canal direto no WhatsApp', 'Comissionamento em cross-sell']
   },
   {
-    key: 'platinum', name: 'Platinum', color: '#60A5FA', bg: 'rgba(96, 165, 250, 0.1)', discount: 22, threshold: 'R$ 60.000',
+    key: 'platinum', name: 'Platinum', color: '#2563EB', lightBg: 'rgba(37,99,235,0.08)', discount: 22, threshold: 'R$ 60.000',
     featured: false,
     perks: ['Account Manager dedicado', 'White-label nas embalagens', 'Integração via API REST']
   },
   {
-    key: 'diamond', name: 'Diamond', color: '#A78BFA', bg: 'rgba(167, 139, 250, 0.1)', discount: 30, threshold: 'R$ 150.000',
+    key: 'diamond', name: 'Diamond', color: '#7C3AED', lightBg: 'rgba(124,58,237,0.08)', discount: 30, threshold: 'R$ 150.000',
     featured: false,
     perks: ['Condições B2B customizadas', 'Participação no conselho parceiro', 'Fundo de Co-marketing']
   },
 ]
 
 const benefitsCompact = [
-  { title: 'Zero investimento em infra', desc: 'Armazenamento, picking e packing por nossa conta.' },
-  { title: 'Rastreabilidade B2B', desc: 'Logística transparente para você e seu cliente final.' },
-  { title: 'Integração tecnológica', desc: 'Sincronização de estoque contra quebras de venda.' },
+  { title: 'Zero investimento em infra',  desc: 'Armazenamento, picking e packing por nossa conta.' },
+  { title: 'Rastreabilidade B2B',         desc: 'Logística transparente para você e seu cliente final.' },
+  { title: 'Integração tecnológica',      desc: 'Sincronização de estoque contra quebras de venda.' },
 ]
 
-const scrollToForm = () => formSection.value?.scrollIntoView({ behavior: 'smooth' })
-const scrollToTiers = () => tiersSection.value?.scrollIntoView({ behavior: 'smooth' })
-const goToLogin = () => window.location.href = '/home'
+const scrollToForm   = () => formSection.value?.scrollIntoView({ behavior: 'smooth' })
+const scrollToTiers  = () => tiersSection.value?.scrollIntoView({ behavior: 'smooth' })
+const goToLogin      = () => window.location.href = '/home'
 
 const formatCNPJ = (e) => {
   let v = e.target.value.replace(/\D/g, '').slice(0, 14)
-
   if (v.length > 12) v = `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8,12)}-${v.slice(12)}`
   else if (v.length > 8) v = `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8)}`
   else if (v.length > 5) v = `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5)}`
   else if (v.length > 2) v = `${v.slice(0,2)}.${v.slice(2)}`
-
   cnpj.value = v
   if (v.length === 18) validateCNPJ(v)
   else cnpjStatus.value = null
@@ -412,12 +415,8 @@ const handleSubmit = async () => {
       storeName: storeName.value,
       whatsapp: whatsapp.value
     })
-
-    // ✅ Busca o usuário atualizado (agora com role: DROPPER)
     await auth.fetchUser()
-    // ✅ Carrega o perfil dropper (level BRONZE, cnpj, etc)
     await dropperStore.fetchProfile()
-
     submitted.value = true
   } catch (err) {
     cnpjError.value = err.response?.data?.message || 'Erro ao processar cadastro.'
@@ -428,251 +427,268 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap');
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── TOKENS ───────────────────────────────────── */
 .dropper-page {
-  --c-bg: #050505;
-  --c-surface: #121212;
-  --c-surface-hover: #1A1A1A;
-  --c-border: rgba(255, 255, 255, 0.1);
-  --c-border-strong: rgba(255, 255, 255, 0.2);
-  --c-text: #FAFAFA;
-  --c-muted: #A1A1AA;
-  --c-primary: #3B82F6;
-  --c-primary-hover: #2563EB;
-  --c-primary-light: #60A5FA;
-  --c-success: #10B981;
-  --c-error: #EF4444;
+  --blue-50:  #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
+  --blue-400: #60A5FA;
+  --blue-600: #2563EB;
+  --blue-700: #1D4ED8;
+  --text:     #0F172A;
+  --text-2:   #475569;
+  --text-3:   #94A3B8;
+  --border:   #E2E8F0;
+  --bg:       #FFFFFF;
+  --bg-2:     #F8FAFF;
+  --success:  #16A34A;
+  --error:    #DC2626;
 
-  font-family: 'Inter', sans-serif;
-  background: var(--c-bg);
-  color: var(--c-text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  line-height: 1.5;
-}
-
-h1, h2, h3, h4, .font-display {
   font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
 }
 
-.section-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 32px;
-}
+.text-blue { color: var(--blue-600); }
 
-/* --- HERO SECTION --- */
+/* ── HERO ─────────────────────────────────────── */
 .hero {
   position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-bottom: 80px;
   overflow: hidden;
+  background: var(--bg);
 }
 
-.hero-grid-bg {
+.hero-bg-shape {
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 800px; height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--blue-50) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-dots {
   position: absolute;
   inset: 0;
-  background-image:
-      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(circle at center, black, transparent 80%);
+  background-image: radial-gradient(var(--blue-200) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse 60% 80% at 80% 40%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 80% at 80% 40%, black 20%, transparent 70%);
+  opacity: .45;
   pointer-events: none;
-}
-
-.hero-glow {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
-  top: -100px;
-  right: 10%;
-  pointer-events: none;
-  filter: blur(40px);
 }
 
 .hero-nav {
+  position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 24px 48px;
-  position: relative;
-  z-index: 10;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
 }
 
-.nav-logo { height: 32px; filter: brightness(0) invert(1); }
+.nav-logo {
+  height: 30px;
+  /* remove o filtro dark — agora o logo aparece como é */
+}
 
 .nav-back {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--c-muted);
+  color: var(--text-2);
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: 600;
+  transition: color .15s;
 }
-.nav-back:hover { color: var(--c-text); }
+.nav-back:hover { color: var(--blue-600); }
 
-.hero-content {
+.hero-inner {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 40px 48px;
-  max-width: 650px;
   position: relative;
-  z-index: 10;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 48px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  width: 100%;
 }
 
-.hero-eyebrow {
-  margin-bottom: 24px;
-}
-
-.eyebrow-badge {
+.hero-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: var(--blue-50);
+  border: 1px solid var(--blue-200);
   border-radius: 100px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--c-primary-light);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue-600);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
 }
 
-.eyebrow-dot {
+.pill-dot {
   width: 6px; height: 6px;
-  background: var(--c-primary-light);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--c-primary-light);
+  background: var(--blue-600);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.2);
+  animation: pillPulse 2s ease-in-out infinite;
+}
+@keyframes pillPulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(37,99,235,.2); }
+  50%     { box-shadow: 0 0 0 6px rgba(37,99,235,.08); }
 }
 
-.hero-title {
-  font-size: clamp(36px, 5vw, 64px);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  margin: 0 0 24px;
+.hero-h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  color: var(--text);
+  margin-bottom: 20px;
 }
 
-.title-gradient {
-  background: linear-gradient(135deg, #FFFFFF 0%, #A1A1AA 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.hero-em {
+  font-style: italic;
+  color: var(--blue-600);
 }
 
-.hero-desc {
-  font-size: 18px;
-  color: var(--c-muted);
-  margin-bottom: 40px;
-  max-width: 540px;
+.hero-p {
+  font-size: 17px;
+  line-height: 1.72;
+  color: var(--text-2);
+  max-width: 460px;
+  margin-bottom: 36px;
 }
-.hero-desc strong { color: var(--c-text); font-weight: 600; }
+.hero-p strong { color: var(--text); font-weight: 700; }
 
-.hero-actions {
+.hero-btns {
   display: flex;
-  gap: 16px;
-  margin-bottom: 60px;
+  gap: 12px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
 }
 
-.btn-primary {
+.btn-solid {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  background: var(--c-primary);
-  color: #FFFFFF;
+  gap: 9px;
+  padding: 13px 26px;
+  background: var(--blue-600);
+  color: white;
   border: none;
-  border-radius: 8px;
-  padding: 14px 28px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 12px;
+  font: 700 15px 'Plus Jakarta Sans', sans-serif;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 4px 20px rgba(37,99,235,.35);
+  transition: background .15s, transform .1s, box-shadow .2s;
 }
-.btn-primary:hover:not(:disabled) {
-  background: var(--c-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+.btn-solid:hover:not(:disabled) {
+  background: var(--blue-700);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(37,99,235,.45);
 }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-primary.full-width { width: 100%; }
+.btn-solid:disabled { opacity: .6; cursor: not-allowed; }
+.btn-solid.full-width { width: 100%; }
+.btn-solid.btn-large  { padding: 16px 32px; font-size: 16px; border-radius: 14px; }
 
-.btn-secondary {
+.btn-outline {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(255,255,255,0.05);
-  color: var(--c-text);
-  border: 1px solid var(--c-border);
-  border-radius: 8px;
-  padding: 14px 28px;
-  font-size: 15px;
-  font-weight: 600;
+  padding: 13px 22px;
+  background: transparent;
+  color: var(--text-2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font: 600 15px 'Plus Jakarta Sans', sans-serif;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color .15s, color .15s, background .15s;
 }
-.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: var(--c-border-strong); }
-
-.hero-trust { display: flex; align-items: center; gap: 32px; }
-.trust-item { display: flex; flex-direction: column; gap: 4px; }
-.trust-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 700; color: var(--c-text); }
-.trust-lbl { font-size: 13px; color: var(--c-muted); }
-.trust-sep { width: 1px; height: 32px; background: var(--c-border); }
-
-.hero-visual {
-  position: absolute;
-  top: 50%;
-  right: 5%;
-  transform: translateY(-50%);
-  width: 500px;
-  z-index: 5;
-  display: none;
+.btn-outline:hover {
+  border-color: var(--blue-200);
+  color: var(--blue-600);
+  background: var(--blue-50);
 }
-@media (min-width: 1100px) { .hero-visual { display: block; } }
 
-.visual-wrapper { position: relative; width: 100%; height: 500px; }
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 24px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: fit-content;
+}
+.trust-stat  { display: flex; flex-direction: column; gap: 2px; }
+.ts-num      { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; color: var(--text); letter-spacing: -.02em; }
+.ts-lbl      { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; }
+.trust-sep   { width: 1px; height: 36px; background: var(--border); }
+
+/* ── HERO RIGHT — dashboard mockup ───────────── */
+.hero-right {
+  position: relative;
+}
 
 .glass-panel {
-  background: rgba(18, 18, 18, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(37,99,235,.1), 0 4px 12px rgba(0,0,0,.04);
+  padding: 28px;
 }
 
-.main-dashboard {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  padding: 24px;
+.main-dashboard { width: 100%; }
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
+.dash-title { font-size: 13px; font-weight: 600; color: var(--text-3); }
+.dash-badge { font-size: 12px; font-weight: 700; color: #D97706; background: rgba(217,119,6,.1); padding: 4px 10px; border-radius: 6px; }
 
-.dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.dash-title { font-size: 14px; font-weight: 500; color: var(--c-muted); }
-.dash-badge { font-size: 12px; font-weight: 600; color: #FBBF24; background: rgba(251, 191, 36, 0.1); padding: 4px 10px; border-radius: 6px; }
-
-.dash-body { display: flex; flex-direction: column; gap: 24px; }
+.dash-body { display: flex; flex-direction: column; gap: 20px; }
 .dash-stat { display: flex; flex-direction: column; gap: 4px; }
-.stat-lbl { font-size: 13px; color: var(--c-muted); }
-.stat-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 32px; font-weight: 700; }
-.stat-growth { font-size: 13px; color: var(--c-success); font-weight: 500; }
+.stat-lbl    { font-size: 12px; color: var(--text-3); font-weight: 600; }
+.stat-val    { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); letter-spacing: -.02em; }
+.stat-growth { font-size: 13px; color: var(--success); font-weight: 600; }
 
-.dash-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; gap: 8px; margin-top: 10px; }
+.dash-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 72px;
+  gap: 6px;
+}
 .chart-bar {
   flex: 1;
-  background: var(--c-primary);
+  background: var(--blue-600);
   border-radius: 4px 4px 0 0;
-  opacity: 0.8;
+  opacity: .75;
   transform-origin: bottom;
   animation: growBar 1s ease-out forwards;
 }
@@ -680,187 +696,389 @@ h1, h2, h3, h4, .font-display {
 
 .floating-stat {
   position: absolute;
-  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  border-radius: 12px;
+  gap: 14px;
+  padding: 14px 18px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(37,99,235,.1);
 }
-.fs-1 { top: 10%; right: -20px; animation: floatY 6s ease-in-out infinite; }
-.fs-2 { bottom: 15%; left: -40px; animation: floatY 5s ease-in-out infinite reverse; }
+.fs-1 { top: 8%; right: -28px; animation: floatY 6s ease-in-out infinite; }
+.fs-2 { bottom: 12%; left: -36px; animation: floatY 5s ease-in-out infinite reverse; }
+@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
-.fs-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
-.fs-icon.blue-bg { background: linear-gradient(135deg, var(--c-primary-light), var(--c-primary)); }
-.fs-icon.green-bg { background: linear-gradient(135deg, #34D399, #10B981); }
-.fs-info { display: flex; flex-direction: column; }
-.fs-val { font-weight: 600; font-size: 14px; }
-.fs-lbl { font-size: 12px; color: var(--c-muted); }
-
-
-/* --- SECTIONS GLOBALS --- */
-section { padding: 120px 0; border-top: 1px solid var(--c-border); }
-.section-header { text-align: center; margin-bottom: 72px; }
-.section-eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-primary-light); margin-bottom: 16px; }
-.section-title { font-size: clamp(32px, 4vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
-.section-subtitle { font-size: 18px; color: var(--c-muted); max-width: 600px; margin: 0 auto; }
-
-/* --- COMO FUNCIONA --- */
-.how { background: #0A0A0A; }
-.how-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; position: relative; }
-.step-line { position: absolute; top: 24px; left: 50px; right: 50px; height: 1px; background: var(--c-border); z-index: 1; }
-@media (max-width: 900px) { .how-steps { grid-template-columns: 1fr; gap: 48px; } .step-line { display: none; } }
-
-.step { position: relative; z-index: 2; display: flex; flex-direction: column; }
-.step-marker { background: #0A0A0A; padding-right: 16px; display: inline-block; margin-bottom: 24px; align-self: flex-start; }
-.step-num {
-  width: 48px; height: 48px;
-  background: var(--c-surface);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 12px;
+.fs-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--c-text);
 }
-.step-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-.step-desc { font-size: 14px; color: var(--c-muted); line-height: 1.6; }
+.blue-bg  { background: linear-gradient(135deg, var(--blue-400), var(--blue-600)); }
+.green-bg { background: linear-gradient(135deg, #34D399, #16A34A); }
+.fs-info  { display: flex; flex-direction: column; gap: 2px; }
+.fs-val   { font-size: 13px; font-weight: 700; color: var(--text); }
+.fs-lbl   { font-size: 11.5px; color: var(--text-3); font-weight: 500; }
 
-/* --- NÍVEIS --- */
-.tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: end; }
+/* ── SCROLL HINT ──────────────────────────────── */
+.scroll-hint {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 36px;
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(var(--blue-200), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+/* ── SECTIONS SHARED ──────────────────────────── */
+section {
+  padding: 120px 0;
+  border-top: 1px solid var(--border);
+}
+
+.section-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.section-eyebrow {
+  display: inline-flex;
+  padding: 5px 14px;
+  background: var(--blue-50);
+  border: 1px solid var(--blue-200);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue-600);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(30px, 3.5vw, 48px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: var(--text-2);
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── COMO FUNCIONA ────────────────────────────── */
+.how-section { background: var(--bg-2); }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  position: relative;
+}
+.step-line { display: none; }
+
+.step-card {
+  background: white;
+  padding: 40px 28px;
+  transition: background .2s;
+}
+.step-card:hover { background: var(--blue-50); }
+
+.step-num-big {
+  font-family: 'DM Serif Display', serif;
+  font-size: 56px;
+  font-weight: 400;
+  color: var(--blue-100);
+  line-height: 1;
+  margin-bottom: 12px;
+  letter-spacing: -.04em;
+}
+.step-icon-box {
+  font-size: 32px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+.step-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -.01em; }
+.step-desc  { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
+
+/* ── NÍVEIS ───────────────────────────────────── */
+.tiers-section { background: white; }
+
+.tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  align-items: end;
+}
 
 .tier-card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 16px;
-  padding: 32px 24px;
-  transition: all 0.3s ease;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 28px 18px;
   position: relative;
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
 }
-.tier-card:hover { transform: translateY(-8px); border-color: var(--c-border-strong); background: var(--c-surface-hover); }
+.tier-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(37,99,235,.1);
+  border-color: var(--blue-200);
+}
 
 .tier-featured {
-  border-color: rgba(251, 191, 36, 0.4);
-  background: linear-gradient(to bottom, rgba(251, 191, 36, 0.03), var(--c-surface));
-  transform: translateY(-16px);
+  border-color: #D97706;
+  background: white;
+  box-shadow: 0 8px 32px rgba(217,119,6,.12);
+  transform: translateY(-12px);
 }
-.tier-featured:hover { transform: translateY(-24px); border-color: rgba(251, 191, 36, 0.6); }
+.tier-featured:hover { transform: translateY(-18px); }
 
 .featured-banner {
-  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-  background: #FBBF24; color: #000; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-  padding: 4px 12px; border-radius: 100px; white-space: nowrap;
+  position: absolute;
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+  background: #D97706;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 4px 14px;
+  border-radius: 100px;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(217,119,6,.35);
 }
 
-.tier-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-.tier-icon-wrapper { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-.tier-name { font-size: 20px; font-weight: 700; margin: 0; }
+.tier-header     { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.tier-icon-wrapper {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tier-name   { font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
 
-.tier-discount { display: flex; align-items: baseline; gap: 2px; }
-.discount-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 40px; font-weight: 800; color: var(--c-text); }
-.discount-pct { font-size: 20px; font-weight: 700; color: var(--c-muted); }
-.tier-lbl { font-size: 13px; color: var(--c-muted); margin-bottom: 24px; }
+.tier-discount   { display: flex; align-items: baseline; gap: 2px; }
+.discount-num    { font-family: 'DM Serif Display', serif; font-size: 40px; font-weight: 400; color: var(--text); line-height: 1; }
+.discount-pct    { font-size: 18px; font-weight: 700; color: var(--text-3); }
+.tier-lbl        { font-size: 12px; color: var(--text-3); margin-bottom: 16px; font-weight: 500; }
 
-.tier-threshold { font-size: 13px; color: var(--c-muted); }
-.tier-threshold strong { color: var(--c-text); font-weight: 600; }
+.tier-threshold  { font-size: 12px; color: var(--text-2); }
+.tier-threshold strong { color: var(--text); font-weight: 700; }
 
-.tier-divider { height: 1px; background: var(--c-border); margin: 24px 0; }
+.tier-divider    { height: 1px; background: var(--border); margin: 18px 0; }
 
-.tier-perks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-.tier-perks li { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; color: var(--c-muted); line-height: 1.4; }
-.tier-perks svg { color: var(--c-text); flex-shrink: 0; margin-top: 2px; opacity: 0.7; }
+.tier-perks      { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tier-perks li   { display: flex; align-items: flex-start; gap: 10px; font-size: 12.5px; color: var(--text-2); line-height: 1.4; font-weight: 500; }
 
-/* --- FORMULÁRIO --- */
-.form-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-@media (max-width: 900px) { .form-wrapper { grid-template-columns: 1fr; gap: 48px; } }
+/* ── FORMULÁRIO ───────────────────────────────── */
+.form-section { background: var(--bg-2); }
 
-.form-title { font-size: clamp(32px, 4vw, 44px); font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
-.form-subtitle { font-size: 16px; color: var(--c-muted); margin-bottom: 40px; }
+.form-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
 
-.benefits-compact { display: flex; flex-direction: column; gap: 24px; }
-.bc-item { display: flex; gap: 16px; }
-.bc-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--c-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.bc-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.bc-item p { font-size: 14px; color: var(--c-muted); }
+.form-left .section-eyebrow  { display: inline-flex; }
+.form-left .section-title    { text-align: left; }
+.form-left .section-subtitle { text-align: left; margin: 0 0 40px; max-width: 100%; }
 
-.premium-form-card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
+.benefits-compact  { display: flex; flex-direction: column; gap: 20px; }
+.bc-item           { display: flex; gap: 14px; }
+.bc-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.bc-item h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.bc-item p  { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+
+.form-card {
+  background: white;
+  border: 1.5px solid var(--border);
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 12px 40px rgba(37,99,235,.08), 0 2px 8px rgba(0,0,0,.04);
 }
 
 .form-not-logged { text-align: center; }
-.lock-icon { width: 64px; height: 64px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--c-border); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: var(--c-muted); }
-.form-not-logged h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
-.form-not-logged p { font-size: 14px; color: var(--c-muted); margin-bottom: 32px; }
+.lock-icon {
+  width: 60px; height: 60px;
+  border-radius: 16px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--text-3);
+}
+.form-not-logged h3 { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--text); }
+.form-not-logged p  { font-size: 14px; color: var(--text-2); margin-bottom: 28px; line-height: 1.6; }
 
-.active-user-badge { display: flex; align-items: center; gap: 16px; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--c-border); border-radius: 12px; margin-bottom: 32px; }
-.aub-avatar { width: 40px; height: 40px; border-radius: 8px; background: var(--c-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
-.aub-info { display: flex; flex-direction: column; }
-.aub-name { font-weight: 600; font-size: 14px; }
-.aub-email { font-size: 13px; color: var(--c-muted); }
+.active-user-badge {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 28px;
+}
+.aub-avatar {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  background: var(--blue-600);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px;
+}
+.aub-info  { display: flex; flex-direction: column; gap: 2px; }
+.aub-name  { font-weight: 700; font-size: 14px; color: var(--text); }
+.aub-email { font-size: 12px; color: var(--text-3); }
 
-.already-dropper { text-align: center; padding: 20px 0; }
-.success-ring { width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
-.already-dropper h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-.already-dropper p { font-size: 14px; color: var(--c-muted); }
+.already-dropper { text-align: center; padding: 16px 0; }
+.success-ring {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(22,163,74,.08);
+  border: 1.5px solid rgba(22,163,74,.2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.already-dropper h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+.already-dropper p  { font-size: 14px; color: var(--text-2); }
 
-.form-fields { display: flex; flex-direction: column; gap: 20px; }
-.input-group { display: flex; flex-direction: column; gap: 8px; }
-.input-label { font-size: 13px; font-weight: 500; color: var(--c-muted); }
+.form-fields { display: flex; flex-direction: column; gap: 18px; }
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .04em; }
 
 .input-wrapper { position: relative; display: flex; align-items: center; }
 .form-input {
   width: 100%;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 8px;
-  padding: 12px 16px;
-  color: var(--c-text);
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  transition: all 0.2s;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 44px 12px 14px;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14.5px;
+  transition: border-color .15s, box-shadow .15s;
 }
-.form-input:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-.form-input::placeholder { color: #52525B; }
+.form-input:focus {
+  outline: none;
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  background: white;
+}
+.form-input::placeholder { color: var(--text-3); }
+.is-valid   .form-input  { border-color: var(--success); }
+.is-invalid .form-input  { border-color: var(--error); }
 
-.input-status-icon { position: absolute; right: 16px; display: flex; }
-.is-valid .form-input { border-color: var(--c-success); }
-.is-invalid .form-input { border-color: var(--c-error); }
-.input-error { font-size: 12px; color: var(--c-error); margin-top: 4px; }
+.input-status-icon { position: absolute; right: 14px; display: flex; }
+.input-error       { font-size: 12px; color: var(--error); font-weight: 500; }
 
-.checkbox-label { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin: 8px 0 16px; }
+.checkbox-label {
+  display: flex; align-items: flex-start; gap: 10px;
+  cursor: pointer;
+  margin: 4px 0 8px;
+}
 .checkbox-input { display: none; }
 .checkbox-box {
-  width: 20px; height: 20px; border-radius: 6px; border: 1px solid var(--c-border-strong);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(0,0,0,0.2);
-  transition: all 0.2s;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all .15s;
 }
-.checkbox-box svg { opacity: 0; transform: scale(0.5); transition: all 0.2s; }
-.checkbox-input:checked + .checkbox-box { background: var(--c-primary); border-color: var(--c-primary); }
-.checkbox-input:checked + .checkbox-box svg { opacity: 1; transform: scale(1); color: white; }
-.checkbox-text { font-size: 13px; color: var(--c-muted); line-height: 1.5; }
-.checkbox-text a { color: var(--c-text); text-decoration: underline; }
+.checkbox-box svg { opacity: 0; transform: scale(.5); transition: all .15s; }
+.checkbox-input:checked + .checkbox-box { background: var(--blue-600); border-color: var(--blue-600); }
+.checkbox-input:checked + .checkbox-box svg { opacity: 1; transform: scale(1); }
+.checkbox-text { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.checkbox-text a { color: var(--blue-600); text-decoration: underline; font-weight: 600; }
 
 .spinner {
-  width: 20px; height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,.4);
   border-top-color: white;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* FORM SUCCESS STATE */
 .form-success { text-align: center; }
-.success-shield { width: 72px; height: 72px; border-radius: 20px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--c-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
-.success-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
-.success-desc { font-size: 14px; color: var(--c-muted); margin-bottom: 32px; }
-.success-card { background: rgba(0,0,0,0.3); border: 1px solid var(--c-border); border-radius: 12px; padding: 20px; margin-bottom: 32px; display: flex; flex-direction: column; gap: 16px; }
-.sc-row { display: flex; justify-content: space-between; align-items: center; }
-.sc-lbl { font-size: 13px; color: var(--c-muted); }
-.sc-val { font-size: 14px; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;}
-.bronze-text { color: #B08D57; }
+.success-shield {
+  width: 68px; height: 68px;
+  border-radius: 18px;
+  background: var(--blue-50);
+  border: 1.5px solid var(--blue-200);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.success-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.success-desc  { font-size: 14px; color: var(--text-2); margin-bottom: 28px; line-height: 1.65; }
+.success-card  {
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.sc-row   { display: flex; justify-content: space-between; align-items: center; }
+.sc-lbl   { font-size: 12px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.sc-val   { font-size: 14px; font-weight: 700; color: var(--text); }
+.bronze-text { color: #92400E; }
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media (max-width: 1100px) {
+  .hero-right   { display: none; }
+  .hero-inner   { grid-template-columns: 1fr; }
+  .tiers-grid   { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .steps-grid   { grid-template-columns: 1fr; gap: 2px; }
+  .tiers-grid   { grid-template-columns: repeat(2, 1fr); }
+  .form-wrapper { grid-template-columns: 1fr; gap: 48px; }
+  .section-wrap { padding: 0 24px; }
+  .hero-inner   { padding: 60px 24px 40px; }
+  .hero-nav     { padding: 20px 24px; }
+}
+@media (max-width: 640px) {
+  .tiers-grid { grid-template-columns: 1fr; }
+}
 </style>
