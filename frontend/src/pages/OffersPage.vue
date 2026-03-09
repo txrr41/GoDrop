@@ -17,19 +17,19 @@
     <section class="kpi-strip">
       <div class="kpi-tile">
         <div class="kpi-head"><span class="kpi-label">Agendadas</span><span class="kpi-dot dot-blue"></span></div>
-        <p class="kpi-val">{{ scheduledOffers.length }}</p>
+        <p class="kpi-val">{{ offerStore.scheduledOffers.length }}</p>
         <p class="kpi-sub">Aguardando início</p>
       </div>
       <div class="kpi-div"></div>
       <div class="kpi-tile">
         <div class="kpi-head"><span class="kpi-label">Ativas Agora</span><span class="kpi-dot dot-green"></span></div>
-        <p class="kpi-val">{{ activeOffers.length }}</p>
+        <p class="kpi-val">{{ offerStore.activeOffers.length }}</p>
         <p class="kpi-sub">Descontos aplicados</p>
       </div>
       <div class="kpi-div"></div>
       <div class="kpi-tile">
         <div class="kpi-head"><span class="kpi-label">Finalizadas</span><span class="kpi-dot dot-gray"></span></div>
-        <p class="kpi-val">{{ expiredOffers.length }}</p>
+        <p class="kpi-val">{{ offerStore.expiredOffers.length }}</p>
         <p class="kpi-sub">Encerradas</p>
       </div>
     </section>
@@ -38,14 +38,15 @@
       <div class="table-topbar">
         <h2 class="table-title">Ofertas <span class="count-badge">{{ filteredOffers.length }}</span></h2>
         <div class="filter-tabs">
-          <button v-for="tab in tabs" :key="tab.val" class="filter-tab" :class="{ active: currentTab === tab.val }"
+          <button v-for="tab in tabs" :key="tab.val" class="filter-tab"
+                  :class="{ active: currentTab === tab.val }"
                   @click="currentTab = tab.val">
             {{ tab.label }}
           </button>
         </div>
       </div>
 
-      <div v-if="loading" class="loader-state">
+      <div v-if="offerStore.loading" class="loader-state">
         <div class="loader-ring"></div>
         <span>Carregando ofertas...</span>
       </div>
@@ -69,26 +70,27 @@
             <div class="offer-info">
               <div class="offer-name-row">
                 <span class="offer-name">{{ offer.name }}</span>
-                <span :class="['status-chip', 'chip-' + offer.status.toLowerCase()]">{{
-                    getStatusLabel(offer.status)
-                  }}</span>
+                <span :class="['status-chip', 'chip-' + offer.status.toLowerCase()]">
+                  {{ getStatusLabel(offer.status) }}
+                </span>
               </div>
               <p v-if="offer.description" class="offer-desc">{{ offer.description }}</p>
               <div class="offer-meta">
                 <span class="meta-item">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect
-                      x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8"
-                                                                                                            y1="2"
-                                                                                                            x2="8"
-                                                                                                            y2="6"/><line
-                      x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
                   {{ formatDateTime(offer.startDate) }}
                 </span>
                 <span class="meta-sep">→</span>
                 <span class="meta-item">{{ formatDateTime(offer.endDate) }}</span>
                 <span v-if="offer.stockLimit" class="meta-item meta-stock">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path
-                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                  </svg>
                   {{ offer.usedStock }}/{{ offer.stockLimit }} usados
                 </span>
               </div>
@@ -104,7 +106,7 @@
               <span v-if="offer.products.length > 3" class="prod-more">+{{ offer.products.length - 3 }}</span>
             </div>
             <label class="toggle-wrap" :title="offer.active ? 'Desativar' : 'Ativar'">
-              <input type="checkbox" v-model="offer.active" @change="toggleOffer(offer.id)"/>
+              <input type="checkbox" v-model="offer.active" @change="handleToggle(offer.id)"/>
               <span class="toggle-track"><span class="toggle-thumb"></span></span>
             </label>
             <button class="act-btn act-edit" @click="openOfferModal(offer)">
@@ -113,7 +115,7 @@
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
             </button>
-            <button class="act-btn act-delete" @click="deleteOffer(offer.id)">
+            <button class="act-btn act-delete" @click="handleDelete(offer.id)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
@@ -144,7 +146,13 @@
             <p class="form-section-label">Informações Básicas</p>
             <div class="field-group">
               <label class="field-label">Nome da Oferta <span class="req">*</span></label>
-              <input v-model="offerData.name" class="field-input" placeholder="Ex: Black Friday — 20% off"/>
+              <input
+                  v-model="offerData.name"
+                  class="field-input"
+                  :class="{ 'field-input--error': fieldErrors.name }"
+                  placeholder="Ex: Black Friday — 20% off"
+              />
+              <span v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</span>
             </div>
             <div class="field-group">
               <label class="field-label">Descrição</label>
@@ -167,9 +175,15 @@
                 <label class="field-label">Valor <span class="req">*</span></label>
                 <div class="input-prefix-wrap">
                   <span class="input-prefix">{{ offerData.type === 'FIXED' ? 'R$' : '%' }}</span>
-                  <input v-model.number="offerData.discountValue" type="number" class="field-input input-with-prefix"
-                         placeholder="0"/>
+                  <input
+                      v-model.number="offerData.discountValue"
+                      type="number"
+                      class="field-input input-with-prefix"
+                      :class="{ 'field-input--error': fieldErrors.discountValue }"
+                      placeholder="0"
+                  />
                 </div>
+                <span v-if="fieldErrors.discountValue" class="field-error">{{ fieldErrors.discountValue }}</span>
               </div>
             </div>
           </div>
@@ -179,11 +193,24 @@
             <div class="form-row">
               <div class="field-group">
                 <label class="field-label">Início <span class="req">*</span></label>
-                <input v-model="offerData.startDate" type="datetime-local" class="field-input"/>
+                <input
+                    v-model="offerData.startDate"
+                    type="datetime-local"
+                    class="field-input"
+                    :class="{ 'field-input--error': fieldErrors.startDate }"
+                    :min="minDateTime"
+                />
+                <span v-if="fieldErrors.startDate" class="field-error">{{ fieldErrors.startDate }}</span>
               </div>
               <div class="field-group">
                 <label class="field-label">Fim <span class="req">*</span></label>
-                <input v-model="offerData.endDate" type="datetime-local" class="field-input"/>
+                <input
+                    v-model="offerData.endDate"
+                    type="datetime-local"
+                    class="field-input"
+                    :class="{ 'field-input--error': fieldErrors.endDate }"
+                />
+                <span v-if="fieldErrors.endDate" class="field-error">{{ fieldErrors.endDate }}</span>
               </div>
             </div>
           </div>
@@ -222,8 +249,8 @@
 
         <div class="modal-ft">
           <button class="ft-cancel" @click="closeOfferModal">Cancelar</button>
-          <button class="ft-save" :disabled="saving" @click="saveOffer">
-            <span v-if="saving" class="spin-sm"></span>
+          <button class="ft-save" :disabled="offerStore.loading" @click="saveOffer">
+            <span v-if="offerStore.loading" class="spin-sm"></span>
             <span v-else>{{ editingOffer ? 'Salvar Alterações' : 'Criar Oferta' }}</span>
           </button>
         </div>
@@ -237,12 +264,12 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted} from 'vue'
+import {ref, computed, onMounted, reactive} from 'vue'
+import {useOfferStore} from '../stores/offer'
 import api from '../api/api'
 
-const loading = ref(false)
-const saving = ref(false)
-const offers = ref([])
+const offerStore = useOfferStore()
+
 const products = ref([])
 const currentTab = ref('all')
 const offerModal = ref(false)
@@ -250,6 +277,17 @@ const editingOffer = ref(null)
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 const snackbarColor = ref('success')
+
+const fieldErrors = reactive({
+  name: '',
+  discountValue: '',
+  startDate: '',
+  endDate: ''
+})
+
+const minDateTime = computed(() => {
+  return new Date().toISOString().slice(0, 16)
+})
 
 const tabs = [
   {val: 'all', label: 'Todas'},
@@ -272,41 +310,69 @@ const offerData = ref({
   productIds: []
 })
 
-const scheduledOffers = computed(() => offers.value.filter(o => o.status === 'SCHEDULED'))
-const activeOffers = computed(() => offers.value.filter(o => o.status === 'ACTIVE'))
-const expiredOffers = computed(() => offers.value.filter(o => o.status === 'EXPIRED'))
 const filteredOffers = computed(() => {
-  if (currentTab.value === 'scheduled') return scheduledOffers.value
-  if (currentTab.value === 'active') return activeOffers.value
-  if (currentTab.value === 'expired') return expiredOffers.value
-  return offers.value
+  if (currentTab.value === 'scheduled') return offerStore.scheduledOffers
+  if (currentTab.value === 'active') return offerStore.activeOffers
+  if (currentTab.value === 'expired') return offerStore.expiredOffers
+  return offerStore.offers
 })
 
 onMounted(async () => {
-  await loadOffers();
+  await offerStore.fetchOffers()
   await loadProducts()
 })
 
-const loadOffers = async () => {
-  try {
-    loading.value = true;
-    const {data} = await api.get('/api/offers');
-    offers.value = data
-  } catch {
-    showSnackbar('Erro ao carregar ofertas', 'error')
-  } finally {
-    loading.value = false
-  }
-}
 const loadProducts = async () => {
   try {
-    const {data} = await api.get('/produtos');
+    const {data} = await api.get('/produtos')
     products.value = data
   } catch {
     console.error('Erro ao carregar produtos')
   }
 }
+
+const clearFieldErrors = () => {
+  fieldErrors.name = ''
+  fieldErrors.discountValue = ''
+  fieldErrors.startDate = ''
+  fieldErrors.endDate = ''
+}
+
+const validateForm = () => {
+  clearFieldErrors()
+  let valid = true
+
+  if (!offerData.value.name?.trim()) {
+    fieldErrors.name = 'Nome é obrigatório'
+    valid = false
+  }
+  if (!offerData.value.discountValue || offerData.value.discountValue <= 0) {
+    fieldErrors.discountValue = 'Informe um valor de desconto válido'
+    valid = false
+  }
+  if (offerData.value.type === 'PERCENTAGE' && offerData.value.discountValue > 100) {
+    fieldErrors.discountValue = 'Desconto não pode ser maior que 100%'
+    valid = false
+  }
+  if (!offerData.value.startDate) {
+    fieldErrors.startDate = 'Data de início é obrigatória'
+    valid = false
+  }
+  if (!offerData.value.endDate) {
+    fieldErrors.endDate = 'Data de fim é obrigatória'
+    valid = false
+  }
+  if (offerData.value.startDate && offerData.value.endDate) {
+    if (new Date(offerData.value.startDate) >= new Date(offerData.value.endDate)) {
+      fieldErrors.endDate = 'Data de fim deve ser posterior ao início'
+      valid = false
+    }
+  }
+  return valid
+}
+
 const openOfferModal = (offer = null) => {
+  clearFieldErrors()
   if (offer) {
     editingOffer.value = offer
     offerData.value = {
@@ -325,86 +391,90 @@ const openOfferModal = (offer = null) => {
   } else {
     editingOffer.value = null
     offerData.value = {
-      name: '',
-      description: '',
-      type: 'PERCENTAGE',
-      discountValue: 0,
-      startDate: '',
-      endDate: '',
-      active: true,
-      category: '',
-      stockLimit: null,
-      priority: 0,
-      productIds: []
+      name: '', description: '', type: 'PERCENTAGE', discountValue: 0,
+      startDate: '', endDate: '', active: true, category: '',
+      stockLimit: null, priority: 0, productIds: []
     }
   }
   offerModal.value = true
 }
+
 const closeOfferModal = () => {
-  offerModal.value = false;
+  offerModal.value = false
   editingOffer.value = null
+  clearFieldErrors()
 }
+
 const saveOffer = async () => {
+  if (!validateForm()) return
+
   try {
-    saving.value = true
     const payload = {
       ...offerData.value,
       startDate: new Date(offerData.value.startDate).toISOString(),
       endDate: new Date(offerData.value.endDate).toISOString()
     }
+
     if (editingOffer.value) {
-      await api.put(`/api/offers/${editingOffer.value.id}`, payload);
+      await offerStore.updateOffer(editingOffer.value.id, payload)
       showSnackbar('Oferta atualizada!')
     } else {
-      await api.post('/api/offers', payload);
+      await offerStore.createOffer(payload)
       showSnackbar('Oferta criada!')
     }
-    await loadOffers();
     closeOfferModal()
-  } catch {
-    showSnackbar('Erro ao salvar oferta', 'error')
-  } finally {
-    saving.value = false
+  } catch (error) {
+    const data = error.response?.data
+
+    if (data?.errors) {
+      Object.entries(data.errors).forEach(([field, msg]) => {
+        if (field in fieldErrors) fieldErrors[field] = msg
+      })
+      showSnackbar('Corrija os campos destacados', 'error')
+    } else if (data?.message) {
+      showSnackbar(data.message, 'error')
+    } else {
+      showSnackbar('Erro ao salvar oferta. Tente novamente.', 'error')
+    }
   }
 }
-const toggleOffer = async (offerId) => {
+
+const handleToggle = async (offerId) => {
   try {
-    await api.patch(`/api/offers/${offerId}/toggle`);
+    await offerStore.toggleOffer(offerId)
     showSnackbar('Status atualizado!')
   } catch {
-    showSnackbar('Erro ao atualizar', 'error');
-    await loadOffers()
+    showSnackbar('Erro ao atualizar', 'error')
+    await offerStore.fetchOffers()
   }
 }
-const deleteOffer = async (offerId) => {
+
+const handleDelete = async (offerId) => {
   if (!confirm('Excluir esta oferta?')) return
   try {
-    await api.delete(`/api/offers/${offerId}`);
-    showSnackbar('Oferta excluída.');
-    await loadOffers()
+    await offerStore.deleteOffer(offerId)
+    showSnackbar('Oferta excluída.')
   } catch {
     showSnackbar('Erro ao excluir', 'error')
   }
 }
+
 const getStatusLabel = s => ({
-  SCHEDULED: 'Agendada',
-  ACTIVE: 'Ativa',
-  EXPIRED: 'Finalizada',
-  PAUSED: 'Pausada',
-  CANCELLED: 'Cancelada'
+  SCHEDULED: 'Agendada', ACTIVE: 'Ativa', EXPIRED: 'Finalizada',
+  PAUSED: 'Pausada', CANCELLED: 'Cancelada'
 }[s] || s)
+
 const formatDateTime = d => new Date(d).toLocaleString('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  year: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit'
+  day: '2-digit', month: '2-digit', year: '2-digit',
+  hour: '2-digit', minute: '2-digit'
 })
+
 const formatForInput = d => new Date(d).toISOString().slice(0, 16)
+
 const showSnackbar = (message, color = 'success') => {
-  snackbarMessage.value = message;
-  snackbarColor.value = color;
-  snackbar.value = true;
+  snackbarMessage.value = message
+  snackbarColor.value = color
+  snackbar.value = true
   setTimeout(() => {
     snackbar.value = false
   }, 3000)
@@ -412,8 +482,6 @@ const showSnackbar = (message, color = 'success') => {
 </script>
 
 <style scoped>
-
-
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -431,7 +499,6 @@ const showSnackbar = (message, color = 'success') => {
   gap: 20px;
 }
 
-/* TOPBAR */
 .page-topbar {
   display: flex;
   align-items: flex-end;
@@ -480,7 +547,6 @@ const showSnackbar = (message, color = 'success') => {
   background: #1E293B;
 }
 
-/* KPI */
 .kpi-strip {
   display: flex;
   align-items: stretch;
@@ -555,7 +621,6 @@ const showSnackbar = (message, color = 'success') => {
   font-family: 'DM Mono', monospace;
 }
 
-/* TABLE CARD */
 .table-card {
   background: #fff;
   border: 1px solid #E2E8F0;
@@ -619,7 +684,6 @@ const showSnackbar = (message, color = 'success') => {
   font-weight: 600;
 }
 
-/* LOADER / EMPTY */
 .loader-state {
   display: flex;
   align-items: center;
@@ -659,7 +723,6 @@ const showSnackbar = (message, color = 'success') => {
   color: #94A3B8;
 }
 
-/* OFFERS LIST */
 .offers-list {
   display: flex;
   flex-direction: column;
@@ -852,7 +915,6 @@ const showSnackbar = (message, color = 'success') => {
   margin-left: 4px;
 }
 
-/* TOGGLE */
 .toggle-wrap {
   display: flex;
   align-items: center;
@@ -925,7 +987,6 @@ const showSnackbar = (message, color = 'success') => {
   background: #FEE2E2;
 }
 
-/* MODAIS */
 .modal-card {
   background: #fff;
   border-radius: 18px;
@@ -1039,6 +1100,21 @@ const showSnackbar = (message, color = 'success') => {
 .field-input:focus {
   border-color: #6366F1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, .1);
+}
+
+.field-input--error {
+  border-color: #EF4444 !important;
+}
+
+.field-input--error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, .1);
+}
+
+.field-error {
+  font-size: 11px;
+  font-weight: 600;
+  color: #EF4444;
+  margin-top: 2px;
 }
 
 .field-select {

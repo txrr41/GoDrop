@@ -69,9 +69,8 @@
                   </button>
                 </div>
                 <div class="p-pricing">
-                  <!-- Se tem desconto dropper, mostra preço original riscado -->
-                  <span v-if="cartStore.hasDropperDiscount" class="original-price">
-                    {{ formatCurrency(item.preco * item.quantity) }}
+                  <span v-if="item.precoOriginal" class="original-price">
+                    {{ formatCurrency(item.precoOriginal * item.quantity) }}
                   </span>
                   <span class="total-p" :class="{ 'discounted': cartStore.hasDropperDiscount }">
                     {{ formatCurrency(itemFinalPrice(item)) }}

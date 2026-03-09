@@ -6,8 +6,8 @@ export const useCartStore = defineStore('cart', {
         items: [],
         coupon: null,
         shippingCost: 15.00,
-        dropperDiscount: 0,        // % de desconto do nível dropper (ex: 10)
-        dropperLevel: null,        // nível atual (BRONZE, SILVER, etc.)
+        dropperDiscount: 0,
+        dropperLevel: null,
         loadingDiscount: false,
     }),
 
@@ -22,18 +22,16 @@ export const useCartStore = defineStore('cart', {
 
         couponDiscount: (state, getters) => {
             if (!state.coupon) return 0
-            // usa subtotal via this dentro de getter com função
             const sub = state.items.reduce((sum, item) => sum + (item.preco * item.quantity), 0)
             return sub * (state.coupon.percentage / 100)
         },
 
-        // Valor absoluto do desconto dropper
         dropperDiscountAmount() {
             if (!this.dropperDiscount || this.dropperDiscount === 0) return 0
             return this.subtotal * (this.dropperDiscount / 100)
         },
 
-        // Subtotal já com desconto dropper aplicado
+
         subtotalWithDropperDiscount() {
             return this.subtotal - this.dropperDiscountAmount
         },
@@ -46,7 +44,7 @@ export const useCartStore = defineStore('cart', {
             return this.subtotalWithDropperDiscount - this.couponDiscount + this.shipping
         },
 
-        // Total em centavos para enviar ao backend (já com desconto aplicado)
+
         totalInCents() {
             return Math.round(this.total * 100)
         },
@@ -57,7 +55,6 @@ export const useCartStore = defineStore('cart', {
     },
 
     actions: {
-        // Busca o desconto do dropper autenticado
         async fetchDropperDiscount() {
             try {
                 this.loadingDiscount = true
@@ -70,7 +67,6 @@ export const useCartStore = defineStore('cart', {
                     this.dropperLevel = null
                 }
             } catch {
-                // Usuário não é dropper ou não está autenticado — sem desconto
                 this.dropperDiscount = 0
                 this.dropperLevel = null
             } finally {
@@ -78,7 +74,6 @@ export const useCartStore = defineStore('cart', {
             }
         },
 
-        // Limpa desconto dropper (ex: ao fazer logout)
         clearDropperDiscount() {
             this.dropperDiscount = 0
             this.dropperLevel = null
@@ -97,6 +92,7 @@ export const useCartStore = defineStore('cart', {
 
         addItem(product) {
             const existingItem = this.items.find(item => item.id === product.id)
+            const preco = product.offerPrice ?? product.preco
 
             if (existingItem) {
                 if (existingItem.quantity < product.estoque) {
@@ -107,10 +103,11 @@ export const useCartStore = defineStore('cart', {
             } else {
                 this.items.push({
                     ...product,
+                    preco,
+                    precoOriginal: product.preco,
                     quantity: 1
                 })
             }
-
             this.saveCart()
         },
 

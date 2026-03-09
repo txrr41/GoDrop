@@ -51,8 +51,17 @@
               <h3 class="pcard-name">{{ product.nome }}</h3>
               <p class="pcard-desc">{{ product.descricao }}</p>
               <div class="pcard-bottom">
-                <span class="pcard-price">{{ formatCurrency(product.preco) }}</span>
-                <span class="pcard-stock" :class="getStockClass(product.estoque)">{{ getStockLabel(product.estoque) }}</span>
+                <div style="display:flex;flex-direction:column;">
+                  <span v-if="product.offerPrice" style="font-size:12px;color:#94A3B8;text-decoration:line-through;">
+                    {{ formatCurrency(product.preco) }}
+                  </span>
+                  <span class="pcard-price" :style="product.offerPrice ? 'color:#DC2626' : ''">
+                    {{ formatCurrency(product.offerPrice ?? product.preco) }}
+                  </span>
+                </div>
+                  <span class="pcard-stock" :class="getStockClass(product.estoque)">
+                    {{ getStockLabel(product.estoque) }}
+                  </span>
               </div>
             </div>
           </div>
@@ -67,7 +76,7 @@
       </div>
 
       <div v-if="featuredProducts.length > 0" class="text-center mt-12">
-        <button class="btn-view-all" @click="$router.push('/produtos')">
+        <button class="btn-view-all" @click="$router.push('/catalogo')">
           Ver Todos os Produtos
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -119,7 +128,7 @@ const addToCart = (product) => {
 
 onMounted(async () => {
   if (productStore.products.length === 0) {
-    await productStore.fetchProducts()
+    await productStore.fetchProductsWithOffers()
   }
 })
 </script>

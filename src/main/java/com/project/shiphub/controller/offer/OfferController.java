@@ -1,4 +1,4 @@
-package com.project.shiphub.controller;
+package com.project.shiphub.controller.offer;
 
 import com.project.shiphub.dto.offer.OfferDTO;
 import com.project.shiphub.dto.offer.OfferRequest;
