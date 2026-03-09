@@ -7,8 +7,8 @@
     <div class="w-100 h-100 d-flex flex-column">
 
       <div class="top-row d-flex align-center px-md-10 px-4 flex-grow-1">
-        <v-btn v-if="auth.isStaff || auth.isOwner" icon @click="emit('toggle-sidebar')">
-          <v-icon size="24">mdi-menu-variant</v-icon>
+        <v-btn v-if="auth.isStaff || auth.isOwner" icon size="40" @click="emit('toggle-sidebar')">
+          <v-icon size="24">mdi-menu</v-icon>
         </v-btn>
 
         <div class="logo-wrapper d-flex align-center cursor-pointer">
@@ -86,9 +86,9 @@
 
       <div class="categories-row d-none d-md-flex align-center justify-center">
         <nav class="nav-links d-flex align-center">
-          <a href="/catalogo" class="nav-link">Catalogo</a>
-          <a href="/api" class="nav-link">API</a>
-          <a href="/loja-info" class="nav-link">Criar minha loja</a>
+          <a href="/catalogo" class="nav-link" >Catalogo</a>
+          <a href="/api" class="nav-link">API</a >
+          <a v-if=isDropper href="/loja-info" class="nav-link">Criar minha loja</a>
           <a href="/dropper" class="nav-link">Seja Dropper</a>
           <a href="#" class="nav-link">Ofertas</a>
           <v-menu open-on-hover transition="slide-y-transition">

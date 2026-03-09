@@ -14,23 +14,14 @@ export const useAdminOrderStore = defineStore('adminOrder', {
     }),
 
     getters: {
-        // Pedidos pendentes
         pendingOrders: (state) =>
             state.orders.filter(o => o.status === 'PENDING'),
-
-        // Pedidos aprovados
         approvedOrders: (state) =>
             state.orders.filter(o => o.status === 'PAYMENT_APPROVED'),
-
-        // Pedidos sendo preparados
         processingOrders: (state) =>
             state.orders.filter(o => o.status === 'PROCESSING'),
-
-        // Pedidos despachados
         shippedOrders: (state) =>
             state.orders.filter(o => o.status === 'SHIPPED'),
-
-        // Total de pedidos
         totalOrders: (state) => state.orders.length
     },
 
@@ -64,7 +55,6 @@ export const useAdminOrderStore = defineStore('adminOrder', {
 
                 console.log('✅ Status atualizado:', data)
 
-                // Atualiza pedido na lista local
                 const index = this.orders.findIndex(o => o.id === orderId)
                 if (index !== -1) {
                     this.orders[index] = data.order

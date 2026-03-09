@@ -111,7 +111,7 @@ public class StripePaymentServiceImp implements StripePaymentService {
             params.setTransferData(
                     PaymentIntentCreateParams.TransferData.builder()
                             .setDestination(dropperAccountId)
-                            .setAmount(dropperMarginCents) // só a margem vai pro dropper
+                            .setAmount(dropperMarginCents)
                             .build()
             );
 

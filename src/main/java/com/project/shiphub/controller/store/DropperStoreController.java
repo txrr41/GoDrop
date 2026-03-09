@@ -1,6 +1,6 @@
 package com.project.shiphub.controller.store;
 
-import com.project.shiphub.dto.store.AiThemeResponse;
+import  com.project.shiphub.dto.store.AiThemeResponse;
 import com.project.shiphub.dto.store.DropperStoreDTO;
 import com.project.shiphub.dto.store.DropperStoreRequest;
 import com.project.shiphub.model.auth.User;

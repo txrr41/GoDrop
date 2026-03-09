@@ -91,18 +91,17 @@ const drawer = ref(false)
 const router = useRouter()
 const auth   = useAuthStore()
 
-// Cada item tem uma "permission" ou "ownerOnly" que espelha o router
+
 const principalItems = reactive([
   { title: 'Home',            path: '/home',             icon: 'mdi-home',         permission: null,       ownerOnly: false },
   { title: 'Dashboard',       path: '/metricas',         icon: 'mdi-finance',      permission: null,       ownerOnly: true  },
   { title: 'Produtos',        path: '/produtos',         icon: 'mdi-package',      permission: 'catalog',  ownerOnly: false },
-  { title: 'Etiquetas',       path: '/pedidos/droppers', icon: 'mdi-tag',          permission: 'orders',   ownerOnly: false },
+  { title: 'Solicitações',    path: '/pedidos/droppers', icon: 'mdi-account-check',permission: 'orders',   ownerOnly: false },
   { title: 'Pedidos',         path: '/admin/pedidos',    icon: 'mdi-truck',        permission: 'orders',   ownerOnly: false },
   { title: 'Usuários',        path: '/usuarios',         icon: 'mdi-account',      permission: null,       ownerOnly: true  },
   { title: 'Cadastrar Oferta',path: '/oferta/cadastro',  icon: 'mdi-sale',         permission: 'marketing',ownerOnly: false },
 ])
 
-// Filtra os itens que o usuário atual pode ver
 const visiblePrincipalItems = computed(() =>
     principalItems.filter(item => {
       if (item.ownerOnly) return auth.isOwner

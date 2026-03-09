@@ -89,6 +89,40 @@ export const useProductStore = defineStore('product', {
             if (!this.categories.find(c => c.name === categoryName)) {
                 this.categories.push({ name: categoryName, value: categoryName })
             }
-        }
+        },
+
+        async fetchProductsWithOffers() {
+            try {
+                this.loading = true
+                this.error = null
+                const { data } = await api.get('/produtos')
+
+                const enriched = await Promise.all(
+                    data.map(async (product) => {
+                        try {
+                            const { data: offer } = await api.get(`/api/offers/product/${product.id}/best-offer`)
+                            if (offer) {
+                                return {
+                                    ...product,
+                                    offer,
+                                    offerPrice: offer.type === 'PERCENTAGE'
+                                        ? product.preco * (1 - offer.discountValue / 100)
+                                        : product.preco - offer.discountValue
+                                }
+                            }
+                        } catch {
+
+                        }
+                        return product
+                    })
+                )
+                this.products = enriched
+            } catch (error) {
+                this.error = 'Erro ao carregar produtos'
+                throw error
+            } finally {
+                this.loading = false
+            }
+        },
     }
 })

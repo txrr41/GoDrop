@@ -8,11 +8,14 @@ import '@mdi/font/css/materialdesignicons.css'
 import App from './App.vue'
 import router from './router'
 import { useAuthStore } from './stores/auth'
-import { vMaska} from "maska/vue";
+import { vMaska } from "maska/vue"
 
 const vuetify = createVuetify({
     components,
     directives,
+    icons: {
+        defaultSet: 'mdi',
+    },
 })
 
 const pinia = createPinia()

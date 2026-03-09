@@ -28,25 +28,20 @@ async function permissionGuard(to, _from, next) {
     const ownerOnly    = to.meta?.ownerOnly
     const staffOnly    = to.meta?.staffOnly  // rotas que precisam ser pelo menos staff
 
-    // Rota pública — deixa passar
     if (!requiresAuth) return next()
 
-    // Não autenticado
     if (!auth.isLogged) return next('/login')
 
-    // Suspenso
     if (auth.isSuspended) {
         await auth.logout()
         return next('/login?suspended=1')
     }
 
-    // Rota só para owner
     if (ownerOnly && !auth.isOwner) return next('/not-found')
 
-    // Rota só para staff/owner
+
     if (staffOnly && !auth.isStaff && !auth.isOwner) return next('/not-found')
 
-    // Rota com permissão específica
     if (requiredPerm && !auth.can(requiredPerm)) return next('/not-found')
 
     next()

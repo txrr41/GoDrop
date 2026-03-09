@@ -45,7 +45,6 @@ public class DropperProfileDTO {
         this.totalSales     = profile.getTotalSales();
         this.discountPercent = calculateDiscount(profile.getLevel());
         this.createdAt      = profile.getCreatedAt();
-
         this.stripeAccountId      = profile.getStripeAccountId();
         this.stripeAccountStatus  = profile.getStripeAccountStatus() != null
                 ? profile.getStripeAccountStatus()

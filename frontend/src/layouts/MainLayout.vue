@@ -3,7 +3,6 @@
     <Sidebar ref="sidebarRef" />
 
     <Header @toggle-sidebar="openSidebar" />
-
     <v-main>
       <RouterView />
     </v-main>

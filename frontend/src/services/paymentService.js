@@ -1,6 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js'
 
-// Chave pública do Stripe - deve ser configurada via variável de ambiente em produção
 const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_51SvVp38HCfbXm3tKlj7cQF204tYrkDYYpBCt9LUau0QazoqVDwXgh2OY51VoDTeTvJMjl45ureNNIp9pHxsSTbCT00cn3G5bYe'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
@@ -80,8 +79,6 @@ class PaymentService {
 
             const stripe = await getStripe()
 
-            // Para PIX, precisamos confirmar o PaymentIntent com o tipo de pagamento
-            // Isso faz com que o Stripe gere os dados do QR Code no next_action
             const { error, paymentIntent } = await stripe.confirmPixPayment(clientSecret, {
                 payment_method: {
                     billing_details: {
@@ -112,8 +109,6 @@ class PaymentService {
 
             const stripe = await getStripe()
 
-            // Para Boleto, precisamos confirmar o PaymentIntent com o tipo de pagamento
-            // Isso faz com que o Stripe gere os dados do boleto no next_action
             const { error, paymentIntent } = await stripe.confirmBoletoPayment(clientSecret, {
                 payment_method: {
                     billing_details: {

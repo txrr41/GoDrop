@@ -13,4 +13,6 @@ public interface DropperProfileRepository extends JpaRepository<DropperProfile, 
     boolean existsByCnpj(String cnpj);
 
     List<DropperProfile> findByStatus(DropperStatus status);
+
+    Optional<DropperProfile> findByStripeAccountId(String stripeAccountId);
 }

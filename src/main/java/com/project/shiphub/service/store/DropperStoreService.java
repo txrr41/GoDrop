@@ -46,21 +46,21 @@ public class DropperStoreService {
         log.info("🤖 Gerando tema com IA para prompt: {}", prompt);
 
         String systemPrompt = """
-        Você é um especialista em design de lojas virtuais.
-        Baseado na descrição do usuário, gere um tema para a loja.
-        
-        Responda APENAS com um JSON válido, sem texto antes ou depois, no formato:
-        {
-          "storeName": "nome sugerido para a loja",
-          "slogan": "slogan criativo e curto",
-          "primaryColor": "#HEXCODE",
-          "secondaryColor": "#HEXCODE",
-          "backgroundColor": "#HEXCODE",
-          "theme": "MODERN ou MINIMAL ou BOLD ou ELEGANT",
-          "description": "descrição da loja em 2 frases",
-          "reasoning": "por que escolhei esse estilo"
-        }
-        """;
+                Você é um especialista em design de lojas virtuais.
+                Baseado na descrição do usuário, gere um tema para a loja.
+                
+                Responda APENAS com um JSON válido, sem texto antes ou depois, no formato:
+                {
+                  "storeName": "nome sugerido para a loja",
+                  "slogan": "slogan criativo e curto",
+                  "primaryColor": "#HEXCODE",
+                  "secondaryColor": "#HEXCODE",
+                  "backgroundColor": "#HEXCODE",
+                  "theme": "MODERN ou MINIMAL ou BOLD ou ELEGANT",
+                  "description": "descrição da loja em 2 frases",
+                  "reasoning": "por que escolhei esse estilo"
+                }
+                """;
 
         try {
             RestTemplate restTemplate = new RestTemplate();
