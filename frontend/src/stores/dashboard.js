@@ -24,6 +24,10 @@ export const useDashboardStore = defineStore('dashboard', {
         monthRevenue: (state) => state.stats?.monthRevenue ?? 0,
         lastDayOrdersMapped: (state) => state.stats?.lastDayOrders ?? [],
         bestProducts: (state) => state.stats?.bestProducts ?? [],
+        revenueChart: (state) => state.stats?.revenueChart ?? [],
+        donutCategories: (state) => state.stats?.donutCategories ?? [],
+        miniStats: (state) => state.stats?.miniStats ?? [],
+        dateRange: (state) => state.stats?.dateRange ?? '',
     },
 
     actions: {
@@ -32,7 +36,7 @@ export const useDashboardStore = defineStore('dashboard', {
                 this.loading = true
                 this.error = null
 
-                const { data } = await api.get('/api/admin/dashboard/stats')
+                const { data } = await api.get('/dashboard/stats')
                 console.log('✅ Dados recebidos:', data)  // ← adiciona isso
                 this.stats = data
                 console.log('✅ Store stats:', this.stats)
@@ -43,6 +47,48 @@ export const useDashboardStore = defineStore('dashboard', {
             } finally {
                 this.loading = false
             }
+        },
+
+        async generateCommissionReport (startDate, endDate) {
+            const response = await api.get('/dashboard/relatorio/comissoes', {
+                params: { startDate, endDate },
+                responseType: 'blob'
+            })
+            const url = window.URL.createObjectURL(response.data)
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'commission-report.pdf')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+        },
+
+        async generateTopProductsReport(startDate, endDate) {
+            const response = await api.get('/dashboard/relatorio/top-produtos', {
+                params: { startDate, endDate },
+                responseType: 'blob'
+            })
+            const url = window.URL.createObjectURL(response.data)
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'top-produtos.pdf')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+        },
+
+        async generateCriticalStockReport() {
+            const response = await api.get('/dashboard/relatorio/estoque-critico', {
+                responseType: 'blob'
+            })
+            const url = window.URL.createObjectURL(response.data)
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'estoque-critico.pdf')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
         }
+
     }
 })

@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard-page">
 
-    <!-- ══ PAGE TITLE ══ -->
     <div class="page-title-row">
       <div class="page-title-left">
         <p class="page-breadcrumb">Dashboard / <span>Visão Geral</span></p>
@@ -10,17 +9,16 @@
       <div class="page-title-right">
         <div class="date-range-btn">
           <v-icon size="14">mdi-calendar-range</v-icon>
-          <span>Fev 1 — Fev 24, 2026</span>
+          <span>{{ store.dateRange }}</span>
           <v-icon size="14">mdi-chevron-down</v-icon>
         </div>
-        <button class="export-btn">
-          <v-icon size="14">mdi-arrow-up-circle-outline</v-icon>
-          Exportar
+        <button class="export-btn" @click="modalReport = true">
+          <v-icon size="14">mdi-file-chart-outline</v-icon>
+          Relatórios
         </button>
       </div>
     </div>
 
-    <!-- ══ KPI STRIP ══ -->
     <div class="kpi-strip">
 
       <div class="kpi-tile">
@@ -28,9 +26,8 @@
           <span class="kpi-label">Receita do Mês</span>
           <span class="kpi-delta positive">▲ 23%</span>
         </div>
-        <p class="kpi-value">R$ {{ store.monthRevenue }}</p>
+        <p class="kpi-value">R$ {{ totalChartRevenue }}</p>
         <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:74%;background:#059669"></div></div>
-        <p class="kpi-sub">Meta: R$ 65.000 · 74%</p>
       </div>
 
       <div class="kpi-divider"></div>
@@ -95,15 +92,12 @@
 
     </div>
 
-    <!-- ══ MID ROW ══ -->
     <div class="mid-row">
-
-      <!-- Revenue Chart -->
       <div class="panel chart-panel">
         <div class="panel-header">
           <div>
             <p class="panel-label">Receita Bruta</p>
-            <h2 class="panel-title">R$ 59.400 <span class="panel-period">últimos 7 dias</span></h2>
+            <h2 class="panel-title">{{ totalChartRevenue }} <span class="panel-period">últimos 7 dias</span></h2>
           </div>
           <div class="period-group">
             <button class="period-pill active">7D</button>
@@ -136,13 +130,12 @@
             Receita bruta confirmada
           </div>
           <div class="chart-total-info">
-            <span class="chart-total-val">R$ 59.400</span>
+            <span class="chart-total-val">R$ {{ totalChartRevenue }}</span>
             <span class="chart-total-label">Total do período</span>
           </div>
         </div>
       </div>
 
-      <!-- Right column -->
       <div class="panel-col-right">
 
         <div class="panel donut-panel">
@@ -155,16 +148,23 @@
           <div class="donut-layout">
             <svg viewBox="0 0 120 120" class="donut-svg">
               <circle cx="60" cy="60" r="48" fill="none" stroke="#F1F5F9" stroke-width="16"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#059669" stroke-width="16"
-                      stroke-dasharray="115 187" stroke-dashoffset="0" stroke-linecap="butt"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#6366F1" stroke-width="16"
-                      stroke-dasharray="72 230" stroke-dashoffset="-117" stroke-linecap="butt"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#0EA5E9" stroke-width="16"
-                      stroke-dasharray="55 247" stroke-dashoffset="-191" stroke-linecap="butt"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#F59E0B" stroke-width="16"
-                      stroke-dasharray="60 242" stroke-dashoffset="-248" stroke-linecap="butt"/>
-              <text x="60" y="56" text-anchor="middle" class="donut-pct-txt">38%</text>
-              <text x="60" y="67" text-anchor="middle" class="donut-lbl-txt">Eletrôn.</text>
+              <circle
+                  v-for="(seg, i) in donutSegments"
+                  :key="i"
+                  cx="60" cy="60" r="48"
+                  fill="none"
+                  :stroke="seg.color"
+                  stroke-width="16"
+                  :stroke-dasharray="seg.dasharray"
+                  :stroke-dashoffset="seg.dashoffset"
+                  stroke-linecap="butt"
+              />
+              <text x="60" y="56" text-anchor="middle" class="donut-pct-txt">
+                {{ store.donutCategories[0]?.pct ?? 0 }}%
+              </text>
+              <text x="60" y="67" text-anchor="middle" class="donut-lbl-txt">
+                {{ store.donutCategories[0]?.name?.substring(0, 7) ?? '' }}
+              </text>
             </svg>
             <div class="donut-legend-col">
               <div class="dl-row" v-for="cat in donutCategories" :key="cat.name">
@@ -191,7 +191,6 @@
       </div>
     </div>
 
-    <!-- ══ BOTTOM ROW ══ -->
     <div class="bottom-row">
 
       <div class="panel orders-panel">
@@ -273,47 +272,130 @@
       </div>
 
     </div>
+    <v-dialog v-model="modalReport" max-width="480">
+      <v-card rounded="xl" elevation="0" border>
+
+        <v-card-item class="pa-6 pb-0">
+          <template #prepend>
+            <v-avatar color="primary" rounded="lg" size="42">
+              <v-icon color="white">mdi-file-chart-outline</v-icon>
+            </v-avatar>
+          </template>
+          <v-card-title class="text-h6 font-weight-bold">Gerar Relatório</v-card-title>
+          <v-card-subtitle>Selecione o tipo e o período</v-card-subtitle>
+          <template #append>
+            <v-btn icon variant="text" @click="modalReport = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </template>
+        </v-card-item>
+
+        <v-card-text class="pa-6">
+          <v-select
+              v-model="reportType"
+              label="Tipo de Relatório"
+              :items="['Comissões por Loja', 'Produtos Mais Vendidos', 'Estoque Crítico']"
+              variant="outlined"
+              rounded="lg"
+              class="mb-2"
+              prepend-inner-icon="mdi-chart-box-outline"
+          />
+
+          <v-expand-transition>
+            <div v-if="reportType !== 'Estoque Crítico'">
+              <v-text-field
+                  v-model="startDate"
+                  label="Data Início"
+                  type="date"
+                  variant="outlined"
+                  rounded="lg"
+                  class="mb-2"
+                  prepend-inner-icon="mdi-calendar-start"
+              />
+              <v-text-field
+                  v-model="endDate"
+                  label="Data Fim"
+                  type="date"
+                  variant="outlined"
+                  rounded="lg"
+                  prepend-inner-icon="mdi-calendar-end"
+              />
+            </div>
+          </v-expand-transition>
+        </v-card-text>
+
+        <v-divider/>
+
+        <v-card-actions class="pa-4">
+          <v-btn variant="text" rounded="lg" @click="modalReport = false">Cancelar</v-btn>
+          <v-spacer/>
+          <v-btn
+              color="primary"
+              variant="flat"
+              rounded="lg"
+              prepend-icon="mdi-file-download-outline"
+              :disabled="!reportType"
+              @click="generateReport"
+          >
+            Gerar PDF
+          </v-btn>
+        </v-card-actions>
+
+      </v-card>
+    </v-dialog>
+
 
   </div>
 </template>
 
 <script setup>
 import { useDashboardStore} from "../stores/dashboard.js";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 
 const store = useDashboardStore()
+const recentOrders = ref([])
+const topProducts   = ref([])
+const modalReport = ref(false)
+const reportType = ref('')
+const startDate = ref('')
+const endDate = ref('')
+const chartData = computed(() => store.revenueChart)
+const donutCategories = computed(() => store.donutCategories)
+const miniStats = computed(() => store.miniStats)
 
 onMounted(() => {
   store.fetchStats()
 })
 
-// Dados temporários para o gráfico não quebrar
-const chartData = ref([
-  { day: 'Seg', value: 'R$8.2k', pct: 68, highlight: false },
-  { day: 'Ter', value: 'R$9.1k', pct: 76, highlight: false },
-  { day: 'Qua', value: 'R$7.4k', pct: 62, highlight: false },
-  { day: 'Qui', value: 'R$11k',  pct: 92, highlight: true  },
-  { day: 'Sex', value: 'R$9.8k', pct: 82, highlight: false },
-  { day: 'Sáb', value: 'R$6.1k', pct: 51, highlight: false },
-  { day: 'Dom', value: 'R$7.9k', pct: 66, highlight: false },
-])
+const totalChartRevenue = computed(() =>
+    store.revenueChart.reduce((acc, bar) => acc + (bar.amount || 0), 0)
+)
 
-const donutCategories = ref([
-  { name: 'Eletrônicos', pct: 38, color: '#059669' },
-  { name: 'Moda',        pct: 24, color: '#6366F1' },
-  { name: 'Casa',        pct: 18, color: '#0EA5E9' },
-  { name: 'Outros',      pct: 20, color: '#F59E0B' },
-])
+const generateReport = async () => {
+  if (reportType.value === 'Comissões por Loja') {
+    await store.generateCommissionReport(startDate.value, endDate.value)
+  } else if (reportType.value === 'Produtos Mais Vendidos') {
+    await store.generateTopProductsReport(startDate.value, endDate.value)
+  } else if (reportType.value === 'Estoque Crítico') {
+    await store.generateCriticalStockReport()
+  }
+  modalReport.value = false
+}
 
-const miniStats = ref([
-  { icon: '📦', value: '94%',    label: 'Entrega no prazo' },
-  { icon: '↩️', value: '2.1%',   label: 'Taxa devolução'   },
-  { icon: '⭐', value: '4.8',    label: 'Avaliação média'  },
-  { icon: '⚡', value: '1.2d',   label: 'Tempo preparo'    },
-])
-
-const recentOrders = ref([])
-const topProducts   = ref([])
+const donutSegments = computed(() => {
+  const circumference = 2 * Math.PI * 48
+  let offset = 0
+  return store.donutCategories.map(cat => {
+    const dash = (cat.pct / 100) * circumference
+    const segment = {
+      color: cat.color,
+      dasharray: `${dash.toFixed(2)} ${(circumference - dash).toFixed(2)}`,
+      dashoffset: (-offset).toFixed(2)
+    }
+    offset += dash
+    return segment
+  })
+})
 
 </script>
 
